@@ -32,20 +32,6 @@ public sealed class CommandAiTextCodecTests
         Assert.Equal(path, decoded.Commands[0].Arguments[1].Value.Text);
     }
 
-    [Fact]
-    public void EncodeThenDecode_PreservesQuotedTextAndBackslashes()
-    {
-        var quoted = """a "quoted" value with spaces""";
-        var path = @"path\with\slashes";
-        var original = new CommandProposal([new CommandInstruction(1, [
-            new CommandArgument(2, CommandValue.FromText(quoted)),
-            new CommandArgument(3, CommandValue.FromText(path))
-        ])]);
-        var decoded = CommandAiTextCodec.Decode(CommandAiTextCodec.Encode(original));
-        Assert.Equal(quoted, decoded.Commands[0].Arguments[0].Value.Text);
-        Assert.Equal(path, decoded.Commands[0].Arguments[1].Value.Text);
-    }
-
     [Theory]
     [InlineData("[CommandAi]\nProtocol=CommandAi/9\nCommand=100\n[/CommandAi]")]
     [InlineData("[CommandAi]\nProtocol=CommandAi/1\n[/CommandAi]")]
