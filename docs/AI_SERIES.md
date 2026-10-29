@@ -57,7 +57,7 @@ Before claiming cross-package interoperability, document and test:
 - how versions are declared and how incompatible versions fail;
 - which component owns schema generation, output validation, and host approval.
 
-The first CommandAi implementation uses opaque unsigned 64-bit identifiers, explicit literal strings, and a CommandAi/1 envelope. It intentionally has no runtime dependency on ProtocolAi, GrammarAi, or HeadlessAi until their contracts are reconciled with the legacy implementation in The.
+The first CommandAi implementation uses opaque unsigned 64-bit identifiers, explicit literal strings, and a CommandAi/1 envelope. It intentionally has no runtime dependency on ProtocolAi, GrammarAi, or HeadlessAi. It is not a drop-in replacement for the legacy implementation in The; see the [legacy compatibility audit](LEGACY_COMPATIBILITY.md) before proposing migration or an integration adapter.
 
 ## Security invariant
 
