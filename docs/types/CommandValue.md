@@ -1,0 +1,35 @@
+<!-- The Singularity Workshop moniker -->
+<p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
+
+# CommandValue
+
+## Purpose
+
+A value represented as either an opaque positive integer identity or literal text.
+
+## Why this type exists
+
+CommandAi separates a machine-readable proposal from the application policy that may eventually accept it. This type is a source-level part of that representation; it grants no authority by itself.
+
+## Declaration and ownership
+
+- **Declaration:** public sealed record.
+- **Source:** [CommandValue.cs](../../CommandValue.cs).
+- **Source-supported consumers/related types:** CommandArgument.cs; CommandAiTextCodec.cs.
+- **Responsibilities:** Factory methods create either an unsigned integer identifier or non-empty literal text. The kind is explicit.
+- **Non-goals:** It does not resolve an identifier or interpret literal text as executable content.
+
+## Contract notes
+
+The current package uses opaque unsigned 64-bit action, parameter, and value identifiers. Literal strings remain explicitly typed and are JSON-quoted by the text codec. Identifiers are not globally meaningful unless the consuming host resolves them against the intended trusted vocabulary.
+
+## Verification
+
+The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). The current quickstart is [Program.cs](../../examples/CommandAi.QuickStart/Program.cs). These pages are human-authored and source-checked; they are not generated from reflection or a compiler AST.
+
+## Related documentation
+
+- [Problem domain](../PROBLEM_DOMAIN.md)
+- [Architecture](../ARCHITECTURE.md)
+- [Theory and wire format](../THEORY.md)
+- [Companion UML and use cases](../UML/CommandValueUML.md)

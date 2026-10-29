@@ -55,6 +55,8 @@ This example is source-authored and awaits CI verification. It demonstrates repr
 
 ## 🟪 05 Documentation and theory
 
+- [AI series boundaries](docs/AI_SERIES.md) — responsibilities and trust boundaries across ProtocolAi, GrammarAi, CommandAi, and HeadlessAi.
+- [Per-type documentation](docs/types/) and [UML/use cases](docs/UML/) — source-grounded public type contracts and consumer scenarios.
 - [Usage guide](docs/USAGE.md) — construct, encode, decode, and verify a proposal.
 - [Problem domain](docs/PROBLEM_DOMAIN.md) — purpose, non-goals, and acceptance criteria.
 - [Theory](docs/THEORY.md) — why representation, identity, structure, and authority are separate.
