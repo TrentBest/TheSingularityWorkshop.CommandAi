@@ -64,6 +64,7 @@ Or create a proposal in C#:
 - [Theory](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/THEORY.md) — why representation, identity, structure, and authority are separate.
 - [Architecture](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/ARCHITECTURE.md) — component boundary and failure behavior.
 - [Gallery](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/GALLERY.md) — the current reproducible example and what it proves.
+- [Legacy compatibility audit](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/LEGACY_COMPATIBILITY.md) — exact differences from the implementation in The.
 - [Status and open questions](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/REFLECTION.md) — implementation state and remaining evidence.
 - [Shared documentation standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/master/DOCUMENTATION_STANDARD.md).
 
