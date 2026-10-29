@@ -12,9 +12,9 @@ public sealed class CommandAiTextCodecTests
         var decoded = CommandAiTextCodec.Decode(CommandAiTextCodec.Encode(original));
         Assert.Equal(original.ProtocolVersion, decoded.ProtocolVersion);
         Assert.Single(decoded.Commands);
-        Assert.Equal(100, decoded.Commands[0].ActionId);
+        Assert.Equal(100UL, decoded.Commands[0].ActionId);
         Assert.Equal(2, decoded.Commands[0].Arguments.Count);
-        Assert.Equal(302, decoded.Commands[0].Arguments[0].Value.Identifier);
+        Assert.Equal(302UL, decoded.Commands[0].Arguments[0].Value.Identifier);
         Assert.Equal("Logs.Diagnostic Stream", decoded.Commands[0].Arguments[1].Value.Text);
     }
     [Theory]
