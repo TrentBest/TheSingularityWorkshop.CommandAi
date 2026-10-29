@@ -52,7 +52,7 @@ Or create a proposal in C#:
     var decoded = CommandAiTextCodec.Decode(wireText);
     Console.WriteLine(wireText);
 
-This example is source-authored and awaits CI verification. It demonstrates representation and round-trip intent only—not vocabulary resolution, authorization, or execution.
+**Verification:** GitHub Actions built the solution, passed all 9 tests, ran the quickstart, and packed the package at commit [`63dad94`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/63dad94c2d2feaf6344fdd6e3f180bfbbf8446de). This verifies the local representation path, not live-provider behavior, vocabulary resolution, authorization, or execution.
 
 ## 🟪 05 Documentation and theory
 
