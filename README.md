@@ -4,6 +4,7 @@
 # ✳️ 00 TheSingularityWorkshop.CommandAi
 
 [![Build](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml/badge.svg?branch=development)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml)
+[![Last commit](https://img.shields.io/github/last-commit/TrentBest/TheSingularityWorkshop.CommandAi?style=flat-square)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commits/development)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
 
 <p align="center"><img src="docs/images/command-ai-boundary.svg" alt="CommandAi parses a proposed command into a versioned representation; the host separately resolves meaning, validates policy, obtains approval, and executes." width="100%"></p>
@@ -87,4 +88,7 @@ The repository workflow restores, builds, tests, packs, and uploads an artifact 
 - [The Singularity Workshop on GitHub](https://github.com/TrentBest)
 - [CoderLegion](https://coderlegion.com/user/The+Singularity+Workshop)
 
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/Avatar.jpg" alt="The Singularity Workshop Avatar.jpg" width="160"></p>
+---
+
+<!-- THE SINGULARITY WORKSHOP FOOTER -->
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>

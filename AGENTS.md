@@ -35,3 +35,8 @@ Separate source-implemented behavior, source-checked examples, verified CI behav
 ## Scope
 
 CiAi is outside this repository's scope. Do not edit or coordinate changes in CiAi as part of CommandAi work.
+
+---
+
+<!-- THE SINGULARITY WORKSHOP FOOTER -->
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>

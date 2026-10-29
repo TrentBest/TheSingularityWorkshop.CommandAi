@@ -71,3 +71,8 @@ The first CommandAi implementation uses opaque unsigned 64-bit identifiers, expl
 - [CommandAi usage](USAGE.md)
 - [CommandAi status and open questions](REFLECTION.md)
 - [Shared documentation standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md)
+
+---
+
+<!-- THE SINGULARITY WORKSHOP FOOTER -->
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
