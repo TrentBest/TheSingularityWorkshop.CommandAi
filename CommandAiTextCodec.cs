@@ -35,8 +35,12 @@ public static class CommandAiTextCodec
         var lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()).ToArray();
         var start = Array.FindIndex(lines, line => line.Equals("[CommandAi]", StringComparison.Ordinal));
         if (start < 0) throw new FormatException("Opening [CommandAi] marker was not found.");
+        if (start != 0) throw new FormatException("Unexpected content appears before the CommandAi envelope.");
         var end = Array.FindIndex(lines, start + 1, line => line.Equals("[/CommandAi]", StringComparison.Ordinal));
         if (end <= start) throw new FormatException("A complete [/CommandAi] closing marker was not found.");
+        if (end != lines.Length - 1) throw new FormatException("Unexpected content appears after the CommandAi envelope.");
+        if (Array.FindIndex(lines, start + 1, line => line.Equals("[CommandAi]", StringComparison.Ordinal)) >= 0)
+            throw new FormatException("Nested CommandAi envelopes are not supported.");
         string? protocol = null;
         var commands = new List<CommandInstruction>();
         for (var i = start + 1; i < end; i++)
