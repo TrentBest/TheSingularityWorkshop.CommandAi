@@ -56,6 +56,7 @@ Or create a proposal in C#:
 
 ## 🟪 05 Documentation and theory
 
+- [Documentation index](DOCUMENTATION_INDEX.md) — reader-oriented guide to the package, types, UML, and evidence.
 - [AI series boundaries](docs/AI_SERIES.md) — responsibilities and trust boundaries across ProtocolAi, GrammarAi, CommandAi, and HeadlessAi.
 - [Per-type documentation](docs/types/) and [UML/use cases](docs/UML/) — source-grounded public type contracts and consumer scenarios.
 - [Usage guide](docs/USAGE.md) — construct, encode, decode, and verify a proposal.
