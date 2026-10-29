@@ -6,11 +6,11 @@ public enum CommandValueKind { IntegerIdentifier = 0, LiteralText = 1 }
 /// <summary>A typed argument value. Integer identifiers are opaque; this package does not resolve their meaning.</summary>
 public sealed record CommandValue
 {
-    private CommandValue(CommandValueKind kind, int? identifier, string? text) { Kind = kind; Identifier = identifier; Text = text; }
+    private CommandValue(CommandValueKind kind, ulong? identifier, string? text) { Kind = kind; Identifier = identifier; Text = text; }
     public CommandValueKind Kind { get; }
-    public int? Identifier { get; }
+    public ulong? Identifier { get; }
     public string? Text { get; }
-    public static CommandValue FromIdentifier(int identifier)
+    public static CommandValue FromIdentifier(ulong identifier)
     {
         if (identifier <= 0) throw new ArgumentOutOfRangeException(nameof(identifier), "Identifiers must be positive.");
         return new(CommandValueKind.IntegerIdentifier, identifier, null);
