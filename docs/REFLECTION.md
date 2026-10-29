@@ -18,7 +18,7 @@
 - Identifier meaning is host-defined and not resolved here.
 - The initial wire format is intentionally narrow and does not support nested objects or lists as values.
 - Protocol version negotiation and compatibility policy are not implemented.
-- The unit tests are authored but must be confirmed by CI before claiming verified behavior.
+- GitHub Actions verified the Release build, all 9 tests, quickstart execution, and pack step at commit [`63dad94`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/63dad94c2d2feaf6344fdd6e3f180bfbbf8446de). The current code has not been validated against a live provider or an end-to-end host integration.
 - Per-type UML/use-case coverage and automated documentation inventory are not yet present.
 
 ## Next evidence to gather
