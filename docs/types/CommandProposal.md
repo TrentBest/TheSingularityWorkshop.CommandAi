@@ -33,3 +33,8 @@ The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tes
 - [Architecture](../ARCHITECTURE.md)
 - [Theory and wire format](../THEORY.md)
 - [Companion UML and use cases](../UML/CommandProposalUML.md)
+
+---
+
+<!-- THE SINGULARITY WORKSHOP FOOTER -->
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>

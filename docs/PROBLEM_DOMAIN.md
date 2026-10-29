@@ -1,3 +1,6 @@
+<!-- The Singularity Workshop moniker -->
+<p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
+
 # CommandAi problem domain
 
 ## The problem
@@ -33,3 +36,8 @@ The consuming host must resolve identifiers against trusted definitions, validat
 ## Evidence status
 
 This first implementation is source-authored and includes focused unit tests and a runnable quickstart. It must be built and tested by the repository workflow before any release claim is made. NuGet publication is not authorized by this work.
+
+---
+
+<!-- THE SINGULARITY WORKSHOP FOOTER -->
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
