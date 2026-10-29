@@ -14,6 +14,7 @@ CommandAi represents versioned command proposals as inspectable data. The host r
 | Use the current API | [Usage guide](docs/USAGE.md) |
 | Understand package ownership and handoffs | [Architecture](docs/ARCHITECTURE.md) · [AI series boundaries](docs/AI_SERIES.md) |
 | Reproduce the local example | [Gallery](docs/GALLERY.md) · [Quickstart source](examples/CommandAi.QuickStart/Program.cs) |
+| Review legacy migration risks | [Legacy compatibility audit](docs/LEGACY_COMPATIBILITY.md) |
 | Review maturity and open questions | [Status and open questions](docs/REFLECTION.md) |
 | Inspect public type contracts | [Type guides](docs/types/) |
 | Inspect source-backed neighborhoods and use cases | [UML and use cases](docs/UML/) |
