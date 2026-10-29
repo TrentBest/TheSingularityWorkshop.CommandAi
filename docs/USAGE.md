@@ -36,7 +36,7 @@ The example prints an encoded proposal, decodes it, and explicitly does not exec
     dotnet test TheSingularityWorkshop.CommandAi.slnx --configuration Release
     dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
 
-The quickstart is source-authored and awaits CI confirmation. Do not treat these instructions as evidence that a run has succeeded.
+The repository CI verified restore, Release build, all 9 unit tests, quickstart execution, and package packing at commit [`63dad94`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/63dad94c2d2feaf6344fdd6e3f180bfbbf8446de). The quickstart does not call a live provider and does not prove authorization or execution safety.
 
 ---
 
