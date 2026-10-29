@@ -52,19 +52,19 @@ public static class CommandAiTextCodec
         }
         if (!string.Equals(protocol, CommandProposal.CurrentProtocolVersion, StringComparison.Ordinal))
             throw new FormatException($"Unsupported or missing CommandAi protocol '{protocol ?? "(missing)"}'.");
-        return new CommandProposal(commands, protocol);
+        return new CommandProposal(commands, protocol!);
     }
 
     private static CommandInstruction ParseCommand(string payload)
     {
         var tokens = Tokenize(payload);
-        if (tokens.Count == 0 || !int.TryParse(tokens[0], NumberStyles.None, CultureInfo.InvariantCulture, out var actionId) || actionId <= 0)
+        if (tokens.Count == 0 || !ulong.TryParse(tokens[0], NumberStyles.None, CultureInfo.InvariantCulture, out var actionId) || actionId <= 0)
             throw new FormatException("A command must begin with a positive integer action identifier.");
         var arguments = new List<CommandArgument>();
         foreach (var token in tokens.Skip(1))
         {
             var separator = token.IndexOf('=');
-            if (separator <= 0 || !int.TryParse(token[..separator], NumberStyles.None, CultureInfo.InvariantCulture, out var parameterId) || parameterId <= 0)
+            if (separator <= 0 || !ulong.TryParse(token[..separator], NumberStyles.None, CultureInfo.InvariantCulture, out var parameterId) || parameterId <= 0)
                 throw new FormatException($"Invalid parameter token '{token}'.");
             var rawValue = token[(separator + 1)..];
             CommandValue value;
@@ -73,7 +73,7 @@ public static class CommandAiTextCodec
                 try { value = CommandValue.FromText(JsonSerializer.Deserialize<string>(rawValue) ?? throw new FormatException("Literal value cannot be null.")); }
                 catch (JsonException ex) { throw new FormatException($"Invalid quoted literal in '{token}'.", ex); }
             }
-            else if (int.TryParse(rawValue, NumberStyles.None, CultureInfo.InvariantCulture, out var identifier) && identifier > 0)
+            else if (ulong.TryParse(rawValue, NumberStyles.None, CultureInfo.InvariantCulture, out var identifier) && identifier > 0)
                 value = CommandValue.FromIdentifier(identifier);
             else throw new FormatException($"Value '{rawValue}' must be a positive integer identifier or a JSON-quoted string.");
             arguments.Add(new CommandArgument(parameterId, value));
