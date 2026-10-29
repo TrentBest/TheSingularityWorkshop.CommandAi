@@ -24,7 +24,7 @@
 ## Next evidence to gather
 
 1. Restore, build, test, and run the quickstart on the repository's supported SDK.
-2. Add compatibility fixtures based on the legacy CommandAi implementation in The, after reviewing the action/parameter vocabulary and intended migration.
+2. Add differential compatibility fixtures from the [legacy audit](LEGACY_COMPATIBILITY.md); the old decoder uses fixed action tables and supports only Surface/Repository, while the new package deliberately leaves identifier meaning external.
 3. Cross-check the current ProtocolAi/GrammarAi contracts before introducing a package dependency or claiming end-to-end interoperability.
 4. Expand tests for quoted values, escaped quotes/backslashes, malformed tokens, and envelope boundary cases.
 5. Add source-backed per-type documentation and UML/use-case companions as the domain stabilizes.
