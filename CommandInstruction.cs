@@ -8,7 +8,7 @@ public sealed record CommandInstruction
     {
         if (actionId <= 0) throw new ArgumentOutOfRangeException(nameof(actionId), "Action identifiers must be positive.");
         ActionId = actionId;
-        var items = (arguments ?? []).ToArray();
+        var items = (arguments ?? []).Take(CommandLimits.MaxArgumentsPerCommand + 1).ToArray();
         if (items.Length > CommandLimits.MaxArgumentsPerCommand)
             throw new ArgumentException($"A command cannot contain more than {CommandLimits.MaxArgumentsPerCommand} arguments.", nameof(arguments));
         if (items.Any(item => item is null)) throw new ArgumentException("Arguments cannot contain null items.", nameof(arguments));

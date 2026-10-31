@@ -9,7 +9,8 @@ public sealed record CommandProposal
     {
         if (!string.Equals(protocolVersion, CurrentProtocolVersion, StringComparison.Ordinal))
             throw new ArgumentException($"Unsupported protocol version '{protocolVersion}'.", nameof(protocolVersion));
-        var items = (commands ?? throw new ArgumentNullException(nameof(commands))).ToArray();
+        ArgumentNullException.ThrowIfNull(commands);
+        var items = commands.Take(CommandLimits.MaxCommands + 1).ToArray();
         if (items.Length == 0) throw new ArgumentException("A proposal must contain at least one command.", nameof(commands));
         if (items.Length > CommandLimits.MaxCommands)
             throw new ArgumentException($"A proposal cannot contain more than {CommandLimits.MaxCommands} commands.", nameof(commands));
