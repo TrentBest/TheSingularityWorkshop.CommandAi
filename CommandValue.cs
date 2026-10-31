@@ -19,6 +19,8 @@ public sealed record CommandValue
     {
         ArgumentNullException.ThrowIfNull(text);
         if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Literal text cannot be empty or whitespace.", nameof(text));
+        if (text.Length > CommandLimits.MaxLiteralCharacters)
+            throw new ArgumentException($"Literal text cannot exceed {CommandLimits.MaxLiteralCharacters} characters.", nameof(text));
         return new(CommandValueKind.LiteralText, null, text);
     }
 }
