@@ -11,6 +11,8 @@ public sealed record CommandProposal
             throw new ArgumentException($"Unsupported protocol version '{protocolVersion}'.", nameof(protocolVersion));
         var items = (commands ?? throw new ArgumentNullException(nameof(commands))).ToArray();
         if (items.Length == 0) throw new ArgumentException("A proposal must contain at least one command.", nameof(commands));
+        if (items.Length > CommandLimits.MaxCommands)
+            throw new ArgumentException($"A proposal cannot contain more than {CommandLimits.MaxCommands} commands.", nameof(commands));
         if (items.Any(item => item is null)) throw new ArgumentException("Commands cannot contain null items.", nameof(commands));
         ProtocolVersion = protocolVersion;
         Commands = new ReadOnlyCollection<CommandInstruction>(items);
