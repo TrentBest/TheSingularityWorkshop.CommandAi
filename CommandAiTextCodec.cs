@@ -37,7 +37,7 @@ public static class CommandAiTextCodec
         if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("CommandAi text cannot be empty.", nameof(text));
         if (text.Length > CommandLimits.MaxEnvelopeCharacters)
             throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxEnvelopeCharacters}-character limit.");
-        var lines = text.Split(new[] { "\\r\\n", "\\n" }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()).ToArray();
+        var lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()).ToArray();
         if (lines.Length > CommandLimits.MaxCommands + 3)
             throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxCommands}-command limit.");
         var start = Array.FindIndex(lines, line => line.Equals("[CommandAi]", StringComparison.Ordinal));
@@ -111,7 +111,7 @@ public static class CommandAiTextCodec
             var c = payload[i];
             if (start < 0) { if (char.IsWhiteSpace(c)) continue; start = i; }
             if (escaped) { escaped = false; continue; }
-            if (quoted && c == '\\\\') { escaped = true; continue; }
+            if (quoted && c == '\\') { escaped = true; continue; }
             if (c == '"') quoted = !quoted;
             if (char.IsWhiteSpace(c) && !quoted) { tokens.Add(payload[start..i]); start = -1; }
         }
