@@ -26,13 +26,20 @@ public static class CommandAiTextCodec
             lines.Add("Command=" + string.Join(' ', tokens));
         }
         lines.Add("[/CommandAi]");
-        return string.Join(Environment.NewLine, lines);
+        var encoded = string.Join(Environment.NewLine, lines);
+        if (encoded.Length > CommandLimits.MaxEnvelopeCharacters)
+            throw new ArgumentException($"Encoded proposal cannot exceed {CommandLimits.MaxEnvelopeCharacters} characters.", nameof(proposal));
+        return encoded;
     }
 
     public static CommandProposal Decode(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("CommandAi text cannot be empty.", nameof(text));
-        var lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()).ToArray();
+        if (text.Length > CommandLimits.MaxEnvelopeCharacters)
+            throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxEnvelopeCharacters}-character limit.");
+        var lines = text.Split(new[] { "\\r\\n", "\\n" }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()).ToArray();
+        if (lines.Length > CommandLimits.MaxCommands + 3)
+            throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxCommands}-command limit.");
         var start = Array.FindIndex(lines, line => line.Equals("[CommandAi]", StringComparison.Ordinal));
         if (start < 0) throw new FormatException("Opening [CommandAi] marker was not found.");
         if (start != 0) throw new FormatException("Unexpected content appears before the CommandAi envelope.");
@@ -51,7 +58,12 @@ public static class CommandAiTextCodec
                 if (protocol is not null) throw new FormatException("Protocol may be declared only once.");
                 protocol = line["Protocol=".Length..].Trim();
             }
-            else if (line.StartsWith("Command=", StringComparison.Ordinal)) commands.Add(ParseCommand(line["Command=".Length..].Trim()));
+            else if (line.StartsWith("Command=", StringComparison.Ordinal))
+            {
+                if (commands.Count >= CommandLimits.MaxCommands)
+                    throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxCommands}-command limit.");
+                commands.Add(ParseCommand(line["Command=".Length..].Trim()));
+            }
             else if (line.Length > 0) throw new FormatException($"Unrecognized envelope entry on line {i + 1}.");
         }
         if (!string.Equals(protocol, CommandProposal.CurrentProtocolVersion, StringComparison.Ordinal))
@@ -64,6 +76,8 @@ public static class CommandAiTextCodec
         var tokens = Tokenize(payload);
         if (tokens.Count == 0 || !ulong.TryParse(tokens[0], NumberStyles.None, CultureInfo.InvariantCulture, out var actionId) || actionId <= 0)
             throw new FormatException("A command must begin with a positive integer action identifier.");
+        if (tokens.Count - 1 > CommandLimits.MaxArgumentsPerCommand)
+            throw new FormatException($"A command cannot contain more than {CommandLimits.MaxArgumentsPerCommand} arguments.");
         var arguments = new List<CommandArgument>();
         foreach (var token in tokens.Skip(1))
         {
@@ -76,6 +90,7 @@ public static class CommandAiTextCodec
             {
                 try { value = CommandValue.FromText(JsonSerializer.Deserialize<string>(rawValue) ?? throw new FormatException("Literal value cannot be null.")); }
                 catch (JsonException ex) { throw new FormatException($"Invalid quoted literal in '{token}'.", ex); }
+                catch (ArgumentException ex) { throw new FormatException($"Literal value in '{token}' exceeds CommandAi limits.", ex); }
             }
             else if (ulong.TryParse(rawValue, NumberStyles.None, CultureInfo.InvariantCulture, out var identifier) && identifier > 0)
                 value = CommandValue.FromIdentifier(identifier);
@@ -96,7 +111,7 @@ public static class CommandAiTextCodec
             var c = payload[i];
             if (start < 0) { if (char.IsWhiteSpace(c)) continue; start = i; }
             if (escaped) { escaped = false; continue; }
-            if (quoted && c == '\\') { escaped = true; continue; }
+            if (quoted && c == '\\\\') { escaped = true; continue; }
             if (c == '"') quoted = !quoted;
             if (char.IsWhiteSpace(c) && !quoted) { tokens.Add(payload[start..i]); start = -1; }
         }
