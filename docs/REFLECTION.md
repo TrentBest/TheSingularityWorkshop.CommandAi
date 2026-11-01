@@ -6,9 +6,11 @@
 ## Current implementation
 
 - Immutable proposal, instruction, argument, and typed-value contracts.
+- Generic fluent `CommandProposalBuilder` and scoped `CommandInstructionBuilder`; application-specific named commands remain host/domain extensions.
+- Explicit command, argument, per-literal, aggregate-literal, and encoded-envelope resource bounds.
 - Line-oriented CommandAi/1 encoder/decoder.
 - Positive-integer validation and duplicate-parameter rejection.
-- Round-trip and malformed-input unit tests.
+- Round-trip, malformed-input, builder behavior, immutable-snapshot, and resource-boundary unit tests.
 - Console quickstart.
 - No runtime package references to the other AI packages.
 - No command execution, approval UI, authorization, or AI endpoint.
@@ -18,16 +20,14 @@
 - Identifier meaning is host-defined and not resolved here.
 - The initial wire format is intentionally narrow and does not support nested objects or lists as values.
 - Protocol version negotiation and compatibility policy are not implemented.
-- GitHub Actions verified the Release build, all 9 tests, quickstart execution, and pack step at commit [`63dad94`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/63dad94c2d2feaf6344fdd6e3f180bfbbf8446de). The current code has not been validated against a live provider or an end-to-end host integration.
-- Per-type UML/use-case coverage and automated documentation inventory are not yet present.
+- GitHub Actions run [#63](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41280904172) verified the Release build, all 20 tests, quickstart execution, and pack step at commit [`e998450`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/e99845013edf285ce0d86ecf667db77277035432). Later changes in this sequence added type/UML documentation and were separately verified by [run #68](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41281201023). The package has not been validated against a live provider or end-to-end host integration.
+- Nested objects/lists, protocol version negotiation, and semantic command registries remain out of scope for this wire version.
 
 ## Next evidence to gather
 
-1. Restore, build, test, and run the quickstart on the repository's supported SDK.
-2. Add differential compatibility fixtures from the [legacy audit](LEGACY_COMPATIBILITY.md); the old decoder uses fixed action tables and supports only Surface/Repository, while the new package deliberately leaves identifier meaning external.
-3. Cross-check the current ProtocolAi/GrammarAi contracts before introducing a package dependency or claiming end-to-end interoperability.
-4. Expand tests for quoted values, escaped quotes/backslashes, malformed tokens, and envelope boundary cases.
-5. Add source-backed per-type documentation and UML/use-case companions as the domain stabilizes.
+1. Add differential compatibility fixtures from the [legacy audit](LEGACY_COMPATIBILITY.md); the old decoder uses fixed action tables and supports only Surface/Repository, while the new package deliberately leaves identifier meaning external.
+2. Cross-check the current ProtocolAi/GrammarAi contracts before introducing a package dependency or claiming end-to-end interoperability.
+3. Decide whether a separate host/domain extension package should own shared named command definitions; do not add universal meanings to CommandAi.
 
 No NuGet publication is authorized by this status page.
 
