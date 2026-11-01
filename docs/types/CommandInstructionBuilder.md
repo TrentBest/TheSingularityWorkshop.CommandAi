@@ -5,28 +5,21 @@
 
 ## Purpose
 
-Build one generic command instruction from an opaque action identity and ordered parameter/value pairs.
+Build one immutable atomic command with all required metadata.
 
-## Declaration and ownership
+## Contract
 
-- **Declaration:** public sealed class `CommandInstructionBuilder`.
-- **Source:** [CommandInstructionBuilder.cs](../../CommandInstructionBuilder.cs).
-- **Related types:** CommandArgument; CommandValue; CommandInstruction; CommandLimits.
-- **Responsibility:** Provides `WithIdentifier`, `WithText`, and `WithValue` methods and creates an immutable instruction snapshot.
-- **Non-goals:** It does not resolve action or parameter identities or assign meaning to values.
+The constructor requires command identity, action identity, target, scope, idempotency key, and expected outcome contract. The fluent methods add typed arguments through WithIdentifier, WithText, and WithValue, and add opaque grammar-versioned preconditions through WithPrecondition. Build validates and snapshots the command.
 
-## Contract and use
+The builder is mutable and not thread-safe. It performs representation validation only.
 
-Action and parameter identifiers must be positive. Parameter identities cannot repeat within one instruction. The builder enforces `CommandLimits.MaxArgumentsPerCommand`; the resulting `CommandInstruction` performs the same validation again when built.
+## Ownership
+
+Source: [CommandInstructionBuilder.cs](../../CommandInstructionBuilder.cs). Related types: CommandInstruction, CommandArgument, CommandPrecondition, CommandOutcomeContract, CommandValue.
 
 ## Verification
 
-Relevant tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs), including value preservation and duplicate parameter rejection.
-
-## Related documentation
-
-- [Builder integration boundary](../BUILDER_INTEGRATION.md)
-- [CommandInstruction UML](../UML/CommandInstructionBuilderUML.md)
+[CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs) covers duplicate parameter rejection, metadata round-trip, precondition preservation, limits, and snapshot behavior.
 
 ---
 
