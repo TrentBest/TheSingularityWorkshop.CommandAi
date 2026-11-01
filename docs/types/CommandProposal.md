@@ -16,7 +16,7 @@ CommandAi separates a machine-readable proposal from the application policy that
 - **Declaration:** public sealed record.
 - **Source:** [CommandProposal.cs](../../CommandProposal.cs).
 - **Source-supported consumers/related types:** CommandAiTextCodec.cs; examples/CommandAi.QuickStart/Program.cs; tests/CommandAi.Tests/CommandAiTextCodecTests.cs.
-- **Responsibilities:** Owns the protocol version and non-empty command collection. Construction rejects unsupported versions, null collections, empty collections, and null entries.
+- **Responsibilities:** Owns the protocol version and non-empty ordered command collection. Construction rejects unsupported versions, null collections, empty collections, and null entries. A proposal is a batch, not a transaction; the type does not imply that all instructions execute or succeed together.
 - **Non-goals:** It does not validate the meaning of identifiers, authorize a command, or execute instructions.
 
 ## Contract notes
