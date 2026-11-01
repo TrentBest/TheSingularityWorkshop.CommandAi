@@ -27,12 +27,14 @@ These are source-reviewed observations, not a verified interoperability contract
 
 The current CommandAi package intentionally provides a narrower, generic representation:
 
-- exact `Protocol=CommandAi/1` envelope identity;
-- positive opaque action and parameter identifiers;
-- typed integer-identity or JSON-quoted literal-text values;
-- ordered immutable command proposals;
-- generic fluent proposal/instruction builders;
-- strict encoding and decoding with explicit resource limits.
+- exact `Protocol=CommandAi/2` envelope identity;
+- unique command identity, positive opaque action identity, typed target and scope;
+- typed parameters, grammar-versioned opaque preconditions, and a required idempotency key;
+- an explicit expected outcome contract;
+- ordered immutable command proposals and generic fluent builders;
+- strict JSON command encoding/decoding with explicit resource limits.
+
+The previous standalone package alpha shape (action plus arguments only) was also replaced. See the [alpha consumer migration guide](MIGRATION_COMMAND_AI_2.md).
 
 CommandAi does not resolve identifier meanings, authorize, approve, or execute commands. Application/domain extensions own named operations and semantic validation; the host owns trust, current-state checks, authorization, approval, and execution.
 
