@@ -38,7 +38,7 @@ CommandAi represents versioned command proposals as inspectable data. The host r
 
 ## Evidence and limits
 
-The type guides and diagrams are human-authored and checked against current source references. They are not generated from a compiler AST or a repository-wide consumer scan. The current local test suite and quickstart were verified by GitHub Actions at commit [3c0e328](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/3c0e3288cbbbc3bfe94fe705d10dc4b61be068a8). This does not establish live-provider behavior, host authorization, or end-to-end interoperability with the other AI packages.
+The type guides and diagrams are human-authored and checked against current source references. They are not generated from a compiler AST or a repository-wide consumer scan. GitHub Actions run [#63](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41280904172) verified the source at commit [e998450](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/e99845013edf285ce0d86ecf667db77277035432): Release build, all 20 tests, quickstart, and package artifact. Subsequent changes on development in this sequence were documentation-only. This does not establish live-provider behavior, host authorization, or end-to-end interoperability with the other AI packages.
 
 ---
 
