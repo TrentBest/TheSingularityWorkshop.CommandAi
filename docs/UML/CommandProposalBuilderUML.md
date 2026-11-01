@@ -1,43 +1,34 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-# CommandProposalBuilder — UML and use cases
+# CommandProposalBuilder — UML neighborhood and use cases
 
-## Class neighborhood
-
-```mermaid
+~~~mermaid
 classDiagram
-    class CommandProposalBuilder {
-      -List~CommandInstruction~ commands
-      +AddCommand(actionId, configure) CommandProposalBuilder
-      +Build() CommandProposal
-    }
-    class CommandInstructionBuilder {
-      +WithIdentifier(parameterId, valueId) CommandInstructionBuilder
-      +WithText(parameterId, value) CommandInstructionBuilder
-      +WithValue(parameterId, value) CommandInstructionBuilder
-      +Build() CommandInstruction
-    }
-    class CommandProposal {
-      +ProtocolVersion string
-      +Commands IReadOnlyList
-    }
-    CommandProposalBuilder --> CommandInstructionBuilder : scopes configuration
-    CommandProposalBuilder --> CommandProposal : snapshots
-    CommandInstructionBuilder --> CommandInstruction : snapshots
-```
+  class CommandProposalBuilder {
+    +AddCommand(Guid, ulong, CommandValue, CommandValue, string, CommandOutcomeContract, Action)
+    +Build() CommandProposal
+  }
+  class CommandInstructionBuilder {
+    +WithIdentifier(ulong, ulong)
+    +WithText(ulong, string)
+    +WithValue(ulong, CommandValue)
+    +WithPrecondition(string, string)
+    +Build() CommandInstruction
+  }
+  CommandProposalBuilder --> CommandInstructionBuilder : scopes authoring
+  CommandProposalBuilder --> CommandProposal : snapshots
+  CommandInstructionBuilder --> CommandInstruction : builds complete command
+~~~
 
-## Use case: construct a proposal
+## Use cases
 
-1. Create a `CommandProposalBuilder`.
-2. Add each opaque action identity in order.
-3. Configure parameters using the scoped instruction builder.
-4. Call `Build` to obtain a validated immutable proposal.
-5. Encode with `CommandAiTextCodec` if a text representation is required.
+- Host extensions compose named application operations using the generic builder.
+- Each command must declare identity, action, target, scope, idempotency key, and outcome contract.
+- Parameters and optional preconditions are added through the scoped instruction builder.
+- Build snapshots the proposal; it does not validate domain meaning or grant execution authority.
 
-## Boundary
-
-The builder only constructs representation. The host still resolves IDs, validates current domain state, applies policy and authorization, obtains approval where required, and chooses whether to execute.
+Source: [CommandProposalBuilder.cs](../../CommandProposalBuilder.cs). Tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs).
 
 ---
 
