@@ -5,34 +5,34 @@
 
 ## Purpose
 
-Versioned collection of one or more proposed instructions.
+A versioned ordered collection of one or more complete atomic command instructions.
 
-## Why this type exists
+## Public contract
 
-CommandAi separates a machine-readable proposal from the application policy that may eventually accept it. This type is a source-level part of that representation; it grants no authority by itself.
+- CurrentProtocolVersion is CommandAi/2.
+- Commands must be non-empty, bounded, and non-null.
+- Command identities must be unique within the proposal.
+- Idempotency keys must be unique within the proposal.
+- Aggregate literal/precondition/idempotency text is bounded.
+- A proposal is an ordered batch, not a transaction; it does not imply that all commands execute or succeed together.
 
-## Declaration and ownership
+## Ownership
 
 - **Declaration:** public sealed record.
 - **Source:** [CommandProposal.cs](../../CommandProposal.cs).
-- **Source-supported consumers/related types:** CommandAiTextCodec.cs; examples/CommandAi.QuickStart/Program.cs; tests/CommandAi.Tests/CommandAiTextCodecTests.cs.
-- **Responsibilities:** Owns the protocol version and non-empty ordered command collection. Construction rejects unsupported versions, null collections, empty collections, and null entries. A proposal is a batch, not a transaction; the type does not imply that all instructions execute or succeed together.
-- **Non-goals:** It does not validate the meaning of identifiers, authorize a command, or execute instructions.
-
-## Contract notes
-
-The current package uses opaque unsigned 64-bit action, parameter, and value identifiers. Literal strings remain explicitly typed and are JSON-quoted by the text codec. Identifiers are not globally meaningful unless the consuming host resolves them against the intended trusted vocabulary.
+- **Related types:** CommandInstruction, CommandLimits, CommandAiTextCodec.
+- **Non-goals:** resolving identifiers, evaluating preconditions, authorizing, executing, or enforcing idempotency across proposals or processes.
 
 ## Verification
 
-The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). The current quickstart is [Program.cs](../../examples/CommandAi.QuickStart/Program.cs). These pages are human-authored and source-checked; they are not generated from reflection or a compiler AST.
+The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). The quickstart is [Program.cs](../../examples/CommandAi.QuickStart/Program.cs). These pages are human-authored and source-checked.
 
 ## Related documentation
 
 - [Problem domain](../PROBLEM_DOMAIN.md)
 - [Architecture](../ARCHITECTURE.md)
 - [Theory and wire format](../THEORY.md)
-- [Companion UML and use cases](../UML/CommandProposalUML.md)
+- [Companion UML](../UML/CommandProposalUML.md)
 
 ---
 
