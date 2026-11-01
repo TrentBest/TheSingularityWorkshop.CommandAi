@@ -31,6 +31,7 @@ CommandAi represents versioned command proposals as inspectable data. The host r
 | CommandArgument | [Type guide](docs/types/CommandArgument.md) | [UML](docs/UML/CommandArgumentUML.md) |
 | CommandValue | [Type guide](docs/types/CommandValue.md) | [UML](docs/UML/CommandValueUML.md) |
 | CommandValueKind | [Type guide](docs/types/CommandValueKind.md) | [UML](docs/UML/CommandValueKindUML.md) |
+| CommandValueKind | [Type guide](docs/types/CommandValueKind.md) | [UML](docs/UML/CommandValueKindUML.md) |
 | CommandLimits | [Type guide](docs/types/CommandLimits.md) | [UML](docs/UML/CommandLimitsUML.md) |
 | CommandAiTextCodec | [Type guide](docs/types/CommandAiTextCodec.md) | [UML](docs/UML/CommandAiTextCodecUML.md) |
 | CommandProposalBuilder | [Type guide](docs/types/CommandProposalBuilder.md) | [UML](docs/UML/CommandProposalBuilderUML.md) |
