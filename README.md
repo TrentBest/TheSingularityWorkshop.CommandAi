@@ -41,7 +41,9 @@ Run the local example:
 
     dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
 
-Or create a proposal in C#:
+The quickstart now demonstrates a host-owned named-command extension layer in `ResourceCommandExtensions.cs`: it adds typed `InspectResource` and `OpenDiagnosticStream` methods over the generic CommandAi builder. These action/parameter IDs are sample values owned by the example host, not built-in CommandAi meanings.
+
+Or create a generic proposal directly in C#:
 
     using TheSingularityWorkshop.CommandAi;
     var proposal = new CommandProposalBuilder()
@@ -61,11 +63,12 @@ Or create a proposal in C#:
 - [AI series boundaries](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/AI_SERIES.md) — responsibilities and trust boundaries across ProtocolAi, GrammarAi, CommandAi, and HeadlessAi.
 - [Per-type documentation](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/tree/development/docs/types) and [UML/use cases](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/tree/development/docs/UML) — source-grounded public type contracts and consumer scenarios.
 - [Usage guide](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/USAGE.md) — construct, encode, decode, and verify a proposal.
+- [Builder integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/BUILDER_INTEGRATION.md) — layer host-owned named commands over the generic builder.
 - [Problem domain](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/PROBLEM_DOMAIN.md) — purpose, non-goals, and acceptance criteria.
 - [Theory](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/THEORY.md) — why representation, identity, structure, and authority are separate.
 - [Architecture](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/ARCHITECTURE.md) — component boundary and failure behavior.
 - [Gallery](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/GALLERY.md) — the current reproducible example and what it proves.
-- [Legacy compatibility audit](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/LEGACY_COMPATIBILITY.md) — exact differences from the implementation in The.
+- [Legacy historical reference](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/LEGACY_COMPATIBILITY.md) — exact differences from the implementation in The.
 - [Status and open questions](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/REFLECTION.md) — implementation state and remaining evidence.
 - [Shared documentation standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/master/DOCUMENTATION_STANDARD.md).
 
@@ -94,4 +97,4 @@ The repository workflow restores, builds, tests, packs, and uploads an artifact 
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
