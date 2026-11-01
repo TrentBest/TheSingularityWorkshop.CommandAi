@@ -38,6 +38,45 @@ jobs:
         run: dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj --configuration Release --no-build
       - name: Pack
         run: dotnet pack TheSingularityWorkshop.CommandAi.csproj --configuration Release --no-build --output ./artifacts
+      - name: Audit and compile quickstart against packed package
+        shell: bash
+        run: |
+          set -euo pipefail
+          package="$(find ./artifacts -maxdepth 1 -type f -name '*.nupkg' -print -quit)"
+          if [[ -z "$package" ]]; then
+            echo "Expected a CommandAi package artifact."
+            exit 1
+          fi
+          package_version="$(python3 - "$package" <<'PY'
+          import sys, zipfile
+          from xml.etree import ElementTree as ET
+          with zipfile.ZipFile(sys.argv[1]) as package:
+              names = package.namelist()
+              nuspec_name = next((name for name in names if name.endswith('.nuspec')), None)
+              assert nuspec_name, 'Package nuspec is missing'
+              assert any(name.lower() == 'readme.md' for name in names), 'Package README is missing'
+              assert any(name.endswith('LICENSE.txt') for name in names), 'Package license is missing'
+              assert any(name.startswith('lib/net8.0/') and name.endswith('.dll') for name in names), 'Package assembly is missing'
+              assert any(name.startswith('lib/net8.0/') and name.endswith('.xml') for name in names), 'Package XML documentation is missing'
+              root = ET.fromstring(package.read(nuspec_name))
+              metadata = root.find('.//{*}metadata')
+              assert metadata is not None, 'Package metadata is missing'
+              def value(tag):
+                  node = metadata.find('{*}' + tag)
+                  return node.text.strip() if node is not None and node.text else ''
+              assert value('id') == 'TheSingularityWorkshop.CommandAi', f"Unexpected package ID: {value('id')}"
+              assert value('version') == '0.1.0-alpha.1', f"Unexpected package version: {value('version')}"
+              assert value('license') or value('licenseUrl'), 'Package license metadata is missing'
+              assert value('readme') == 'README.md', f"Unexpected package README metadata: {value('readme')}"
+              assert not root.findall('.//{*}dependency'), 'CommandAi core must remain dependency-free'
+              print(value('version'))
+          PY
+          )"
+          sample="examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj"
+          dotnet restore "$sample" --source "$PWD/artifacts" -p:UsePackedCommandAi=true -p:CommandAiPackageVersion="$package_version"
+          dotnet build "$sample" --configuration Release --no-restore -p:UsePackedCommandAi=true -p:CommandAiPackageVersion="$package_version"
+          dotnet run --project "$sample" --configuration Release --no-build --no-restore
+
       - name: Upload NuGet package artifact
         uses: actions/upload-artifact@v7
         with:
