@@ -53,7 +53,7 @@ Or create a proposal in C#:
     var decoded = CommandAiTextCodec.Decode(wireText);
     Console.WriteLine(wireText);
 
-**Verification:** GitHub Actions built the solution, passed all 9 tests, ran the quickstart, and packed the package at commit [`63dad94`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/63dad94c2d2feaf6344fdd6e3f180bfbbf8446de). This verifies the local representation path, not live-provider behavior, vocabulary resolution, authorization, or execution.
+**Verification:** GitHub Actions built the solution, passed all 19 tests, ran the quickstart, and packed the package at commit [`3c0e328`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/3c0e3288cbbbc3bfe94fe705d10dc4b61be068a8). This verifies the local representation path, not live-provider behavior, vocabulary resolution, authorization, or execution.
 
 ## 🟪 05 Documentation and theory
 
