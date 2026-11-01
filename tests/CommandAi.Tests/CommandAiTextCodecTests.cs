@@ -95,6 +95,32 @@ public sealed class CommandAiTextCodecTests
     }
 
     [Fact]
+    public void Decode_RejectsDuplicateJsonPropertiesAtAnyLevel()
+    {
+        var json = """{"commandId":"00000000-0000-0000-0000-000000000001","commandId":"00000000-0000-0000-0000-000000000002","actionId":1,"target":{"kind":"IntegerIdentifier","identifier":1,"text":null},"scope":{"kind":"IntegerIdentifier","identifier":2,"text":null},"idempotencyKey":"key","outcomeContract":{"outcomeId":1,"fields":[]},"arguments":[],"preconditions":[]}""";
+        var text = $"[CommandAi]\\nProtocol=CommandAi/2\\nCommand={json}\\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
+    }
+
+    [Fact]
+    public void Decode_RejectsOutcomeFieldWhenRequiredFlagIsMissing()
+    {
+        var json = """{"commandId":"00000000-0000-0000-0000-000000000001","actionId":1,"target":{"kind":"IntegerIdentifier","identifier":1,"text":null},"scope":{"kind":"IntegerIdentifier","identifier":2,"text":null},"idempotencyKey":"key","outcomeContract":{"outcomeId":1,"fields":[{"fieldId":2,"valueKind":"LiteralText"}]},"arguments":[],"preconditions":[]}""";
+        var text = $"[CommandAi]\\nProtocol=CommandAi/2\\nCommand={json}\\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
+    }
+
+    [Fact]
+    public void Proposal_RejectsAggregateLiteralTextAboveTheLimit()
+    {
+        var literal = new string('x', CommandLimits.MaxLiteralCharacters);
+        var arguments = Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand)
+            .Select(id => new CommandArgument((ulong)id, CommandValue.FromText(literal)));
+        var command = CreateCommand(arguments: arguments);
+        Assert.Throws<ArgumentException>(() => new CommandProposal([command]));
+    }
+
+    [Fact]
     public void Instruction_RejectsDuplicateParameters() =>
         Assert.Throws<ArgumentException>(() => CreateCommand(arguments: [
             new CommandArgument(2, CommandValue.FromIdentifier(3)),
