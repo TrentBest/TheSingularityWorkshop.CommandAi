@@ -147,4 +147,15 @@ public sealed class CommandAiTextCodecTests
         Assert.Single(first.Commands);
         Assert.Equal(2, second.Commands.Count);
     }
+    [Fact]
+    public void Proposal_RejectsAggregateLiteralTextAboveTheLimit()
+    {
+        var literal = new string('x', CommandLimits.MaxLiteralCharacters);
+        var first = new CommandInstruction(1, Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand)
+            .Select(id => new CommandArgument((ulong)id, CommandValue.FromText(literal))));
+        var second = new CommandInstruction(2, [
+            new CommandArgument(1, CommandValue.FromText(literal))
+        ]);
+        Assert.Throws<ArgumentException>(() => new CommandProposal([first, second]));
+    }
 }
