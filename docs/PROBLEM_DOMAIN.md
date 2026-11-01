@@ -23,6 +23,10 @@ CommandAi validates proposal shape. It does not own vocabulary or resolve intege
 
 The consuming host must resolve identifiers against trusted definitions, validate business rules and current state, apply authorization and approval policy, and only then dispatch an action. A well-formed proposal is not proof of intent, truth, permission, or safety.
 
+## Resource boundaries
+
+A proposal is limited to 1,048,576 literal-text characters in aggregate, in addition to the per-literal, per-command, command-count, and encoded-envelope limits in `CommandLimits`. This prevents many individually valid arguments from producing an unexpectedly large in-memory proposal. Integer identifiers remain opaque and do not contribute literal text size.
+
 ## Acceptance criteria
 
 1. Invalid or missing protocol versions are rejected.
