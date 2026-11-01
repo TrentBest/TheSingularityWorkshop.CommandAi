@@ -51,6 +51,38 @@ An application or domain package can extend that foundation with named methods a
 
 Those names and meanings belong to the application/domain layer. They must not become universal built-in meanings for numeric IDs in CommandAi.
 
+## Example: host-owned named command
+
+The following is illustrative consuming-application code, not a type shipped by CommandAi:
+
+```csharp
+using TheSingularityWorkshop.CommandAi;
+
+public static class ResourceCommandExtensions
+{
+    private const ulong InspectResourceAction = 1001;
+    private const ulong ResourceIdParameter = 2001;
+
+    public static CommandProposalBuilder InspectResource(
+        this CommandProposalBuilder builder, ulong resourceId)
+    {
+        if (resourceId == 0)
+            throw new ArgumentOutOfRangeException(nameof(resourceId));
+
+        return builder.AddCommand(
+            InspectResourceAction,
+            command => command.WithIdentifier(ResourceIdParameter, resourceId));
+    }
+}
+
+// The host now authors a named operation over the generic representation.
+var proposal = new CommandProposalBuilder()
+    .InspectResource(resourceId: 42)
+    .Build();
+```
+
+The host extension owns the name `InspectResource`, the action/parameter identity mapping, and the domain-specific nonzero-resource check. CommandAi only stores the ordered identities and typed value. A different host can assign different IDs and expose different named methods without changing the generic package.
+
 ## What an extension may add
 
 A higher-level builder may provide:
