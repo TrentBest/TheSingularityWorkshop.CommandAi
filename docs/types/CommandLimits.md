@@ -16,6 +16,8 @@ Limits applied to command proposals, instructions, literal text, and encoded env
 
 ## Contract and use
 
+The current limits are: 256 commands per proposal; 64 arguments per command; 16,384 characters per literal; 1,048,576 aggregate literal characters per proposal; and 262,144 characters per encoded envelope. The proposal model and codec enforce the applicable bounds.
+
 The public constants are enforced by the owning constructors/builders. Treat them as part of the current representation contract; do not silently bypass them in host adapters.
 
 ## Verification
