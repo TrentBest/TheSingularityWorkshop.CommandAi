@@ -13,6 +13,9 @@ public static class CommandLimits
     /// <summary>Maximum number of arguments on one atomic command.</summary>
     public const int MaxArgumentsPerCommand = 64;
 
+    /// <summary>Maximum aggregate literal text characters in one proposal.</summary>
+    public const int MaxTotalLiteralCharacters = 1_048_576;
+
     /// <summary>Maximum length of one literal text argument, measured in UTF-16 characters.</summary>
     public const int MaxLiteralCharacters = 16_384;
 }
