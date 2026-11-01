@@ -3,33 +3,22 @@
 
 # CommandLimits
 
-## Purpose
+Central source constants that bound untrusted CommandAi/2 proposals and encoded envelopes.
 
-Limits applied to command proposals, instructions, literal text, and encoded envelopes.
+| Bound | Maximum |
+|---|---:|
+| Encoded envelope | 262,144 characters |
+| Commands per proposal | 256 |
+| Arguments per command | 64 |
+| Preconditions per command | 32 |
+| Fields per outcome contract | 64 |
+| Individual literal text | 16,384 characters |
+| Aggregate literal, precondition, and idempotency text | 1,048,576 characters |
+| Grammar-version identifier | 128 characters |
+| Precondition expression | 16,384 characters |
+| Idempotency key | 256 characters |
 
-## Declaration and ownership
-
-- **Declaration:** public static class `CommandLimits`.
-- **Source:** [CommandLimits.cs](../../CommandLimits.cs).
-- **Responsibility:** Centralizes explicit, testable representation limits so callers can reason about bounded input.
-- **Non-goals:** These constants do not establish semantic validity, authorization, or execution safety.
-
-## Contract and use
-
-The current limits are: 256 commands per proposal; 64 arguments per command; 16,384 characters per literal; 1,048,576 aggregate literal characters per proposal; and 262,144 characters per encoded envelope. The proposal model and codec enforce the applicable bounds.
-
-The public constants are enforced by the owning constructors/builders. Treat them as part of the current representation contract; do not silently bypass them in host adapters.
-
-## Verification
-
-See the package test project for boundary and over-limit regression cases.
-
-## Related documentation
-
-- [Companion UML and use cases](./CommandLimitsUML.md)
-
-- [Problem domain](../PROBLEM_DOMAIN.md)
-- [Documentation index](../../DOCUMENTATION_INDEX.md)
+Source: [CommandLimits.cs](../../CommandLimits.cs). These are representation/resource limits, not semantic safety or authorization guarantees.
 
 ---
 
