@@ -39,9 +39,9 @@ The decoder normalizes model-construction failures caused by malformed wire cont
 
 ## Atomicity and lifecycle boundary
 
-Each CommandInstruction represents one proposed action with an ordered set of parameter/value pairs. A CommandProposal is an ordered batch of those instructions; the model does not claim that the batch is transactional or that the host must execute every instruction.
+Each CommandInstruction is intended to represent one atomic proposed action with explicit command identity, target, scope, ordered parameters, preconditions, idempotency identity, and an outcome contract. CommandAi owns the bounded, immutable representation and its codec; it does not interpret domain-specific target/scope values or decide whether a precondition is true. The current ActionId-plus-Arguments implementation is an incomplete first slice and does not yet satisfy this full contract. A CommandProposal is an ordered batch of atomic instructions; it is not a transaction and does not require every instruction to execute.
 
-The representation deliberately does not define a universal target, scope, precondition language, idempotency key, observer lifecycle, execution status, or outcome. Such fields only become meaningful when a host/domain defines their vocabulary and semantics. They may be represented as host-owned parameters where appropriate; durable event identity, evidence, gate transitions, execution results, retries, and authorization belong to the relevant host and protocol contracts. Do not infer any of those guarantees from a successful parse.
+The generic fields must preserve enough opaque, typed data for a host to make independent decisions. For example, repository, isolated branch, base/candidate SHA, exact path, operation kind, expected content digest, and bounded payload are values a repository-domain extension can express without hard-coding GitHub or CiAi semantics into CommandAi. GrammarAi validates structured condition/success-action grammar; ProtocolAi carries correlated, provenance-bearing event and outcome envelopes; CiAi remains authoritative for CI evidence and verdicts. Durable observer lifecycle, scheduling, truth evaluation against live state, authorization, approval, dispatch, and execution remain host responsibilities. A successful parse is never proof of permission or successful execution.
 
 ---
 
