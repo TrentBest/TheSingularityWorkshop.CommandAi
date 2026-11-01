@@ -1,15 +1,13 @@
 using TheSingularityWorkshop.CommandAi;
 
 /// <summary>
-/// Example-only host extensions. These names, IDs, and semantic checks belong to the
-/// consuming application; they are not built-in CommandAi commands.
+/// Example-only host extensions. Names, identities, targets, scopes, outcome contracts,
+/// and semantic checks belong to the consuming application.
 /// </summary>
 internal static class ResourceCommandExtensions
 {
     private const ulong InspectResourceAction = 1001;
-    private const ulong ResourceIdParameter = 2001;
     private const ulong OpenDiagnosticStreamAction = 1002;
-    private const ulong StreamNameParameter = 2002;
 
     public static CommandProposalBuilder InspectResource(
         this CommandProposalBuilder builder, ulong resourceId)
@@ -18,8 +16,14 @@ internal static class ResourceCommandExtensions
         ArgumentOutOfRangeException.ThrowIfZero(resourceId);
 
         return builder.AddCommand(
-            InspectResourceAction,
-            command => command.WithIdentifier(ResourceIdParameter, resourceId));
+            commandId: Guid.NewGuid(),
+            actionId: InspectResourceAction,
+            target: CommandValue.FromIdentifier(resourceId),
+            scope: CommandValue.FromText("resource"),
+            idempotencyKey: $"inspect-resource:{resourceId}",
+            outcomeContract: new CommandOutcomeContract(3001, [
+                new CommandOutcomeField(3002, CommandValueKind.LiteralText)
+            ]));
     }
 
     public static CommandProposalBuilder OpenDiagnosticStream(
@@ -29,7 +33,13 @@ internal static class ResourceCommandExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(streamName);
 
         return builder.AddCommand(
-            OpenDiagnosticStreamAction,
-            command => command.WithText(StreamNameParameter, streamName));
+            commandId: Guid.NewGuid(),
+            actionId: OpenDiagnosticStreamAction,
+            target: CommandValue.FromText(streamName),
+            scope: CommandValue.FromText("diagnostic-stream"),
+            idempotencyKey: $"open-diagnostic-stream:{streamName}",
+            outcomeContract: new CommandOutcomeContract(3003, [
+                new CommandOutcomeField(3004, CommandValueKind.LiteralText)
+            ]));
     }
 }
