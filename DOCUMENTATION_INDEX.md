@@ -13,6 +13,7 @@ CommandAi represents versioned command proposals as inspectable data. The host r
 | Learn the versioned wire format | [Theory](docs/THEORY.md) |
 | Use the current API | [Usage guide](docs/USAGE.md) |
 | Understand package ownership and handoffs | [Architecture](docs/ARCHITECTURE.md) · [AI series boundaries](docs/AI_SERIES.md) |
+| Understand the generic proposal layer and higher-level builders | [Builder integration](docs/BUILDER_INTEGRATION.md) |
 | Reproduce the local example | [Gallery](docs/GALLERY.md) · [Quickstart source](examples/CommandAi.QuickStart/Program.cs) |
 | Review legacy migration risks | [Legacy compatibility audit](docs/LEGACY_COMPATIBILITY.md) |
 | Review maturity and open questions | [Status and open questions](docs/REFLECTION.md) |
