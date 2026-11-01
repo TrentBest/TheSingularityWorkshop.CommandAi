@@ -38,7 +38,7 @@ CommandAi represents versioned command proposals as inspectable data. The host r
 
 ## Evidence and limits
 
-The type guides and diagrams are human-authored and checked against current source references. They are not generated from a compiler AST or a repository-wide consumer scan. GitHub Actions run [#63](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41280904172) verified the source at commit [e998450](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/e99845013edf285ce0d86ecf667db77277035432): Release build, all 20 tests, quickstart, and package artifact. Subsequent changes on development in this sequence were documentation-only. This does not establish live-provider behavior, host authorization, or end-to-end interoperability with the other AI packages.
+The type guides and diagrams are human-authored and checked against current source references. They are not generated from a compiler AST or a repository-wide consumer scan. GitHub Actions run [#89](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283845342) verified the exact development head at commit [`96adbaa`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/96adbaa023fd5a052479d809a2061801790e9f6a): Release build, all 20 tests, quickstart execution, package packing, packed-artifact audit, and compilation of the quickstart against the packed package. The NuGet publication job was skipped. This does not establish live-provider behavior, host authorization, or end-to-end interoperability with the other AI packages.
 
 ---
 
