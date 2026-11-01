@@ -3,50 +3,43 @@
 
 # CommandProposal — UML neighborhood and use cases
 
-> **Target:** public sealed record CommandProposal. The relationships below are authored from the current source and identify source-level structure; they are not runtime traces or generated UML.
+> **Target:** public sealed record CommandProposal. Relationships are authored from current source; they are not runtime traces or generated UML.
 
 ## Neighborhood
 
-```mermaid
-flowchart TD
-  C[Consumers and related types] --> T[CommandProposal]
-  T --> D[Declared contract and dependencies]
-  T -.-> H[Host policy remains external]
-```
+~~~mermaid
+classDiagram
+  class CommandProposal {
+    +string ProtocolVersion
+    +IReadOnlyList~CommandInstruction~ Commands
+    +CurrentProtocolVersion = CommandAi/2
+  }
+  CommandProposal --> CommandInstruction : ordered atomic commands
+  CommandInstruction --> CommandValue : target / scope
+  CommandInstruction --> CommandArgument : parameters
+  CommandInstruction --> CommandPrecondition : grammar-versioned conditions
+  CommandInstruction --> CommandOutcomeContract : expected outcome shape
+~~~
 
-### Source-supported relationships
+## Source-supported relationships
 
 - **Target source:** [CommandProposal.cs](../../CommandProposal.cs).
-- **Related types and consumers:** CommandAiTextCodec.cs; examples/CommandAi.QuickStart/Program.cs; tests/CommandAi.Tests/CommandAiTextCodecTests.cs.
-- **Package reference:** CommandAi core targets .NET 8 and has no runtime project reference to ProtocolAi, GrammarAi, or HeadlessAi.
-- **Provenance:** current C# declaration and repository references; no compiler-generated relationship inventory is claimed.
+- **Related source:** CommandInstruction.cs and CommandLimits.cs.
+- **Codec:** CommandAiTextCodec.cs serializes each command entry as JSON within the CommandAi/2 envelope.
+- **Invariants:** proposals are non-empty, ordered, bounded, and unique by command identity and idempotency key.
 
 ## Use cases
 
-### UC-1 — Consume a proposed command safely
-
+### UC-1 — Consume a proposed batch safely
 - **Actor:** host application.
-- **Goal:** inspect a command proposal without confusing decoding with authorization.
-- **Trigger:** the host receives a candidate CommandAi envelope.
-- **Preconditions:** the host selects the expected CommandAi protocol version and trusted vocabulary.
-- **Outcome:** a parsed representation is available for host-owned validation; no side effect occurs in CommandAi.
-- **Failure/alternative:** malformed input or unsupported versions are rejected; the host logs/rejects the proposal rather than silently reinterpreting it.
-- **Evidence/status:** source-authored use case grounded in the current codec and domain boundary; no automatic use-case inference is claimed.
+- **Trigger:** the host receives a candidate CommandAi/2 envelope.
+- **Outcome:** a parsed proposal is available for host-owned validation; no side effect occurs in CommandAi.
+- **Failure:** malformed content and unsupported versions are rejected.
 
-### UC-2 — Inspect or encode a proposal in a test/example
-
-- **Actor:** package consumer or test.
-- **Goal:** create a deterministic representation and verify round-trip behavior.
-- **Trigger:** a consumer constructs the typed model and calls the codec.
-- **Outcome:** a versioned text envelope can be inspected or decoded.
-- **Failure/alternative:** invalid IDs, duplicate parameters, empty proposals, or malformed literals are rejected.
-- **Evidence/status:** source-checked against the quickstart and test suite; actual CI status is reported by the repository workflow.
-
-## Detail levels
-
-- **Collapsed:** CommandProposal and declaration kind.
-- **Contract:** the public members and their argument/return types are defined by the source file.
-- **Implementation:** see the source link above; this static Markdown page does not provide interactive expansion.
+### UC-2 — Coordinate atomic commands
+- **Actor:** FSM_Foundry or another host.
+- **Goal:** inspect the ordered proposal, then independently validate and authorize each atomic command.
+- **Outcome:** the host may accept, reject, retry, or dispatch commands according to its policy. The proposal itself does not imply transaction semantics or all-or-nothing execution.
 
 ## Related pages
 
@@ -57,4 +50,4 @@ flowchart TD
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
