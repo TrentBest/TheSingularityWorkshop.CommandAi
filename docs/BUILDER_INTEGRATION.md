@@ -53,7 +53,7 @@ Those names and meanings belong to the application/domain layer. They must not b
 
 ## Example: host-owned named command
 
-The following is illustrative consuming-application code, not a type shipped by CommandAi:
+The following is consuming-application code, not a type shipped by CommandAi. The quickstart compiles this pattern in `examples/CommandAi.QuickStart/ResourceCommandExtensions.cs`; its numeric IDs are demonstration values owned by that example host:
 
 ```csharp
 using TheSingularityWorkshop.CommandAi;
