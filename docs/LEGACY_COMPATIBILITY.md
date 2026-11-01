@@ -1,51 +1,48 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-# Legacy CommandAi compatibility audit
+# Legacy CommandAi — historical reference
 
-## Scope
+## Status
 
-This page compares the current CommandAi package proposal model with the legacy implementation at [The / Architect/Workshop/Ai/CommandAi.cs](https://github.com/TrentBest/The/blob/6ad1971f3932654ea58f8dd8dbc0dde530e4e4c6/Architect/Workshop/Ai/CommandAi.cs) and its adjacent legacy GrammarAi implementation. It is a source review, not a compatibility test.
+**Historical reference only.** The old CommandAi implementation is not a compatibility target. The repository owner has decided that preserving or recreating the legacy implementation is not worth the effort beyond the source-level observations already recorded here.
 
-## What the legacy implementation does
+Do not add a legacy parser, compatibility adapter, captured fixture corpus, or differential test project. Do not delay current package development to reproduce the old behavior.
 
-- Uses the CommandAi/1 envelope marker and accepts the Protocol header case-insensitively; the legacy parser permits a missing Protocol header.
-- Parses both human-readable commands and compact integer commands.
-- Maps integer action IDs through a fixed legacy ProtocolAi action table.
-- Supports a limited parameter set in the legacy decoder: Surface and Repository.
-- Resolves Surface value IDs through a fixed legacy table and unquotes Repository strings.
-- Describes explicit user approval and execution in The as the final safety boundary. The same source file mixes parsing/decoding with an application-specific Command model.
+## What the source review established
 
-## What the current package does
+The legacy implementation reviewed at [The / Architect/Workshop/Ai/CommandAi.cs](https://github.com/TrentBest/The/blob/6ad1971f3932654ea58f8dd8dbc0dde530e4e4c6/Architect/Workshop/Ai/CommandAi.cs) and its adjacent ProtocolAi/GrammarAi sources:
 
-- Requires an explicit exact Protocol=CommandAi/1 header.
-- Encodes/decodes typed command proposals with unsigned 64-bit action and parameter identifiers.
-- Represents argument values as either integer identities or JSON-quoted literal text.
-- Rejects unknown envelope entries, invalid identifiers, duplicate parameters, missing/unsupported protocol versions, and malformed literals.
-- Does not resolve action or parameter meanings, parse the legacy human-readable command syntax, request approval, or execute commands.
+- used a CommandAi/1 envelope marker;
+- accepted a Protocol header case-insensitively and permitted it to be absent;
+- parsed human-readable and compact integer command forms;
+- mapped integer action IDs through a fixed legacy ProtocolAi table;
+- supported legacy Surface and Repository parameters;
+- resolved Surface IDs through a fixed table and unquoted Repository strings;
+- mixed generic parsing with application-specific command meanings and approval/execution concerns.
 
-## Compatibility conclusion
+These are source-reviewed observations, not a verified interoperability contract. No captured historical input corpus or runtime compatibility claim is retained.
 
-**The current package is not a drop-in replacement for the legacy CommandAi implementation.** It shares the broad idea of a versioned envelope and compact action/parameter identity notation, but its parsing strictness, typed value representation, supported syntax, and ownership boundary differ.
+## Current package boundary
 
-Do not claim end-to-end interoperability or migrate The's UI to the new package until compatibility fixtures and an explicit migration decision exist. The next implementation step should be a test corpus captured from legacy examples, including optional headers, casing, human-readable commands, Surface mappings, Repository literal escaping, malformed envelopes, and unsupported parameters.
+The current CommandAi package intentionally provides a narrower, generic representation:
 
-## Recommended migration sequence
+- exact `Protocol=CommandAi/1` envelope identity;
+- positive opaque action and parameter identifiers;
+- typed integer-identity or JSON-quoted literal-text values;
+- ordered immutable command proposals;
+- generic fluent proposal/instruction builders;
+- strict encoding and decoding with explicit resource limits.
 
-1. Freeze representative legacy inputs and their expected decoded meanings in tests.
-2. Decide whether legacy human-readable commands remain a compatibility feature or are retired.
-3. Define how the generic unsigned identities map to the modern ProtocolAi/GrammarAi definitions; do not copy legacy static tables into CommandAi.
-4. Decide whether the package wire format stays strict or offers a separately named legacy-compatible parser.
-5. Keep authorization, explicit approval, and execution in the host application.
-6. Only then add adapters and claim cross-package compatibility.
+CommandAi does not resolve identifier meanings, authorize, approve, or execute commands. Application/domain extensions own named operations and semantic validation; the host owns trust, current-state checks, authorization, approval, and execution.
 
-## Evidence labels
+## Decision
 
-- **Source-reviewed:** the legacy C# file and current CommandAi source were inspected.
-- **Not yet verified:** automated differential tests against a captured legacy corpus.
-- **Not claimed:** runtime interoperability between the modern package and The's existing UI.
+The former compatibility-corpus work item, [Issue #2](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/issues/2), was closed as **not planned** by repository-owner direction. The source observations above are retained only to prevent accidental claims that the modern package is a drop-in replacement.
+
+For current implementation guidance, use the [builder integration guide](BUILDER_INTEGRATION.md), [usage guide](USAGE.md), and [architecture](ARCHITECTURE.md).
 
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
