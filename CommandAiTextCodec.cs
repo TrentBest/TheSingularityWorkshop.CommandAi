@@ -68,7 +68,14 @@ public static class CommandAiTextCodec
         }
         if (!string.Equals(protocol, CommandProposal.CurrentProtocolVersion, StringComparison.Ordinal))
             throw new FormatException($"Unsupported or missing CommandAi protocol '{protocol ?? "(missing)"}'.");
-        return new CommandProposal(commands, protocol!);
+        try
+        {
+            return new CommandProposal(commands, protocol!);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new FormatException("The CommandAi envelope does not describe a valid proposal.", ex);
+        }
     }
 
     private static CommandInstruction ParseCommand(string payload)
@@ -90,14 +97,22 @@ public static class CommandAiTextCodec
             {
                 try { value = CommandValue.FromText(JsonSerializer.Deserialize<string>(rawValue) ?? throw new FormatException("Literal value cannot be null.")); }
                 catch (JsonException ex) { throw new FormatException($"Invalid quoted literal in '{token}'.", ex); }
-                catch (ArgumentException ex) { throw new FormatException($"Literal value in '{token}' exceeds CommandAi limits.", ex); }
+                catch (ArgumentException ex) { throw new FormatException($"Literal value in '{token}' violates CommandAi value limits.", ex); }
             }
             else if (ulong.TryParse(rawValue, NumberStyles.None, CultureInfo.InvariantCulture, out var identifier) && identifier > 0)
                 value = CommandValue.FromIdentifier(identifier);
             else throw new FormatException($"Value '{rawValue}' must be a positive integer identifier or a JSON-quoted string.");
             arguments.Add(new CommandArgument(parameterId, value));
         }
-        return new CommandInstruction(actionId, arguments);
+
+        try
+        {
+            return new CommandInstruction(actionId, arguments);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new FormatException("The command contains invalid or duplicate arguments.", ex);
+        }
     }
 
     private static List<string> Tokenize(string payload)
