@@ -3,7 +3,7 @@
 
 # CommandAi builder integration
 
-> **Status: architectural guidance, not a shipped builder API.** The current CommandAi package supplies immutable proposal contracts and a deterministic text codec. It does not currently contain a fluent builder, command registry, plugin system, command executor, or host authorization mechanism.
+> **Status: generic builder shipped; domain-specific extensions remain host-owned.** CommandAi supplies immutable proposal contracts, a deterministic text codec, and a small fluent builder for opaque action/parameter identities. It does not contain a command registry, plugin system, command executor, or host authorization mechanism.
 
 ## The layering decision
 
@@ -14,8 +14,12 @@ Application / host
   policy, state, trust, authorization, approval, execution
         |
         v
-Application-specific command builder
-  fluent authoring, domain validation, typed convenience methods
+CommandAi generic fluent builder
+  opaque IDs, typed values, ordered proposal construction
+        |
+        v
+Application/domain extensions
+  named operations, typed domain validation, convenience methods
         |
         v
 CommandAi proposal model
@@ -29,11 +33,13 @@ CommandAiTextCodec
   deterministic CommandAi/1 representation
 ```
 
-The builder improves authoring ergonomics. CommandAi keeps the interchange contract stable and inspectable.
+The generic builder improves authoring ergonomics without assigning meaning to IDs. Application/domain extensions can layer named methods and semantic validation above it. CommandAi keeps the interchange contract stable and inspectable.
 
 ## Generic commands and extended commands
 
-The generic layer should express only what can be represented without knowing the consuming application:
+The generic layer should express only what can be represented without knowing the consuming application. `CommandProposalBuilder.AddCommand` creates ordered instructions; its scoped `CommandInstructionBuilder` supports `WithIdentifier`, `WithText`, and `WithValue`. `Build` returns an immutable proposal snapshot. The builder enforces the same argument and command limits as the proposal model.
+
+The generic model supports:
 
 - positive opaque action identifiers;
 - positive opaque parameter identifiers;
@@ -69,12 +75,12 @@ If reusable extension metadata is later required, design it as a separate, expli
 |---|---|---|
 | Immutable proposal/instruction/argument/value contracts | Implemented | Consumed |
 | CommandAi/1 text encode/decode | Implemented | Delegated to codec |
-| Fluent named builder | Not implemented | Candidate layer |
+| Generic fluent proposal/instruction builder | Implemented | Used directly or wrapped |
 | Application-specific command names | Not implemented | Host/domain extension |
 | Protocol/grammar linking | Not implemented | Host-owned integration |
 | Authorization, approval, execution | Explicitly outside scope | Host-owned |
 
-The generic model is therefore a suitable representation boundary for a builder, but the builder itself and end-to-end integration remain future work. No compatibility or runtime behavior beyond the current source and tests is implied.
+The generic builder is implemented and tested as an authoring convenience. Domain-specific named commands and end-to-end integration remain host work. No compatibility or runtime behavior beyond the current source and tests is implied.
 
 ---
 
