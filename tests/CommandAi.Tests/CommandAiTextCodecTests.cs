@@ -42,6 +42,19 @@ public sealed class CommandAiTextCodecTests
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
 
     [Fact]
+    public void Decode_UsesArgumentExceptionWhenNoInputWasSupplied()
+    {
+        Assert.Throws<ArgumentException>(() => CommandAiTextCodec.Decode(" "));
+    }
+
+    [Fact]
+    public void Decode_UsesFormatExceptionForDuplicateProtocolDeclarations()
+    {
+        var text = "[CommandAi]\\nProtocol=CommandAi/1\\nProtocol=CommandAi/1\\nCommand=1\\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
+    }
+
+    [Fact]
     public void Decode_UsesFormatExceptionForAnEmptyProposal()
     {
         var text = "[CommandAi]\nProtocol=CommandAi/1\n[/CommandAi]";
@@ -102,6 +115,16 @@ public sealed class CommandAiTextCodecTests
             new string('x', CommandLimits.MaxEnvelopeCharacters) +
             "\"\n[/CommandAi]";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
+    }
+
+    [Fact]
+    public void Encode_RejectsProposalThatExceedsTheEnvelopeLimit()
+    {
+        var literal = new string('x', CommandLimits.MaxLiteralCharacters);
+        var arguments = Enumerable.Range(1, 17)
+            .Select(id => new CommandArgument((ulong)id, CommandValue.FromText(literal)));
+        var proposal = new CommandProposal([new CommandInstruction(1, arguments)]);
+        Assert.Throws<ArgumentException>(() => CommandAiTextCodec.Encode(proposal));
     }
 
     [Fact]
