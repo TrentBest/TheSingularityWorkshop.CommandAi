@@ -9,7 +9,7 @@ CommandAi/2 represents complete atomic command proposals as inspectable data. Th
 
 | Goal | Read |
 |---|---|
-| Understand the problem and boundary | [README](README.md) · [Problem domain](docs/PROBLEM_DOMAIN.md) |
+| Understand the problem and boundary | [README](README.md) · [Problem domain](docs/PROBLEM_DOMAIN.md) · [Domain completeness and ownership](docs/DOMAIN_COMPLETENESS.md) |
 | Learn the versioned wire contract | [Theory](docs/THEORY.md) |
 | Use the current API | [Usage guide](docs/USAGE.md) |
 | Understand package ownership and handoffs | [Architecture](docs/ARCHITECTURE.md) · [AI series](docs/AI_SERIES.md) |
