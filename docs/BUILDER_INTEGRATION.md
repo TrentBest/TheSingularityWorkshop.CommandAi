@@ -3,116 +3,85 @@
 
 # CommandAi builder integration
 
-> **Status: generic builder shipped; domain-specific extensions remain host-owned.** CommandAi supplies immutable proposal contracts, a deterministic text codec, and a small fluent builder for opaque action/parameter identities. It does not contain a command registry, plugin system, command executor, or host authorization mechanism.
+> **Status: complete generic command representation and fluent construction are implemented.** Domain-specific names, mappings, policy, and execution remain host-owned.
 
 ## The layering decision
 
-CommandAi should remain the small, reusable representation underneath a higher-level builder.
+CommandAi provides the immutable contract and a fluent construction surface. A consuming host adds named operations and validates their domain-specific meaning.
 
-```text
-Application / host
-  policy, state, trust, authorization, approval, execution
-        |
-        v
-CommandAi generic fluent builder
-  opaque IDs, typed values, ordered proposal construction
-        |
-        v
-Application/domain extensions
-  named operations, typed domain validation, convenience methods
-        |
-        v
-CommandAi proposal model
-  CommandProposal
-    -> CommandInstruction
-       -> CommandArgument
-          -> CommandValue
-        |
-        v
-CommandAiTextCodec
-  deterministic CommandAi/1 representation
-```
+    Application / host
+      policy, state, trust, authorization, approval, execution
+              |
+              v
+    Host-owned named command extensions
+      operation names, mappings, typed validation, intent
+              |
+              v
+    CommandAi generic builder
+      identity, action, target, scope, arguments,
+      preconditions, idempotency, expected outcome
+              |
+              v
+    Immutable CommandProposal
+              |
+              v
+    CommandAiTextCodec
+      deterministic CommandAi/2 envelope
 
-The generic builder improves authoring ergonomics without assigning meaning to IDs. Application/domain extensions can layer named methods and semantic validation above it. CommandAi keeps the interchange contract stable and inspectable.
+## Required atomic metadata
 
-## Generic commands and extended commands
+The generic builder requires a command identity, action identity, target, scope, idempotency key, and outcome contract. Its optional configure callback adds ordered parameters and grammar-versioned preconditions.
 
-The generic layer should express only what can be represented without knowing the consuming application. `CommandProposalBuilder.AddCommand` creates ordered instructions; its scoped `CommandInstructionBuilder` supports `WithIdentifier`, `WithText`, and `WithValue`. `Build` returns an immutable proposal snapshot. The builder enforces the same argument and command limits as the proposal model. Proposal construction also enforces a 1,048,576-character aggregate literal-text budget across all commands.
+The command identity identifies the proposed instruction. The idempotency key is separately supplied so a host can recognize repeated delivery. The host must persist and enforce the key; CommandAi does not provide exactly-once semantics.
 
-The generic model supports:
-
-- positive opaque action identifiers;
-- positive opaque parameter identifiers;
-- integer-identifier or literal-text values;
-- ordered command proposals;
-- versioned encoding and decoding.
-
-An application or domain package can extend that foundation with named methods and typed input models. For example, a workshop-specific builder might expose `InspectResource(...)` or `OpenExperience(...)`, then translate those calls into the generic proposal model.
-
-Those names and meanings belong to the application/domain layer. They must not become universal built-in meanings for numeric IDs in CommandAi.
+Target and scope use opaque typed CommandValue instances. Preconditions retain a grammar version and expression string. The generic package does not parse or evaluate the expression. Outcome contracts declare an outcome identity and typed fields; they do not contain an actual execution result.
 
 ## Example: host-owned named command
 
-The following is consuming-application code, not a type shipped by CommandAi. The quickstart compiles this pattern in `examples/CommandAi.QuickStart/ResourceCommandExtensions.cs`; its numeric IDs are demonstration values owned by that example host:
+The quickstart defines InspectResource and OpenDiagnosticStream as example-only host extensions. Those extensions choose action identities, target/scope representations, idempotency keys, and expected outcome shapes. They are not built-in CommandAi operations.
 
-```csharp
-using TheSingularityWorkshop.CommandAi;
-
-public static class ResourceCommandExtensions
-{
-    private const ulong InspectResourceAction = 1001;
-    private const ulong ResourceIdParameter = 2001;
-
-    public static CommandProposalBuilder InspectResource(
-        this CommandProposalBuilder builder, ulong resourceId)
-    {
-        if (resourceId == 0)
-            throw new ArgumentOutOfRangeException(nameof(resourceId));
-
-        return builder.AddCommand(
-            InspectResourceAction,
-            command => command.WithIdentifier(ResourceIdParameter, resourceId));
-    }
-}
-
-// The host now authors a named operation over the generic representation.
+~~~csharp
 var proposal = new CommandProposalBuilder()
-    .InspectResource(resourceId: 42)
+    .AddCommand(
+        Guid.NewGuid(),
+        actionId: 100,
+        target: CommandValue.FromIdentifier(300),
+        scope: CommandValue.FromText("workspace"),
+        idempotencyKey: "inspect:resource:42",
+        outcomeContract: new CommandOutcomeContract(400, [
+            new CommandOutcomeField(401, CommandValueKind.LiteralText)
+        ]),
+        configure: command => command
+            .WithIdentifier(200, 42)
+            .WithPrecondition("GrammarAi/1", "resource.exists"))
     .Build();
-```
-
-The host extension owns the name `InspectResource`, the action/parameter identity mapping, and the domain-specific nonzero-resource check. CommandAi only stores the ordered identities and typed value. A different host can assign different IDs and expose different named methods without changing the generic package.
-
-## What an extension may add
-
-A higher-level builder may provide:
-
-1. a trusted mapping from named operations to action and parameter identities;
-2. typed convenience methods and domain-specific validation;
-3. optional grammar-aware proposal construction, where the host has explicitly linked the grammar and protocol definitions;
-4. diagnostics that explain why a proposal cannot be constructed;
-5. conversion to `CommandProposal` for deterministic serialization.
-
-A builder must not treat successful construction or encoding as authorization. The host still resolves identities against trusted definitions, checks current state and business rules, applies authorization and approval policy, and decides whether to execute.
+~~~
 
 ## Extension boundary
 
-Keep extension behavior outside the generic codec. The codec should not load application plugins, discover arbitrary command implementations, call services, or execute delegates while decoding untrusted input.
+A host extension may provide:
+1. trusted mappings from named operations to action, target, scope, parameter, and outcome identities;
+2. typed convenience methods and domain-specific input validation;
+3. grammar-aware authoring and validation where the host explicitly links GrammarAi;
+4. diagnostics explaining why a command cannot be represented;
+5. host-side idempotency persistence and policy;
+6. conversion to CommandProposal for deterministic serialization.
 
-If reusable extension metadata is later required, design it as a separate, explicit contract with versioning and validation. Do not smuggle executable callbacks or host service references into the serialized proposal.
+A builder must not treat successful construction or encoding as authorization. The host still resolves identities against trusted definitions, checks current state, evaluates preconditions, applies authorization and approval policy, and decides whether to execute.
 
-## Current implementation versus intended composition
+## Current implementation versus host responsibilities
 
-| Capability | Current CommandAi source | Higher-level builder direction |
+| Capability | CommandAi source | Host/domain |
 |---|---|---|
-| Immutable proposal/instruction/argument/value contracts | Implemented | Consumed |
-| CommandAi/1 text encode/decode | Implemented | Delegated to codec |
-| Generic fluent proposal/instruction builder | Implemented | Used directly or wrapped |
-| Application-specific command names | Not implemented | Host/domain extension |
-| Protocol/grammar linking | Not implemented | Host-owned integration |
-| Authorization, approval, execution | Explicitly outside scope | Host-owned |
-
-The generic builder is implemented and tested as an authoring convenience. Domain-specific named commands and end-to-end integration remain host work. No compatibility or runtime behavior beyond the current source and tests is implied.
+| Immutable complete atomic command | Implemented | Consumed |
+| CommandAi/2 encode/decode | Implemented | Consumed |
+| Generic fluent builder | Implemented | Wrapped as desired |
+| Named domain operations | Not built in | Owned |
+| Vocabulary and grammar resolution | Not built in | ProtocolAi / GrammarAi integration |
+| Live precondition evaluation | Not built in | Owned |
+| Idempotency persistence/enforcement | Not built in | Owned |
+| Actual outcomes and CI verdicts | Not built in | ProtocolAi / CiAi / host |
+| Authorization, approval, execution | Explicitly outside scope | FSM_Foundry / host |
 
 ---
 
