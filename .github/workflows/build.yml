@@ -65,7 +65,7 @@ jobs:
                   node = metadata.find('{*}' + tag)
                   return node.text.strip() if node is not None and node.text else ''
               assert value('id') == 'TheSingularityWorkshop.CommandAi', f"Unexpected package ID: {value('id')}"
-              assert value('version') == '0.1.0-alpha.1', f"Unexpected package version: {value('version')}"
+              assert value('version') == '0.1.0-alpha.2', f"Unexpected package version: {value('version')}"
               assert value('license') or value('licenseUrl'), 'Package license metadata is missing'
               assert value('readme') == 'README.md', f"Unexpected package README metadata: {value('readme')}"
               assert not root.findall('.//{*}dependency'), 'CommandAi core must remain dependency-free'
