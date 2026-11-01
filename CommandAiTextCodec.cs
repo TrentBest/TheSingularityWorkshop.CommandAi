@@ -1,30 +1,43 @@
-using System.Globalization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace TheSingularityWorkshop.CommandAi;
 
-/// <summary>Reads and writes the line-oriented CommandAi/1 proposal envelope.</summary>
-/// <remarks>This codec validates representation only. It does not resolve action meaning, authorize commands, or execute them.</remarks>
+/// <summary>Reads and writes the complete line-oriented CommandAi/2 proposal envelope.</summary>
+/// <remarks>This codec validates representation only. It does not interpret preconditions, authorize commands, or execute them.</remarks>
 public static class CommandAiTextCodec
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        MaxDepth = 16
+    };
+
     public static string Encode(CommandProposal proposal)
     {
         ArgumentNullException.ThrowIfNull(proposal);
         var lines = new List<string> { "[CommandAi]", $"Protocol={proposal.ProtocolVersion}" };
         foreach (var command in proposal.Commands)
         {
-            var tokens = new List<string> { command.ActionId.ToString(CultureInfo.InvariantCulture) };
-            foreach (var argument in command.Arguments)
-            {
-                var value = argument.Value.Kind switch
-                {
-                    CommandValueKind.IntegerIdentifier => argument.Value.Identifier!.Value.ToString(CultureInfo.InvariantCulture),
-                    CommandValueKind.LiteralText => JsonSerializer.Serialize(argument.Value.Text),
-                    _ => throw new FormatException($"Unsupported value kind '{argument.Value.Kind}'.")
-                };
-                tokens.Add($"{argument.ParameterId.ToString(CultureInfo.InvariantCulture)}={value}");
-            }
-            lines.Add("Command=" + string.Join(' ', tokens));
+            var wire = new CommandWire(
+                command.CommandId,
+                command.ActionId,
+                ToWire(command.Target),
+                ToWire(command.Scope),
+                command.IdempotencyKey,
+                new OutcomeWire(
+                    command.OutcomeContract.OutcomeId,
+                    command.OutcomeContract.Fields.Select(field =>
+                        new OutcomeFieldWire(field.FieldId, field.ValueKind.ToString(), field.Required)).ToArray()),
+                command.Arguments.Select(argument =>
+                    new ArgumentWire(argument.ParameterId, ToWire(argument.Value))).ToArray(),
+                command.Preconditions.Select(precondition =>
+                    new PreconditionWire(precondition.GrammarVersion, precondition.Expression)).ToArray());
+
+            lines.Add("Command=" + JsonSerializer.Serialize(wire, JsonOptions));
         }
+
         lines.Add("[/CommandAi]");
         var encoded = string.Join(Environment.NewLine, lines);
         if (encoded.Length > CommandLimits.MaxEnvelopeCharacters)
@@ -34,20 +47,25 @@ public static class CommandAiTextCodec
 
     public static CommandProposal Decode(string text)
     {
-        if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("CommandAi text cannot be empty.", nameof(text));
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("CommandAi text cannot be empty.", nameof(text));
         if (text.Length > CommandLimits.MaxEnvelopeCharacters)
             throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxEnvelopeCharacters}-character limit.");
-        var lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(line => line.Trim()).ToArray();
+
+        var lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim()).ToArray();
         if (lines.Length > CommandLimits.MaxCommands + 3)
             throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxCommands}-command limit.");
+
         var start = Array.FindIndex(lines, line => line.Equals("[CommandAi]", StringComparison.Ordinal));
-        if (start < 0) throw new FormatException("Opening [CommandAi] marker was not found.");
-        if (start != 0) throw new FormatException("Unexpected content appears before the CommandAi envelope.");
+        if (start != 0)
+            throw new FormatException("Opening [CommandAi] marker must be the first envelope line.");
         var end = Array.FindIndex(lines, start + 1, line => line.Equals("[/CommandAi]", StringComparison.Ordinal));
-        if (end <= start) throw new FormatException("A complete [/CommandAi] closing marker was not found.");
-        if (end != lines.Length - 1) throw new FormatException("Unexpected content appears after the CommandAi envelope.");
-        if (Array.FindIndex(lines, start + 1, line => line.Equals("[CommandAi]", StringComparison.Ordinal)) >= 0)
-            throw new FormatException("Nested CommandAi envelopes are not supported.");
+        if (end <= start)
+            throw new FormatException("A complete [/CommandAi] closing marker was not found.");
+        if (end != lines.Length - 1)
+            throw new FormatException("Unexpected content appears after the CommandAi envelope.");
+
         string? protocol = null;
         var commands = new List<CommandInstruction>();
         for (var i = start + 1; i < end; i++)
@@ -55,7 +73,8 @@ public static class CommandAiTextCodec
             var line = lines[i];
             if (line.StartsWith("Protocol=", StringComparison.Ordinal))
             {
-                if (protocol is not null) throw new FormatException("Protocol may be declared only once.");
+                if (protocol is not null)
+                    throw new FormatException("Protocol may be declared only once.");
                 protocol = line["Protocol=".Length..].Trim();
             }
             else if (line.StartsWith("Command=", StringComparison.Ordinal))
@@ -64,10 +83,15 @@ public static class CommandAiTextCodec
                     throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxCommands}-command limit.");
                 commands.Add(ParseCommand(line["Command=".Length..].Trim()));
             }
-            else if (line.Length > 0) throw new FormatException($"Unrecognized envelope entry on line {i + 1}.");
+            else
+            {
+                throw new FormatException($"Unrecognized envelope entry on line {i + 1}.");
+            }
         }
+
         if (!string.Equals(protocol, CommandProposal.CurrentProtocolVersion, StringComparison.Ordinal))
             throw new FormatException($"Unsupported or missing CommandAi protocol '{protocol ?? "(missing)"}'.");
+
         try
         {
             return new CommandProposal(commands, protocol!);
@@ -78,60 +102,97 @@ public static class CommandAiTextCodec
         }
     }
 
-    private static CommandInstruction ParseCommand(string payload)
+    private static CommandInstruction ParseCommand(string json)
     {
-        var tokens = Tokenize(payload);
-        if (tokens.Count == 0 || !ulong.TryParse(tokens[0], NumberStyles.None, CultureInfo.InvariantCulture, out var actionId) || actionId <= 0)
-            throw new FormatException("A command must begin with a positive integer action identifier.");
-        if (tokens.Count - 1 > CommandLimits.MaxArgumentsPerCommand)
-            throw new FormatException($"A command cannot contain more than {CommandLimits.MaxArgumentsPerCommand} arguments.");
-        var arguments = new List<CommandArgument>();
-        foreach (var token in tokens.Skip(1))
+        CommandWire wire;
+        try
         {
-            var separator = token.IndexOf('=');
-            if (separator <= 0 || !ulong.TryParse(token[..separator], NumberStyles.None, CultureInfo.InvariantCulture, out var parameterId) || parameterId <= 0)
-                throw new FormatException($"Invalid parameter token '{token}'.");
-            var rawValue = token[(separator + 1)..];
-            CommandValue value;
-            if (rawValue.StartsWith('"'))
-            {
-                try { value = CommandValue.FromText(JsonSerializer.Deserialize<string>(rawValue) ?? throw new FormatException("Literal value cannot be null.")); }
-                catch (JsonException ex) { throw new FormatException($"Invalid quoted literal in '{token}'.", ex); }
-                catch (ArgumentException ex) { throw new FormatException($"Literal value in '{token}' violates CommandAi value limits.", ex); }
-            }
-            else if (ulong.TryParse(rawValue, NumberStyles.None, CultureInfo.InvariantCulture, out var identifier) && identifier > 0)
-                value = CommandValue.FromIdentifier(identifier);
-            else throw new FormatException($"Value '{rawValue}' must be a positive integer identifier or a JSON-quoted string.");
-            arguments.Add(new CommandArgument(parameterId, value));
+            wire = JsonSerializer.Deserialize<CommandWire>(json, JsonOptions)
+                ?? throw new FormatException("A command entry cannot be JSON null.");
         }
+        catch (JsonException ex)
+        {
+            throw new FormatException("A command entry contains invalid or unsupported JSON.", ex);
+        }
+
+        if (wire.Target is null || wire.Scope is null || wire.OutcomeContract is null ||
+            wire.Arguments is null || wire.Preconditions is null || wire.IdempotencyKey is null)
+            throw new FormatException("A command entry is missing required contract fields.");
 
         try
         {
-            return new CommandInstruction(actionId, arguments);
+            var outcomeFields = wire.OutcomeContract.Fields
+                ?? throw new FormatException("The outcome contract must declare its fields collection.");
+            var fields = outcomeFields.Select(field =>
+            {
+                if (field is null || !Enum.TryParse<CommandValueKind>(field.ValueKind, false, out var kind) ||
+                    !Enum.IsDefined(kind))
+                    throw new FormatException("An outcome field contains an unsupported value kind.");
+                return new CommandOutcomeField(field.FieldId, kind, field.Required);
+            }).ToArray();
+
+            var arguments = wire.Arguments.Select(argument =>
+            {
+                if (argument is null || argument.Value is null)
+                    throw new FormatException("A command argument is missing its value.");
+                return new CommandArgument(argument.ParameterId, FromWire(argument.Value));
+            }).ToArray();
+
+            var preconditions = wire.Preconditions.Select(precondition =>
+            {
+                if (precondition is null)
+                    throw new FormatException("A command precondition cannot be null.");
+                return new CommandPrecondition(precondition.GrammarVersion, precondition.Expression);
+            }).ToArray();
+
+            return new CommandInstruction(
+                wire.CommandId,
+                wire.ActionId,
+                FromWire(wire.Target),
+                FromWire(wire.Scope),
+                wire.IdempotencyKey,
+                new CommandOutcomeContract(wire.OutcomeContract.OutcomeId, fields),
+                arguments,
+                preconditions);
         }
         catch (ArgumentException ex)
         {
-            throw new FormatException("The command contains invalid or duplicate arguments.", ex);
+            throw new FormatException("The command contains invalid or duplicate contract fields.", ex);
         }
     }
 
-    private static List<string> Tokenize(string payload)
+    private static ValueWire ToWire(CommandValue value) => value.Kind switch
     {
-        var tokens = new List<string>();
-        var start = -1;
-        var quoted = false;
-        var escaped = false;
-        for (var i = 0; i < payload.Length; i++)
+        CommandValueKind.IntegerIdentifier => new ValueWire("IntegerIdentifier", value.Identifier, null),
+        CommandValueKind.LiteralText => new ValueWire("LiteralText", null, value.Text),
+        _ => throw new FormatException($"Unsupported value kind '{value.Kind}'.")
+    };
+
+    private static CommandValue FromWire(ValueWire value)
+    {
+        return value.Kind switch
         {
-            var c = payload[i];
-            if (start < 0) { if (char.IsWhiteSpace(c)) continue; start = i; }
-            if (escaped) { escaped = false; continue; }
-            if (quoted && c == '\\') { escaped = true; continue; }
-            if (c == '"') quoted = !quoted;
-            if (char.IsWhiteSpace(c) && !quoted) { tokens.Add(payload[start..i]); start = -1; }
-        }
-        if (quoted) throw new FormatException("Unterminated quoted literal.");
-        if (start >= 0) tokens.Add(payload[start..]);
-        return tokens;
+            "IntegerIdentifier" when value.Identifier is > 0 && value.Text is null =>
+                CommandValue.FromIdentifier(value.Identifier.Value),
+            "LiteralText" when value.Identifier is null && value.Text is not null =>
+                CommandValue.FromText(value.Text),
+            _ => throw new FormatException("A typed command value has an invalid kind or field combination.")
+        };
     }
+
+    private sealed record CommandWire(
+        Guid CommandId,
+        ulong ActionId,
+        ValueWire Target,
+        ValueWire Scope,
+        string IdempotencyKey,
+        OutcomeWire OutcomeContract,
+        IReadOnlyList<ArgumentWire> Arguments,
+        IReadOnlyList<PreconditionWire> Preconditions);
+
+    private sealed record ValueWire(string Kind, ulong? Identifier, string? Text);
+    private sealed record ArgumentWire(ulong ParameterId, ValueWire Value);
+    private sealed record PreconditionWire(string GrammarVersion, string Expression);
+    private sealed record OutcomeWire(ulong OutcomeId, IReadOnlyList<OutcomeFieldWire> Fields);
+    private sealed record OutcomeFieldWire(ulong FieldId, string ValueKind, bool Required);
 }
