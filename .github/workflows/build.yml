@@ -24,6 +24,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      - name: Verify Workshop Markdown branding
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import sys
+
+          moniker = '<!-- The Singularity Workshop moniker -->'
+          footer = '<!-- THE SINGULARITY WORKSHOP FOOTER -->'
+          footer_asset = 'https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png'
+          failures = []
+          pages = sorted(path for path in Path('.').rglob('*.md')
+                         if not any(part in {'.git', 'bin', 'obj'} for part in path.parts))
+          for page in pages:
+              content = page.read_text(encoding='utf-8')
+              if not content.lstrip().startswith(moniker):
+                  failures.append(f'{page}: missing animated moniker at top')
+              if footer not in content or footer_asset not in content:
+                  failures.append(f'{page}: missing canonical Workshop PNG footer')
+          if failures:
+              print('Workshop Markdown branding check failed:')
+              print('\\n'.join(failures))
+              sys.exit(1)
+          print(f'Validated animated moniker and canonical footer in all {len(pages)} Markdown files.')
+          PY
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
@@ -32,8 +57,24 @@ jobs:
         run: dotnet restore TheSingularityWorkshop.CommandAi.slnx
       - name: Build
         run: dotnet build TheSingularityWorkshop.CommandAi.slnx --configuration Release --no-restore
-      - name: Test
-        run: dotnet test TheSingularityWorkshop.CommandAi.slnx --configuration Release --no-build --verbosity normal
+      - name: Test with coverage
+        run: dotnet test TheSingularityWorkshop.CommandAi.slnx --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./TestResults
+      - name: Upload coverage to Codecov
+        if: ${{ secrets.CODECOV_TOKEN != '' }}
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: TrentBest/TheSingularityWorkshop.CommandAi
+          files: TestResults/**/coverage.cobertura.xml
+          fail_ci_if_error: true
+          verbose: true
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: command-ai-coverage
+          path: TestResults/**/coverage.cobertura.xml
+          if-no-files-found: warn
       - name: Run quickstart
         run: dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj --configuration Release --no-build
       - name: Pack
