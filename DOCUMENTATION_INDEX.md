@@ -15,7 +15,7 @@ CommandAi represents versioned command proposals as inspectable data. The host r
 | Understand package ownership and handoffs | [Architecture](docs/ARCHITECTURE.md) · [AI series boundaries](docs/AI_SERIES.md) |
 | Understand the generic proposal layer and higher-level builders | [Builder integration](docs/BUILDER_INTEGRATION.md) |
 | Reproduce the local example | [Gallery](docs/GALLERY.md) · [Quickstart source](examples/CommandAi.QuickStart/Program.cs) |
-| Review legacy migration risks | [Legacy compatibility audit](docs/LEGACY_COMPATIBILITY.md) |
+| Understand the retired legacy boundary | [Legacy historical reference](docs/LEGACY_COMPATIBILITY.md) |
 | Review maturity and open questions | [Status and open questions](docs/REFLECTION.md) |
 | Inspect public type contracts | [Type guides](docs/types/) |
 | Inspect source-backed neighborhoods and use cases | [UML and use cases](docs/UML/) |
@@ -43,4 +43,4 @@ The type guides and diagrams are human-authored and checked against current sour
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
