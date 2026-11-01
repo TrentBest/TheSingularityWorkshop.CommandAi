@@ -39,7 +39,7 @@ public sealed class CommandAiTextCodecTests
     [InlineData("[CommandAi]\nProtocol=CommandAi/1\nCommand=100 200=0\n[/CommandAi]")]
     [InlineData("[CommandAi]\nProtocol=CommandAi/1\nUnexpected=value\nCommand=100\n[/CommandAi]")]
     public void Decode_RejectsInvalidEnvelopes(string text) =>
-        Assert.ThrowsAny<Exception>(() => CommandAiTextCodec.Decode(text));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
 
     [Fact]
     public void Decode_UsesFormatExceptionForAnEmptyProposal()
