@@ -15,6 +15,7 @@ CommandAi/2 represents complete atomic command proposals as inspectable data. Th
 | Understand package ownership and handoffs | [Architecture](docs/ARCHITECTURE.md) · [AI series](docs/AI_SERIES.md) |
 | Understand builders and host extensions | [Builder integration](docs/BUILDER_INTEGRATION.md) |
 | Reproduce the local example | [Gallery](docs/GALLERY.md) · [Quickstart](examples/CommandAi.QuickStart/Program.cs) |
+| Upgrade an earlier alpha consumer | [CommandAi/2 migration guide](docs/MIGRATION_COMMAND_AI_2.md) |
 | Understand historical implementation | [Legacy historical reference](docs/LEGACY_COMPATIBILITY.md) |
 | Review maturity and remaining evidence | [Status](docs/REFLECTION.md) |
 | Inspect public type contracts | [Type guides](docs/types/) |
