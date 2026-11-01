@@ -101,4 +101,50 @@ public sealed class CommandAiTextCodecTests
             string.Join(' ', tokens) + "\n[/CommandAi]";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
     }
+    [Fact]
+    public void FluentBuilder_CreatesOrderedGenericProposal()
+    {
+        var proposal = new CommandProposalBuilder()
+            .AddCommand(100, command => command
+                .WithIdentifier(200, 302)
+                .WithText(201, "Logs.Diagnostic Stream"))
+            .AddCommand(101)
+            .Build();
+
+        Assert.Equal(2, proposal.Commands.Count);
+        Assert.Equal(100UL, proposal.Commands[0].ActionId);
+        Assert.Equal(302UL, proposal.Commands[0].Arguments[0].Value.Identifier);
+        Assert.Equal("Logs.Diagnostic Stream", proposal.Commands[0].Arguments[1].Value.Text);
+        Assert.Equal(101UL, proposal.Commands[1].ActionId);
+        Assert.Equal(proposal.Commands[0].ActionId, CommandAiTextCodec.Decode(CommandAiTextCodec.Encode(proposal)).Commands[0].ActionId);
+    }
+
+    [Fact]
+    public void FluentBuilder_RejectsDuplicateParameterIdentities()
+    {
+        Assert.Throws<ArgumentException>(() => new CommandProposalBuilder()
+            .AddCommand(1, command => command
+                .WithIdentifier(2, 3)
+                .WithText(2, "duplicate")));
+    }
+
+    [Fact]
+    public void FluentBuilder_EnforcesProposalCommandLimit()
+    {
+        var builder = new CommandProposalBuilder();
+        for (var i = 1; i <= CommandLimits.MaxCommands; i++)
+            builder.AddCommand((ulong)i);
+        Assert.Throws<InvalidOperationException>(() => builder.AddCommand(CommandLimits.MaxCommands + 1UL));
+    }
+
+    [Fact]
+    public void FluentBuilder_BuildReturnsIndependentSnapshots()
+    {
+        var builder = new CommandProposalBuilder().AddCommand(1);
+        var first = builder.Build();
+        builder.AddCommand(2);
+        var second = builder.Build();
+        Assert.Single(first.Commands);
+        Assert.Equal(2, second.Commands.Count);
+    }
 }
