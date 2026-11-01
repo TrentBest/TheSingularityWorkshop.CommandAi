@@ -42,6 +42,27 @@ public sealed class CommandAiTextCodecTests
         Assert.ThrowsAny<Exception>(() => CommandAiTextCodec.Decode(text));
 
     [Fact]
+    public void Decode_UsesFormatExceptionForAnEmptyProposal()
+    {
+        var text = "[CommandAi]\nProtocol=CommandAi/1\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
+    }
+
+    [Fact]
+    public void Decode_UsesFormatExceptionForDuplicateParameterIdentities()
+    {
+        var text = "[CommandAi]\nProtocol=CommandAi/1\nCommand=100 200=1 200=2\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
+    }
+
+    [Fact]
+    public void Decode_UsesFormatExceptionForInvalidLiteralValues()
+    {
+        var text = "[CommandAi]\nProtocol=CommandAi/1\nCommand=100 200=\"\"\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
+    }
+
+    [Fact]
     public void Instruction_RejectsDuplicateParameters() =>
         Assert.Throws<ArgumentException>(() => new CommandInstruction(1, [
             new CommandArgument(2, CommandValue.FromIdentifier(3)),
@@ -101,6 +122,7 @@ public sealed class CommandAiTextCodecTests
             string.Join(' ', tokens) + "\n[/CommandAi]";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
     }
+
     [Fact]
     public void FluentBuilder_CreatesOrderedGenericProposal()
     {
@@ -147,6 +169,7 @@ public sealed class CommandAiTextCodecTests
         Assert.Single(first.Commands);
         Assert.Equal(2, second.Commands.Count);
     }
+
     [Fact]
     public void Proposal_RejectsAggregateLiteralTextAboveTheLimit()
     {
