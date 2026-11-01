@@ -3,50 +3,56 @@
 
 # CommandInstruction — UML neighborhood and use cases
 
-> **Target:** public sealed record CommandInstruction. The relationships below are authored from the current source and identify source-level structure; they are not runtime traces or generated UML.
+> **Target:** public sealed record CommandInstruction. Relationships are authored from current source; they are not runtime traces or generated UML.
 
 ## Neighborhood
 
-```mermaid
-flowchart TD
-  C[Consumers and related types] --> T[CommandInstruction]
-  T --> D[Declared contract and dependencies]
-  T -.-> H[Host policy remains external]
-```
+~~~mermaid
+classDiagram
+  class CommandInstruction {
+    +Guid CommandId
+    +ulong ActionId
+    +CommandValue Target
+    +CommandValue Scope
+    +string IdempotencyKey
+    +IReadOnlyList~CommandArgument~ Arguments
+    +IReadOnlyList~CommandPrecondition~ Preconditions
+    +CommandOutcomeContract OutcomeContract
+  }
+  CommandInstruction --> CommandValue : target / scope
+  CommandInstruction --> CommandArgument : parameters
+  CommandInstruction --> CommandPrecondition : opaque conditions
+  CommandInstruction --> CommandOutcomeContract : expected result shape
+  CommandProposal --> CommandInstruction : ordered batch
+~~~
 
-### Source-supported relationships
+## Source-supported relationships
 
 - **Target source:** [CommandInstruction.cs](../../CommandInstruction.cs).
-- **Related types and consumers:** CommandProposal.cs; CommandAiTextCodec.cs; examples/CommandAi.QuickStart/Program.cs.
-- **Package reference:** CommandAi core targets .NET 8 and has no runtime project reference to ProtocolAi, GrammarAi, or HeadlessAi.
-- **Provenance:** current C# declaration and repository references; no compiler-generated relationship inventory is claimed.
+- **Related source:** CommandValue.cs, CommandArgument.cs, CommandPrecondition.cs, CommandOutcomeContract.cs, CommandProposal.cs.
+- **Codec:** CommandAiTextCodec.cs encodes/decodes the complete contract.
+- **Package boundary:** CommandAi stores precondition expressions without interpreting them and stores outcome declarations without treating them as actual results.
 
 ## Use cases
 
-### UC-1 — Consume a proposed command safely
-
+### UC-1 — Inspect an untrusted proposal
 - **Actor:** host application.
-- **Goal:** inspect a command proposal without confusing decoding with authorization.
-- **Trigger:** the host receives a candidate CommandAi envelope.
-- **Preconditions:** the host selects the expected CommandAi protocol version and trusted vocabulary.
-- **Outcome:** a parsed representation is available for host-owned validation; no side effect occurs in CommandAi.
-- **Failure/alternative:** malformed input or unsupported versions are rejected; the host logs/rejects the proposal rather than silently reinterpreting it.
-- **Evidence/status:** source-authored use case grounded in the current codec and domain boundary; no automatic use-case inference is claimed.
+- **Trigger:** a candidate CommandAi/2 envelope arrives.
+- **Outcome:** the codec returns a bounded immutable representation for host validation.
+- **Failure:** malformed input or unsupported versions are rejected.
+- **Safety invariant:** parsing does not authorize or execute.
 
-### UC-2 — Inspect or encode a proposal in a test/example
-
-- **Actor:** package consumer or test.
-- **Goal:** create a deterministic representation and verify round-trip behavior.
-- **Trigger:** a consumer constructs the typed model and calls the codec.
-- **Outcome:** a versioned text envelope can be inspected or decoded.
-- **Failure/alternative:** invalid IDs, duplicate parameters, empty proposals, or malformed literals are rejected.
-- **Evidence/status:** source-checked against the quickstart and test suite; actual CI status is reported by the repository workflow.
+### UC-2 — Evaluate and dispatch through the host
+- **Actor:** FSM_Foundry or another trusted host.
+- **Preconditions:** the host resolves action/target/scope identities, validates parameters, interprets preconditions with the appropriate grammar, enforces idempotency, and applies authorization/approval.
+- **Outcome:** the host may dispatch the accepted command and later record an actual correlated outcome.
+- **Ownership:** actual outcomes belong to ProtocolAi/host; CI verdicts belong to CiAi.
 
 ## Detail levels
 
-- **Collapsed:** CommandInstruction and declaration kind.
-- **Contract:** the public members and their argument/return types are defined by the source file.
-- **Implementation:** see the source link above; this static Markdown page does not provide interactive expansion.
+- **Collapsed:** CommandInstruction and its role as one atomic proposal.
+- **Contract:** public members are defined by the linked source file.
+- **Implementation:** see source links; this static page is not interactive generated UML.
 
 ## Related pages
 
@@ -57,4 +63,4 @@ flowchart TD
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
