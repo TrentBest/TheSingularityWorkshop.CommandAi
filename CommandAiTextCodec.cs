@@ -107,6 +107,11 @@ public static class CommandAiTextCodec
         CommandWire wire;
         try
         {
+            using var document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 16 });
+            if (document.RootElement.ValueKind != JsonValueKind.Object)
+                throw new FormatException("A command entry must be a JSON object.");
+            RejectDuplicateProperties(document.RootElement);
+
             wire = JsonSerializer.Deserialize<CommandWire>(json, JsonOptions)
                 ?? throw new FormatException("A command entry cannot be JSON null.");
         }
@@ -125,10 +130,11 @@ public static class CommandAiTextCodec
                 ?? throw new FormatException("The outcome contract must declare its fields collection.");
             var fields = outcomeFields.Select(field =>
             {
-                if (field is null || !Enum.TryParse<CommandValueKind>(field.ValueKind, false, out var kind) ||
+                if (field is null || field.Required is null ||
+                    !Enum.TryParse<CommandValueKind>(field.ValueKind, false, out var kind) ||
                     !Enum.IsDefined(kind))
-                    throw new FormatException("An outcome field contains an unsupported value kind.");
-                return new CommandOutcomeField(field.FieldId, kind, field.Required);
+                    throw new FormatException("An outcome field is missing required data or contains an unsupported value kind.");
+                return new CommandOutcomeField(field.FieldId, kind, field.Required.Value);
             }).ToArray();
 
             var arguments = wire.Arguments.Select(argument =>
@@ -158,6 +164,25 @@ public static class CommandAiTextCodec
         catch (ArgumentException ex)
         {
             throw new FormatException("The command contains invalid or duplicate contract fields.", ex);
+        }
+    }
+
+    private static void RejectDuplicateProperties(JsonElement element)
+    {
+        if (element.ValueKind == JsonValueKind.Object)
+        {
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var property in element.EnumerateObject())
+            {
+                if (!names.Add(property.Name))
+                    throw new FormatException($"Duplicate JSON property '{property.Name}' is not allowed.");
+                RejectDuplicateProperties(property.Value);
+            }
+        }
+        else if (element.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var item in element.EnumerateArray())
+                RejectDuplicateProperties(item);
         }
     }
 
@@ -194,5 +219,5 @@ public static class CommandAiTextCodec
     private sealed record ArgumentWire(ulong ParameterId, ValueWire Value);
     private sealed record PreconditionWire(string GrammarVersion, string Expression);
     private sealed record OutcomeWire(ulong OutcomeId, IReadOnlyList<OutcomeFieldWire> Fields);
-    private sealed record OutcomeFieldWire(ulong FieldId, string ValueKind, bool Required);
+    private sealed record OutcomeFieldWire(ulong FieldId, string ValueKind, bool? Required);
 }
