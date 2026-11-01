@@ -20,7 +20,7 @@
 - Identifier meaning is host-defined and not resolved here.
 - The initial wire format is intentionally narrow and does not support nested objects or lists as values.
 - The only implemented envelope is `CommandAi/1`; version negotiation and migration policy are not implemented.
-- GitHub Actions run [#63](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41280904172) verified the Release build, all 20 tests, quickstart execution, and pack step at commit [`e998450`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/e99845013edf285ce0d86ecf667db77277035432). Later changes in this sequence added type/UML documentation and the host-owned named-command example; those docs were verified by [run #73](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41281600935). The mutable-builder thread-safety documentation was then verified by [run #77](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41282035271). The package has not been validated against a live provider or end-to-end host integration.
+- GitHub Actions run [#89](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283845342) verified the exact development head at commit [`96adbaa`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/96adbaa023fd5a052479d809a2061801790e9f6a): Release build, all 20 tests, quickstart execution, package packing, packed-artifact audit, and compilation of the quickstart against the packed package. The NuGet publication job was skipped. The quickstart now compiles the host-owned named-command extension example. The package has not been validated against a live provider or end-to-end host integration.
 
 ## Next evidence to gather
 
