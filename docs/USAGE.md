@@ -37,7 +37,7 @@ var wireText = CommandAiTextCodec.Encode(proposal);
 var parsed = CommandAiTextCodec.Decode(wireText);
 ~~~
 
-The current wire contract is CommandAi/2. It serializes each complete command as a JSON object on a Command= line. JSON property names and value kinds are explicit; unknown properties and malformed contract fields are rejected. CommandAi/1 is a breaking predecessor and is not accepted by this decoder.
+The current wire contract is CommandAi/2. Earlier alpha consumers should follow the [migration guide](MIGRATION_COMMAND_AI_2.md). It serializes each complete command as a JSON object on a Command= line. JSON property names and value kinds are explicit; unknown properties and malformed contract fields are rejected. CommandAi/1 is a breaking predecessor and is not accepted by this decoder.
 
 The codec validates representation only. It does not evaluate preconditions, enforce idempotency, resolve identities, authorize, or execute.
 
