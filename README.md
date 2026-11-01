@@ -44,10 +44,11 @@ Run the local example:
 Or create a proposal in C#:
 
     using TheSingularityWorkshop.CommandAi;
-    var proposal = new CommandProposal([new CommandInstruction(100, [
-        new CommandArgument(200, CommandValue.FromIdentifier(302)),
-        new CommandArgument(201, CommandValue.FromText("Logs.Diagnostic Stream"))
-    ])]);
+    var proposal = new CommandProposalBuilder()
+        .AddCommand(100, command => command
+            .WithIdentifier(200, 302)
+            .WithText(201, "Logs.Diagnostic Stream"))
+        .Build();
     var wireText = CommandAiTextCodec.Encode(proposal);
     var decoded = CommandAiTextCodec.Decode(wireText);
     Console.WriteLine(wireText);
