@@ -21,7 +21,7 @@ CommandAi defines a small, versioned representation for proposed commands. It ke
 
 CommandAi validates proposal shape. It does not own vocabulary or resolve integer identities (ProtocolAi's domain); define legal composition rules for a larger language (GrammarAi's domain); call an AI endpoint (HeadlessAi's domain); decide whether a proposed action is allowed; request user approval; access application resources; or execute commands.
 
-The consuming host must resolve identifiers against trusted definitions, validate business rules and current state, apply authorization and approval policy, and only then dispatch an action. A well-formed proposal is not proof of intent, truth, permission, or safety.
+The consuming host must resolve identifiers against trusted definitions, validate business rules and current state, apply authorization and approval policy, and only then dispatch an action. A well-formed proposal is not proof of intent, truth, permission, or safety. Each instruction represents one atomic proposed action; a proposal is an ordered batch, not a transaction. Universal target, scope, precondition, idempotency, observer, execution-status, and outcome semantics are not part of this generic representation. Hosts may assign meaning to domain-owned arguments; durable event/evidence/gate lifecycles and execution outcomes belong to the host and relevant protocol contracts.
 
 ## Resource boundaries
 
@@ -33,7 +33,7 @@ A proposal is limited to 1,048,576 literal-text characters in aggregate, in addi
 2. Actions and parameters require positive integer identifiers.
 3. Repeated parameter identifiers in one instruction are rejected.
 4. Literal strings round-trip without being confused with integer identifiers.
-5. The codec rejects malformed envelopes rather than silently skipping unknown entries.
+5. The codec rejects malformed envelopes rather than silently skipping unknown entries, and reports malformed non-empty wire content as FormatException.
 6. No API in this package executes commands or grants authority.
 7. The package remains provider-neutral and has no runtime dependency on ProtocolAi, GrammarAi, HeadlessAi, or host application frameworks.
 
@@ -44,4 +44,4 @@ This first implementation is source-authored and includes focused unit tests and
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
