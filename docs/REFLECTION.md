@@ -3,34 +3,36 @@
 
 # CommandAi status and open questions
 
-## Current implementation
+## Current implementation on development
 
-- Immutable proposal, instruction, argument, and typed-value contracts.
-- Generic fluent CommandProposalBuilder and scoped CommandInstructionBuilder; application-specific named commands remain host/domain extensions.
-- Explicit command, argument, per-literal, aggregate-literal, and encoded-envelope resource bounds.
-- Line-oriented CommandAi/1 encoder/decoder with explicit JSON-quoted literal values.
-- Positive-integer validation, duplicate-parameter rejection, strict envelope-entry handling, and normalized FormatException failures for malformed non-empty wire content.
-- Regression tests for empty proposals, duplicate parameter identities, invalid literals, resource limits, round trips, builder behavior, and immutable snapshots.
-- Console quickstart with compiled host-owned named-command extensions.
-- No runtime package references to the other AI packages.
-- No command execution, approval UI, authorization, provider transport, durable observer, or outcome lifecycle.
+- Immutable proposal and complete atomic instruction contracts.
+- Required command identity, action identity, target, scope, idempotency key, and expected outcome contract.
+- Ordered typed parameters and optional grammar-versioned opaque preconditions.
+- Bounded outcome fields, preconditions, literal values, aggregate text, command count, and envelope size.
+- CommandAi/2 JSON command entries with strict version, property, and value-shape validation.
+- Generic fluent proposal/instruction builder.
+- Focused tests for round-trip fields, malformed envelopes, duplicate identities, bounds, and builder snapshots.
+- Console quickstart with host-owned named command extensions.
+- No runtime package references to sibling AI packages.
+- No command execution, authorization, durable observer lifecycle, evidence evaluation, or outcome lifecycle.
 
-## Known limits and explicit non-goals
+## Ownership boundaries
 
-- Identifier meaning is host-defined and not resolved here.
-- The initial wire format is intentionally narrow and does not support nested objects or lists as values.
-- The only implemented envelope is CommandAi/1; version negotiation and migration policy are not implemented.
-- An instruction is an atomic proposed action; a proposal is an ordered batch, not a transaction. Target, scope, precondition, idempotency, and outcome semantics are not universal CommandAi concepts in this version. Hosts may encode domain-owned values as arguments, while durable observer/evidence/gate lifecycles belong to host and sibling protocol contracts.
-- CommandAi does not poll, subscribe to events, evaluate CI evidence, change gates, or dispatch commands. A decoded or well-formed proposal is never authorization.
-- The last previously recorded full verification is GitHub Actions run [#92](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283963463): build/test, quickstart execution, package packing, packed-artifact audit, and compilation against the packed package passed; NuGet publication was skipped. New decoder hardening and tests are not yet CI-verified.
+CommandAi describes the proposed atomic command. GrammarAi owns the structure of precondition expressions. ProtocolAi owns protocol-qualified vocabulary and correlated/provenance-bearing actual outcome events. CiAi owns CI evidence and verdicts. FSM_Foundry and the host own live-state evaluation, idempotency persistence/enforcement, durable observers, authorization, approval, scheduling, dispatch, execution, and runtime outcome lifecycle.
 
-## Next evidence to gather
+A declared expected outcome is not an actual outcome. A parsed command is not authorized. An idempotency key is not replay protection until the host enforces it.
 
-1. Run the complete workflow against the latest development commit and inspect the packed package/consumer compilation after the decoder changes.
-2. Add a host-owned integration example only when the current ProtocolAi and GrammarAi public contracts can be composed without introducing unnecessary generic-package coupling.
-3. Keep authorization, approval, event subscriptions, durable observer state, evidence evaluation, and execution in their owning host/protocol domains; document any cross-repository contract through linked issues before claiming end-to-end behavior.
+## Compatibility decision
 
-Legacy compatibility is intentionally not planned. The source-level observations are retained in Legacy CommandAi — historical reference; no compatibility parser or fixture corpus should be built.
+CommandAi/1 is intentionally removed from the supported contract. The package has not been externally released, so the model and wire format are being corrected as a breaking change rather than carrying a compatibility parser or adapter. Consumers in the Workshop repositories must migrate together before any package publication.
+
+## Remaining verification
+
+1. Run the complete CommandAi workflow on the latest development head, including package artifact audit and quickstart compilation against the packed package.
+2. Migrate The and the CiAi CommandAi proposal-composer feature branch to the new public contract.
+3. Verify cross-repository project/submodule references and tests after the source migration.
+4. Update any remaining docs, examples, fixtures, and protocol prompts that describe the previous ActionId-plus-Arguments model.
+5. Keep NuGet publication disabled until the owner explicitly authorizes a package/version.
 
 No NuGet publication is authorized by this status page.
 
