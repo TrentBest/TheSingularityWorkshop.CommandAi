@@ -5,41 +5,48 @@
 
 ## The problem
 
-An AI model can return an instruction that looks plausible to a person but is ambiguous, malformed, unsupported, or unsafe for the host application. Free-form text is convenient to read, but weak as an interchange contract when software needs to inspect a proposal deterministically.
+A model response that proposes work must carry enough information for a host to identify the requested atomic operation, its target and scope, the parameters it needs, the conditions under which it is valid, the identity used to recognize duplicate delivery, and the shape of the expected result. If these are implicit, each consuming application invents a different contract and critical execution context is lost at the boundary.
 
-CommandAi defines a small, versioned representation for proposed commands. It keeps action and parameter identities numeric when those identities are available, while allowing explicit literal text where the vocabulary intentionally permits it.
+CommandAi defines a provider-neutral, immutable, bounded representation for that complete command contract. It carries identities and typed values without assigning them application-specific meaning.
 
 ## Domain concepts
 
-- **Proposal** — a versioned collection of one or more command instructions.
-- **Instruction** — an action identity plus zero or more parameter arguments.
-- **Argument** — a parameter identity paired with a typed value.
-- **Integer identifier** — an opaque positive identity. CommandAi does not decide what it means.
-- **Literal text** — a string carried explicitly as data, not interpreted as executable code.
+- **Proposal** — a versioned ordered batch of one or more atomic command instructions. It is not a transaction.
+- **Command identity** — unique identity for one proposed instruction; distinct from the idempotency key.
+- **Action identity** — application-owned opaque identity for the operation being proposed.
+- **Target** — required opaque typed identity of the object or resource to which the command applies.
+- **Scope** — required opaque typed identity delimiting the command's intended scope.
+- **Parameter** — an ordered parameter identity paired with an integer identifier or literal text value.
+- **Precondition** — an opaque expression tagged with its grammar version. CommandAi stores it; GrammarAi defines structural grammar; the host evaluates it against live state.
+- **Idempotency key** — required caller-supplied key used by the host to recognize duplicate delivery. Merely carrying the key does not enforce idempotency.
+- **Outcome contract** — expected outcome identity and field declarations. It is a declaration, not an actual execution outcome.
+- **Typed value** — either a positive opaque integer identifier or explicitly typed literal text.
 
 ## Responsibility boundary
 
-CommandAi validates proposal shape. It does not own vocabulary or resolve integer identities (ProtocolAi's domain); define legal composition rules for a larger language (GrammarAi's domain); call an AI endpoint (HeadlessAi's domain); decide whether a proposed action is allowed; request user approval; access application resources; or execute commands.
+CommandAi owns the complete atomic representation, immutable model, resource limits, and deterministic CommandAi/2 codec. It does not own application vocabulary (ProtocolAi), grammar definitions or structural validation of precondition expressions (GrammarAi), endpoint communication (HeadlessAi), CI evidence/verdicts (CiAi), or durable observer lifecycle, live-state evaluation, policy, authorization, approval, scheduling, dispatch, execution, and actual outcome lifecycle (FSM_Foundry/host and ProtocolAi).
 
-The generic atomic Command contract must explicitly represent command identity, target, scope, parameters, preconditions, idempotency, and an outcome contract. CommandAi owns the immutable, bounded representation and codec, not the domain-specific interpretation of those fields. The current ActionId-plus-Arguments model is incomplete against this contract. A well-formed proposal is not proof of intent, truth, permission, or safety. A proposal is an ordered batch of atomic commands, not a transaction. Repository/branch/SHA/path/content-digest values can be carried as opaque typed data; the consuming repository-domain extension and host validate their meaning. GrammarAi owns structural grammar validation, ProtocolAi owns correlated/provenance-bearing event and outcome envelopes, CiAi owns CI evidence and verdicts, and the host owns durable lifecycle, authorization, approval, dispatch, and execution.
+A successful parse is never proof of truth, permission, safety, execution, or success. A declared outcome contract is not a CI verdict. CommandAi has no runtime dependency on its sibling packages.
 
 ## Resource boundaries
 
-A proposal is limited to 1,048,576 literal-text characters in aggregate, in addition to the per-literal, per-command, command-count, and encoded-envelope limits in `CommandLimits`. This prevents many individually valid arguments from producing an unexpectedly large in-memory proposal. Integer identifiers remain opaque and do not contribute literal text size.
+The codec bounds envelope characters, command count, arguments per command, preconditions per command, outcome fields, individual literal values, grammar-version identifiers, idempotency keys, precondition expressions, and aggregate literal characters. See CommandLimits for the exact source constants. Limits protect representation handling; they do not establish semantic safety.
 
 ## Acceptance criteria
 
-1. Invalid or missing protocol versions are rejected.
-2. Actions and parameters require positive integer identifiers.
-3. Repeated parameter identifiers in one instruction are rejected.
-4. Literal strings round-trip without being confused with integer identifiers.
-5. The codec rejects malformed envelopes rather than silently skipping unknown entries, and reports malformed non-empty wire content as FormatException.
-6. No API in this package executes commands or grants authority.
-7. The package remains provider-neutral and has no runtime dependency on ProtocolAi, GrammarAi, HeadlessAi, or host application frameworks.
+1. Each command requires a non-empty unique command identity and a positive action identity.
+2. Each command requires explicit target, scope, idempotency key, and expected outcome contract.
+3. Parameters are ordered, typed, bounded, and unique by parameter identity.
+4. Preconditions are bounded and retain the grammar version without being evaluated by CommandAi.
+5. Outcome contracts declare an opaque outcome identity and unique typed fields.
+6. Proposal command identities and idempotency keys are unique within a proposal.
+7. The CommandAi/2 codec round-trips every field and rejects unsupported versions, malformed JSON, unknown properties, missing fields, and invalid values.
+8. No API in this package resolves domain meaning, grants authority, evaluates live conditions, or executes commands.
+9. The package remains provider-neutral and has no runtime dependency on ProtocolAi, GrammarAi, HeadlessAi, CiAi, or host frameworks.
 
 ## Evidence status
 
-This first implementation is source-authored and includes focused unit tests and a runnable quickstart. It must be built and tested by the repository workflow before any release claim is made. NuGet publication is not authorized by this work.
+The complete model, codec, builders, focused tests, and quickstart are being implemented on development. CI must verify the current head before claiming the contract is complete. NuGet publication is not authorized.
 
 ---
 
