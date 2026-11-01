@@ -4,95 +4,77 @@
 # ✳️ 00 TheSingularityWorkshop.CommandAi
 
 [![Build](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml/badge.svg?branch=development)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml)
-[![Last commit](https://img.shields.io/github/last-commit/TrentBest/TheSingularityWorkshop.CommandAi?style=flat-square)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commits/development)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/LICENSE.txt)
 
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.CommandAi/development/docs/images/command-ai-boundary.svg" alt="CommandAi parses a proposed command into a versioned representation; the host separately resolves meaning, validates policy, obtains approval, and executes." width="100%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.CommandAi/development/docs/images/command-ai-boundary.svg" alt="CommandAi represents a complete atomic command proposal; trusted host layers resolve, validate, authorize, and execute separately." width="100%"></p>
 <p align="center"><em>A well-formed proposal is still only a proposal.</em></p>
 
-## 🟦 01 What is CommandAi?
+## 01 What is CommandAi?
 
-**CommandAi gives software a deterministic representation for commands proposed by an AI or another untrusted input source.** It models a versioned proposal as action identifiers and parameter/value pairs, with explicit support for integer identities and literal text.
+**CommandAi defines a provider-neutral, versioned representation for complete atomic commands proposed by an AI or another untrusted source.** A command explicitly carries its identity, action, target, scope, ordered parameters, preconditions, idempotency key, and expected outcome contract.
 
-CommandAi is not an autonomous agent and is not a command runner. It turns a representation into inspectable data; it does not turn that data into permission.
+The package stores opaque identities and typed values. It does not resolve application meaning, evaluate conditions, authorize actions, or execute them.
 
-## 🟣 02 Why does it exist?
+## 02 Why does it exist?
 
-Free-form model output is hard for a host to validate reliably. A small, explicit envelope gives the host something it can parse, test, log, and reject deterministically. Integer identities keep known vocabulary separate from model-generated spelling; literal text remains visibly data.
+A command proposal must carry enough information for a host to reason about what is requested, where it applies, under which conditions, how duplicate delivery is recognized, and what shape of result is expected. Leaving those fields implicit forces every consumer to invent a different envelope.
 
-The analogy is a shipping label: it helps identify what is being proposed, but it does not prove the contents are correct or authorize delivery.
+CommandAi provides one bounded immutable contract. It deliberately keeps the meaning of identifiers and expressions outside the generic package.
 
-## 🩵 03 How does it work?
+## 03 How does it work?
 
-    [CommandAi]
-    Protocol=CommandAi/1
-    Command=100 200=302 201="Logs.Diagnostic Stream"
-    [/CommandAi]
+A compact envelope contains one JSON command object per line:
 
-- 100 is an opaque action identity.
-- 200=302 pairs a parameter identity with an integer value identity.
-- 201="Logs.Diagnostic Stream" pairs a parameter identity with literal text.
+~~~text
+[CommandAi]
+Protocol=CommandAi/2
+Command={"commandId":"...","actionId":100,"target":{"kind":"IntegerIdentifier","identifier":300,"text":null},"scope":{"kind":"LiteralText","identifier":null,"text":"workspace"},"idempotencyKey":"inspect:resource:42","outcomeContract":{"outcomeId":400,"fields":[{"fieldId":401,"valueKind":"LiteralText","required":true}]},"arguments":[],"preconditions":[]}
+[/CommandAi]
+~~~
 
-The integers are examples, not built-in meanings. The consuming host resolves identities against trusted vocabulary and applies its own domain rules.
+Each command declares identity, target, scope, parameters, grammar-versioned preconditions, an idempotency key, and an expected outcome shape. These values are opaque to CommandAi. A precondition is stored but not evaluated; an idempotency key is carried but not enforced; an outcome contract is a declaration, not an execution result or CI verdict.
 
-## 🟢 04 See it in a minute
+## 04 See it in a minute
 
 Run the local example:
 
-    dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
+~~~bash
+dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
+~~~
 
-The quickstart now demonstrates a host-owned named-command extension layer in `ResourceCommandExtensions.cs`: it adds typed `InspectResource` and `OpenDiagnosticStream` methods over the generic CommandAi builder. These action/parameter IDs are sample values owned by the example host, not built-in CommandAi meanings.
+The quickstart builds InspectResource and OpenDiagnosticStream as host-owned extensions over the generic builder. Their action, target, scope, idempotency, and outcome identities are examples, not universal meanings.
 
-Or create a generic proposal directly in C#:
+A direct consumer can compose a command with Guid identity, opaque target/scope values, a required idempotency key, an outcome contract, parameters, and preconditions. See the usage guide for the complete C# example.
 
-    using TheSingularityWorkshop.CommandAi;
-    var proposal = new CommandProposalBuilder()
-        .AddCommand(100, command => command
-            .WithIdentifier(200, 302)
-            .WithText(201, "Logs.Diagnostic Stream"))
-        .Build();
-    var wireText = CommandAiTextCodec.Encode(proposal);
-    var decoded = CommandAiTextCodec.Decode(wireText);
-    Console.WriteLine(wireText);
+## 05 Documentation and theory
 
-**Verification:** the last previously recorded full workflow [run #92](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283963463) passed build/test, quickstart execution, package packing, packed-artifact audit, and compilation of the quickstart against the packed package; NuGet publication was skipped. The decoder hardening now on development is newer than that run and is awaiting fresh CI. This evidence verifies the local representation path, not live-provider behavior, vocabulary resolution, authorization, or execution.
+- [Documentation index](DOCUMENTATION_INDEX.md)
+- [AI package boundaries](docs/AI_SERIES.md)
+- [Problem domain](docs/PROBLEM_DOMAIN.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Theory and CommandAi/2 wire contract](docs/THEORY.md)
+- [Usage guide](docs/USAGE.md)
+- [Builder integration](docs/BUILDER_INTEGRATION.md)
+- [Type guides](docs/types/)
+- [UML and use cases](docs/UML/)
+- [Legacy implementation history](docs/LEGACY_COMPATIBILITY.md)
 
-## 🟪 05 Documentation and theory
+## Package boundaries
 
-- [Documentation index](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/DOCUMENTATION_INDEX.md) — reader-oriented guide to the package, types, UML, and evidence.
-- [AI series boundaries](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/AI_SERIES.md) — responsibilities and trust boundaries across ProtocolAi, GrammarAi, CommandAi, and HeadlessAi.
-- [Per-type documentation](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/tree/development/docs/types) and [UML/use cases](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/tree/development/docs/UML) — source-grounded public type contracts and consumer scenarios.
-- [Usage guide](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/USAGE.md) — construct, encode, decode, and verify a proposal.
-- [Builder integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/BUILDER_INTEGRATION.md) — layer host-owned named commands over the generic builder.
-- [Problem domain](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/PROBLEM_DOMAIN.md) — purpose, non-goals, and acceptance criteria.
-- [Theory](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/THEORY.md) — why representation, identity, structure, and authority are separate.
-- [Architecture](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/ARCHITECTURE.md) — component boundary and failure behavior.
-- [Gallery](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/GALLERY.md) — the current reproducible example and what it proves.
-- [Legacy historical reference](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/LEGACY_COMPATIBILITY.md) — exact differences from the implementation in The.
-- [Status and open questions](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/REFLECTION.md) — implementation state and remaining evidence.
-- [Shared documentation standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/master/DOCUMENTATION_STANDARD.md).
-
-## Package boundary
-
-| Package | Domain |
+| Package | Owns |
 |---|---|
-| [ProtocolAi](https://github.com/TrentBest/TheSingularityWorkshop.ProtocolAi) | Vocabulary and symbol identity |
-| [GrammarAi](https://github.com/TrentBest/TheSingularityWorkshop.GrammarAi) | Legal structural composition |
-| **CommandAi** | Versioned command proposals and representation |
-| [HeadlessAi](https://github.com/TrentBest/TheSingularityWorkshop.HeadlessAi) | Configured AI endpoint communication |
-| Host application | Trust, policy, approval, and execution |
+| [ProtocolAi](https://github.com/TrentBest/TheSingularityWorkshop.ProtocolAi) | Application-owned vocabulary and stable protocol-qualified symbol identity |
+| [GrammarAi](https://github.com/TrentBest/TheSingularityWorkshop.GrammarAi) | Structural grammar definitions and composition rules |
+| **CommandAi** | Complete atomic command proposal representation and codec |
+| [HeadlessAi](https://github.com/TrentBest/TheSingularityWorkshop.HeadlessAi) | Configured AI endpoint request/response communication |
+| [CiAi](https://github.com/TrentBest/TheSingularityWorkshop.CiAi) | CI evidence and verdicts |
+| [FSM_Foundry](https://github.com/TrentBest/TheSingularityWorkshop.FSM_Foundry) / host | Durable observer lifecycle, policy, authorization, approval, scheduling, dispatch, and execution |
 
-This separation is an architectural intent; cross-package compatibility must be verified before claiming a complete end-to-end protocol. CommandAi has no runtime dependency on its siblings in this initial implementation.
+CommandAi has no runtime dependency on these sibling packages. Their contracts are connected by explicit host or integration adapters, not hidden package coupling.
 
 ## Verification and release status
 
-The repository workflow restores, builds, tests, packs, and uploads an artifact for inspection. **NuGet publication is disabled** unless the owner explicitly authorizes a release. No package release is being performed by this work.
-
-## Resources and support
-
-- [Source repository](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi)
-- [The Singularity Workshop on GitHub](https://github.com/TrentBest)
-- [CoderLegion](https://coderlegion.com/user/The+Singularity+Workshop)
+The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. **NuGet publication remains disabled** unless the owner explicitly authorizes a specific release. The CommandAi/1 wire shape is intentionally not supported by this breaking CommandAi/2 contract; there is no external compatibility promise.
 
 ---
 
