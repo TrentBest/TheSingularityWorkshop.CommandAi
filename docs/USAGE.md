@@ -3,52 +3,75 @@
 
 # Use CommandAi
 
-## Create a proposal
+## Construct a complete atomic command
 
-    using TheSingularityWorkshop.CommandAi;
+~~~csharp
+using TheSingularityWorkshop.CommandAi;
 
-    var proposal = new CommandProposal([
-        new CommandInstruction(100, [
-            new CommandArgument(200, CommandValue.FromIdentifier(302)),
-            new CommandArgument(201, CommandValue.FromText("Logs.Diagnostic Stream"))
-        ])
-    ]);
+var commandId = Guid.NewGuid();
+var outcome = new CommandOutcomeContract(400, [
+    new CommandOutcomeField(401, CommandValueKind.LiteralText),
+    new CommandOutcomeField(402, CommandValueKind.IntegerIdentifier, required: false)
+]);
 
-The numbers are examples, not built-in meanings. Your host's trusted vocabulary must define what each identity means.
+var proposal = new CommandProposalBuilder()
+    .AddCommand(
+        commandId,
+        actionId: 100,
+        target: CommandValue.FromIdentifier(300),
+        scope: CommandValue.FromText("workspace"),
+        idempotencyKey: "inspect:resource:42",
+        outcomeContract: outcome,
+        configure: command => command
+            .WithIdentifier(parameterId: 200, valueId: 42)
+            .WithPrecondition("GrammarAi/1", "resource.exists && resource.readable"))
+    .Build();
+~~~
+
+The identities and expression are opaque to CommandAi. The consuming application owns the meanings of action, target, scope, parameter, outcome, and idempotency key. GrammarAi owns the grammar associated with the precondition expression.
 
 ## Encode and decode
 
-    var wireText = CommandAiTextCodec.Encode(proposal);
-    var parsed = CommandAiTextCodec.Decode(wireText);
+~~~csharp
+var wireText = CommandAiTextCodec.Encode(proposal);
+var parsed = CommandAiTextCodec.Decode(wireText);
+~~~
 
-The codec validates representation only. Treat decoded proposals as untrusted input and perform host-specific resolution, validation, authorization, approval, and execution separately.
+The current wire contract is CommandAi/2. It serializes each complete command as a JSON object on a Command= line. JSON property names and value kinds are explicit; unknown properties and malformed contract fields are rejected. CommandAi/1 is a breaking predecessor and is not accepted by this decoder.
 
-Decode distinguishes caller misuse from malformed wire content: null/empty/whitespace input throws ArgumentException; a non-empty but invalid envelope throws FormatException. This includes empty proposals, duplicate parameter identities, malformed literals, unsupported versions, and unknown entries. Direct model construction uses ArgumentException for invalid caller-supplied values.
+The codec validates representation only. It does not evaluate preconditions, enforce idempotency, resolve identities, authorize, or execute.
 
-## Use the generic builder or add host-owned names
+## Understand the model
 
-    var proposal = new CommandProposalBuilder()
-        .AddCommand(100, command => command
-            .WithIdentifier(200, 302)
-            .WithText(201, "Logs.Diagnostic Stream"))
-        .Build();
+- CommandInstruction.CommandId identifies this proposal instruction. It is not the idempotency key.
+- Target and Scope are required opaque CommandValue instances.
+- Arguments carry ordered parameter IDs and typed values.
+- Preconditions carry an expression plus its grammar version. They are preserved, not interpreted.
+- IdempotencyKey is required and bounded. A host must persist and enforce its duplicate-delivery policy.
+- OutcomeContract describes the expected outcome shape. It is not the actual result of execution.
+- CommandProposal is an ordered batch, not a transaction.
 
-A consuming host can layer typed extension methods such as InspectResource(...) above this generic builder. The names, ID mappings, and domain validation remain in the host; CommandAi does not register or execute them. See Builder integration and the compiled quickstart.
+## Host-owned named operations
 
-## Run the quickstart
+A consuming host may expose named extensions such as InspectResource(...) above CommandProposalBuilder. The host owns the names, IDs, semantic validation, target/scope selection, idempotency policy, and outcome definitions. See [Builder integration](BUILDER_INTEGRATION.md) and the [quickstart](../examples/CommandAi.QuickStart/Program.cs).
 
-    dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
+## Failure behavior
 
-The example prints an encoded proposal, decodes it, and explicitly does not execute it.
+- Empty caller input: ArgumentException.
+- Non-empty malformed envelope, unsupported version, malformed JSON, unknown JSON properties, missing required fields, invalid identifiers, duplicate command/parameter identities, or resource-limit violations while decoding: FormatException.
+- Direct construction with invalid caller-supplied values: ArgumentException.
+- Encoding a valid in-memory proposal that exceeds the envelope limit: ArgumentException.
 
 ## Verify the repository
 
-    dotnet restore TheSingularityWorkshop.CommandAi.slnx
-    dotnet build TheSingularityWorkshop.CommandAi.slnx --configuration Release
-    dotnet test TheSingularityWorkshop.CommandAi.slnx --configuration Release
-    dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
+~~~bash
+dotnet restore TheSingularityWorkshop.CommandAi.slnx
+dotnet build TheSingularityWorkshop.CommandAi.slnx --configuration Release
+dotnet test TheSingularityWorkshop.CommandAi.slnx --configuration Release
+dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
+~~~
 
-The last previously recorded full verification is GitHub Actions run [#92](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283963463): build/test, quickstart execution, package packing, packed-artifact audit, and compilation against the packed package passed; NuGet publication was skipped. The decoder hardening and regression tests described above are newer changes and remain pending a fresh workflow result.
+The GitHub Actions workflow also packs the library and compiles the quickstart against the produced package artifact. NuGet publication remains disabled.
 
 ---
 
