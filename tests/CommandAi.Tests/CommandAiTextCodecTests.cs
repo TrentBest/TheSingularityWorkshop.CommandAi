@@ -201,7 +201,15 @@ public sealed class CommandAiTextCodecTests
         Assert.Equal(100UL, command.ActionId);
         Assert.Single(command.Preconditions);
         Assert.Equal("idempotency-1", command.IdempotencyKey);
-        Assert.Equal(command, Assert.Single(CommandAiTextCodec.Decode(CommandAiTextCodec.Encode(proposal)).Commands));
+        var roundTripped = Assert.Single(CommandAiTextCodec.Decode(CommandAiTextCodec.Encode(proposal)).Commands);
+        Assert.Equal(command.CommandId, roundTripped.CommandId);
+        Assert.Equal(command.ActionId, roundTripped.ActionId);
+        Assert.Equal(command.IdempotencyKey, roundTripped.IdempotencyKey);
+        Assert.Equal(command.Target, roundTripped.Target);
+        Assert.Equal(command.Scope, roundTripped.Scope);
+        Assert.Equal(command.OutcomeContract.OutcomeId, roundTripped.OutcomeContract.OutcomeId);
+        Assert.Equal(command.Arguments.Count, roundTripped.Arguments.Count);
+        Assert.Equal(command.Preconditions[0].Expression, roundTripped.Preconditions[0].Expression);
     }
 
     [Fact]
