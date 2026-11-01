@@ -53,6 +53,7 @@ A direct consumer can compose a command with Guid identity, opaque target/scope 
 - [Problem domain](docs/PROBLEM_DOMAIN.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Theory and CommandAi/2 wire contract](docs/THEORY.md)
+- [Alpha consumer migration to CommandAi/2](docs/MIGRATION_COMMAND_AI_2.md)
 - [Usage guide](docs/USAGE.md)
 - [Builder integration](docs/BUILDER_INTEGRATION.md)
 - [Type guides](docs/types/)
