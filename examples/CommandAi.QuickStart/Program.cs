@@ -1,8 +1,11 @@
 using TheSingularityWorkshop.CommandAi;
-var proposal = new CommandProposal([new CommandInstruction(100, [
-    new CommandArgument(200, CommandValue.FromIdentifier(302)),
-    new CommandArgument(201, CommandValue.FromText("diagnostics"))
-])]);
+
+var proposal = new CommandProposalBuilder()
+    .AddCommand(100, command => command
+        .WithIdentifier(200, 302)
+        .WithText(201, "Logs.Diagnostic Stream"))
+    .Build();
+
 var encoded = CommandAiTextCodec.Encode(proposal);
 Console.WriteLine(encoded);
 Console.WriteLine();
