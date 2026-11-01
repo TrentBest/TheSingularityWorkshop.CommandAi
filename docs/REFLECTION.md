@@ -24,7 +24,7 @@
 
 ## Next evidence to gather
 
-1. Add differential compatibility fixtures from the [legacy audit](LEGACY_COMPATIBILITY.md); the old decoder uses fixed action tables and supports only Surface/Repository, while the new package deliberately leaves identifier meaning external.
+1. **Tracked:** [Issue #2 — add a captured legacy compatibility corpus and differential tests](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/issues/2). The old decoder uses fixed action tables and supports only Surface/Repository, while the new package deliberately leaves identifier meaning external.
 2. Cross-check the current ProtocolAi/GrammarAi contracts before introducing a package dependency or claiming end-to-end interoperability.
 3. Decide whether a separate host/domain extension package should own shared named command definitions; do not add universal meanings to CommandAi.
 
