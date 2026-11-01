@@ -3,43 +3,45 @@
 
 # CommandAi — Documentation index
 
-CommandAi represents versioned command proposals as inspectable data. The host remains responsible for vocabulary resolution, validation, authorization, approval, and execution.
+CommandAi/2 represents complete atomic command proposals as inspectable data. The host remains responsible for vocabulary resolution, precondition evaluation, idempotency enforcement, authorization, approval, and execution.
 
 ## Start here
 
-| Your goal | Read |
+| Goal | Read |
 |---|---|
-| Understand the problem and the boundary | [README](README.md) · [Problem domain](docs/PROBLEM_DOMAIN.md) |
-| Learn the versioned wire format | [Theory](docs/THEORY.md) |
+| Understand the problem and boundary | [README](README.md) · [Problem domain](docs/PROBLEM_DOMAIN.md) |
+| Learn the versioned wire contract | [Theory](docs/THEORY.md) |
 | Use the current API | [Usage guide](docs/USAGE.md) |
-| Understand package ownership and handoffs | [Architecture](docs/ARCHITECTURE.md) · [AI series boundaries](docs/AI_SERIES.md) |
-| Understand the generic proposal layer and higher-level builders | [Builder integration](docs/BUILDER_INTEGRATION.md) |
-| Reproduce the local example | [Gallery](docs/GALLERY.md) · [Quickstart source](examples/CommandAi.QuickStart/Program.cs) |
-| Understand the retired legacy boundary | [Legacy historical reference](docs/LEGACY_COMPATIBILITY.md) |
-| Review maturity and open questions | [Status and open questions](docs/REFLECTION.md) |
+| Understand package ownership and handoffs | [Architecture](docs/ARCHITECTURE.md) · [AI series](docs/AI_SERIES.md) |
+| Understand builders and host extensions | [Builder integration](docs/BUILDER_INTEGRATION.md) |
+| Reproduce the local example | [Gallery](docs/GALLERY.md) · [Quickstart](examples/CommandAi.QuickStart/Program.cs) |
+| Understand historical implementation | [Legacy historical reference](docs/LEGACY_COMPATIBILITY.md) |
+| Review maturity and remaining evidence | [Status](docs/REFLECTION.md) |
 | Inspect public type contracts | [Type guides](docs/types/) |
-| Inspect source-backed neighborhoods and use cases | [UML and use cases](docs/UML/) |
-| Read the repository's AI-agent instructions | [AGENTS.md](AGENTS.md) |
-| Check the shared documentation standard | [FSM_COS Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md) |
+| Inspect source-backed neighborhoods | [UML and use cases](docs/UML/) |
+| Read agent instructions | [AGENTS.md](AGENTS.md) |
+| Check shared documentation standards | [FSM_COS Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md) |
 
 ## Public type guides
 
-| Type | Contract and purpose | UML and use cases |
-|---|---|---|
-| CommandProposal | [Type guide](docs/types/CommandProposal.md) | [UML](docs/UML/CommandProposalUML.md) |
-| CommandInstruction | [Type guide](docs/types/CommandInstruction.md) | [UML](docs/UML/CommandInstructionUML.md) |
-| CommandArgument | [Type guide](docs/types/CommandArgument.md) | [UML](docs/UML/CommandArgumentUML.md) |
-| CommandValue | [Type guide](docs/types/CommandValue.md) | [UML](docs/UML/CommandValueUML.md) |
-| CommandValueKind | [Type guide](docs/types/CommandValueKind.md) | [UML](docs/UML/CommandValueKindUML.md) |
-| CommandValueKind | [Type guide](docs/types/CommandValueKind.md) | [UML](docs/UML/CommandValueKindUML.md) |
-| CommandLimits | [Type guide](docs/types/CommandLimits.md) | [UML](docs/UML/CommandLimitsUML.md) |
-| CommandAiTextCodec | [Type guide](docs/types/CommandAiTextCodec.md) | [UML](docs/UML/CommandAiTextCodecUML.md) |
-| CommandProposalBuilder | [Type guide](docs/types/CommandProposalBuilder.md) | [UML](docs/UML/CommandProposalBuilderUML.md) |
-| CommandInstructionBuilder | [Type guide](docs/types/CommandInstructionBuilder.md) | [UML](docs/UML/CommandInstructionBuilderUML.md) |
+| Type | Contract |
+|---|---|
+| CommandProposal | [Type guide](docs/types/CommandProposal.md) |
+| CommandInstruction | [Type guide](docs/types/CommandInstruction.md) |
+| CommandArgument | [Type guide](docs/types/CommandArgument.md) |
+| CommandValue | [Type guide](docs/types/CommandValue.md) |
+| CommandValueKind | [Type guide](docs/types/CommandValueKind.md) |
+| CommandPrecondition | [Type guide](docs/types/CommandPrecondition.md) |
+| CommandOutcomeContract | [Type guide](docs/types/CommandOutcomeContract.md) |
+| CommandOutcomeField | [Type guide](docs/types/CommandOutcomeField.md) |
+| CommandLimits | [Type guide](docs/types/CommandLimits.md) |
+| CommandAiTextCodec | [Type guide](docs/types/CommandAiTextCodec.md) |
+| CommandProposalBuilder | [Type guide](docs/types/CommandProposalBuilder.md) |
+| CommandInstructionBuilder | [Type guide](docs/types/CommandInstructionBuilder.md) |
 
 ## Evidence and limits
 
-The type guides and diagrams are human-authored and checked against current source references. They are not generated from a compiler AST or a repository-wide consumer scan. GitHub Actions run [#89](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283845342) verified the exact development head at commit [`96adbaa`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/96adbaa023fd5a052479d809a2061801790e9f6a): Release build, all 20 tests, quickstart execution, package packing, packed-artifact audit, and compilation of the quickstart against the packed package. The NuGet publication job was skipped. This does not establish live-provider behavior, host authorization, or end-to-end interoperability with the other AI packages.
+Type guides and diagrams are human-authored and checked against current source. They are not generated from a compiler AST or a repository-wide consumer scan. The current development head must pass the repository workflow, including tests, quickstart, package packing, packed-artifact audit, and consumer compilation, before implementation status is marked CI-verified. NuGet publication remains disabled.
 
 ---
 
