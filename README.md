@@ -55,7 +55,7 @@ Or create a generic proposal directly in C#:
     var decoded = CommandAiTextCodec.Decode(wireText);
     Console.WriteLine(wireText);
 
-**Verification:** GitHub Actions run [#89](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283845342) verified the exact development head at commit [`96adbaa`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/96adbaa023fd5a052479d809a2061801790e9f6a): Release build, all 20 tests, quickstart execution, package packing, packed-artifact audit, and compilation of the quickstart against the packed package. The NuGet publication job was skipped. This verifies the local representation path, not live-provider behavior, vocabulary resolution, authorization, or execution.
+**Verification:** the last previously recorded full workflow [run #92](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283963463) passed build/test, quickstart execution, package packing, packed-artifact audit, and compilation of the quickstart against the packed package; NuGet publication was skipped. The decoder hardening now on development is newer than that run and is awaiting fresh CI. This evidence verifies the local representation path, not live-provider behavior, vocabulary resolution, authorization, or execution.
 
 ## 🟪 05 Documentation and theory
 
