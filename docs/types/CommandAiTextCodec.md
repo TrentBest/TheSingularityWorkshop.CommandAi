@@ -16,7 +16,7 @@ CommandAi separates a machine-readable proposal from the application policy that
 - **Declaration:** public static class.
 - **Source:** [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs).
 - **Source-supported consumers/related types:** CommandProposal.cs; examples/CommandAi.QuickStart/Program.cs; tests/CommandAi.Tests/CommandAiTextCodecTests.cs.
-- **Responsibilities:** Encodes proposals and rejects malformed envelopes, unsupported/missing versions, malformed IDs, duplicate parameters, invalid values, and unknown envelope entries.
+- **Responsibilities:** Encodes proposals and rejects malformed envelopes, unsupported/missing versions, malformed IDs, duplicate parameters, invalid values, and unknown envelope entries. Non-empty malformed wire input is normalized to FormatException, including constructor-level proposal/argument validation failures. Null, empty, or whitespace-only caller input throws ArgumentException.
 - **Non-goals:** It does not parse arbitrary natural language, authenticate a sender, authorize a proposal, or execute commands.
 
 ## Contract notes
