@@ -37,7 +37,7 @@ The generic builder improves authoring ergonomics without assigning meaning to I
 
 ## Generic commands and extended commands
 
-The generic layer should express only what can be represented without knowing the consuming application. `CommandProposalBuilder.AddCommand` creates ordered instructions; its scoped `CommandInstructionBuilder` supports `WithIdentifier`, `WithText`, and `WithValue`. `Build` returns an immutable proposal snapshot. The builder enforces the same argument and command limits as the proposal model.
+The generic layer should express only what can be represented without knowing the consuming application. `CommandProposalBuilder.AddCommand` creates ordered instructions; its scoped `CommandInstructionBuilder` supports `WithIdentifier`, `WithText`, and `WithValue`. `Build` returns an immutable proposal snapshot. The builder enforces the same argument and command limits as the proposal model. Proposal construction also enforces a 1,048,576-character aggregate literal-text budget across all commands.
 
 The generic model supports:
 
