@@ -5,36 +5,38 @@
 
 ## Purpose
 
-One proposed action identity and its parameter arguments.
+An immutable complete atomic command proposal. It carries identity, action, target, scope, ordered parameters, optional preconditions, idempotency identity, and an expected outcome contract.
 
-## Why this type exists
+## Public contract
 
-CommandAi separates a machine-readable proposal from the application policy that may eventually accept it. This type is a source-level part of that representation; it grants no authority by itself.
+- CommandId: Guid identity for this proposed instruction.
+- ActionId: positive application-owned opaque action identity.
+- Target and Scope: required opaque typed CommandValue instances.
+- Arguments: ordered, bounded, unique parameter identities paired with typed values.
+- Preconditions: bounded grammar-versioned expressions. CommandAi stores but does not parse or evaluate them.
+- IdempotencyKey: required bounded key. The host persists and enforces duplicate-delivery behavior.
+- OutcomeContract: required expected outcome identity and declared fields. It is not an actual execution result.
 
-## Declaration and ownership
+## Ownership
 
 - **Declaration:** public sealed record.
 - **Source:** [CommandInstruction.cs](../../CommandInstruction.cs).
-- **Source-supported consumers/related types:** CommandProposal.cs; CommandAiTextCodec.cs; examples/CommandAi.QuickStart/Program.cs.
-- **Responsibilities:** Owns one positive action identifier and a read-only collection of arguments. Duplicate parameter identities are rejected.
-- **Non-goals:** It does not resolve the action identity or determine whether its arguments satisfy an application's business rules.
-
-## Contract notes
-
-The current package uses opaque unsigned 64-bit action, parameter, and value identifiers. Literal strings remain explicitly typed and are JSON-quoted by the text codec. Identifiers are not globally meaningful unless the consuming host resolves them against the intended trusted vocabulary.
+- **Related types:** CommandArgument, CommandValue, CommandPrecondition, CommandOutcomeContract, CommandProposal.
+- **Consumers:** CommandAiTextCodec, CommandInstructionBuilder, CommandProposalBuilder, quickstart, and tests.
+- **Non-goals:** resolving action meaning, evaluating conditions, enforcing idempotency, granting authority, or executing.
 
 ## Verification
 
-The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). The current quickstart is [Program.cs](../../examples/CommandAi.QuickStart/Program.cs). These pages are human-authored and source-checked; they are not generated from reflection or a compiler AST.
+The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). The quickstart is [Program.cs](../../examples/CommandAi.QuickStart/Program.cs). These pages are human-authored and source-checked, not generated from a compiler AST.
 
 ## Related documentation
 
 - [Problem domain](../PROBLEM_DOMAIN.md)
 - [Architecture](../ARCHITECTURE.md)
 - [Theory and wire format](../THEORY.md)
-- [Companion UML and use cases](../UML/CommandInstructionUML.md)
+- [Companion UML](../UML/CommandInstructionUML.md)
 
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
