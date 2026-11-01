@@ -40,7 +40,7 @@ These boundaries describe intended ownership. Actual interoperability must be ve
     Command=100 200=302 201="Logs.Diagnostic Stream"
     [/CommandAi]
 
-Each Command entry contains one positive action identifier followed by zero or more parameterId=value tokens. A value is either a positive integer identifier or a JSON-quoted string. Each parameter identifier may appear at most once in a command. The codec rejects missing/unsupported versions, malformed identifiers, duplicate parameters, and unknown envelope entries.
+Each Command entry contains one positive action identifier followed by zero or more parameterId=value tokens. A value is either a positive integer identifier or a JSON-quoted string. Each parameter identifier may appear at most once in a command. The codec rejects missing/unsupported versions, malformed identifiers, duplicate parameters, and unknown envelope entries. Empty/no-input caller misuse is an ArgumentException; malformed non-empty wire content, including an envelope with no commands, is a FormatException. Encoding a valid in-memory proposal that exceeds the envelope character limit is an ArgumentException.
 
 ## Current limits
 
