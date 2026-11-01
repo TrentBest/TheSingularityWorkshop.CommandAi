@@ -24,6 +24,8 @@ See the package test project for boundary and over-limit regression cases.
 
 ## Related documentation
 
+- [Companion UML and use cases](./CommandLimitsUML.md)
+
 - [Problem domain](../PROBLEM_DOMAIN.md)
 - [Documentation index](../../DOCUMENTATION_INDEX.md)
 
