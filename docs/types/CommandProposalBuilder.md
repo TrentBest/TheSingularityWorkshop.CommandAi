@@ -5,29 +5,23 @@
 
 ## Purpose
 
-Fluent construction of an immutable, versioned CommandAi proposal without assigning application-specific meaning to numeric identities.
+Fluent, generic construction of an immutable ordered CommandProposal.
 
-## Declaration and ownership
+## Contract
 
-- **Declaration:** public sealed class `CommandProposalBuilder`.
-- **Source:** [CommandProposalBuilder.cs](../../CommandProposalBuilder.cs).
-- **Related types:** CommandInstructionBuilder; CommandProposal; CommandLimits.
-- **Responsibility:** Accumulates ordered command instructions and creates a validated proposal snapshot.
-- **Non-goals:** It does not resolve IDs, validate domain semantics, authorize, approve, or execute commands.
+AddCommand requires commandId, actionId, target, scope, idempotencyKey, and outcomeContract. Its optional configuration callback receives a CommandInstructionBuilder for ordered parameters and grammar-versioned preconditions. Build returns an immutable proposal snapshot and enforces the proposal command limit.
 
-## Contract and use
+Application-specific names and semantic validation belong in host-owned extension methods, not in the generic builder.
 
-Call `AddCommand(actionId, configure)` for each command. The callback receives a scoped `CommandInstructionBuilder`. `Build` snapshots the accumulated commands; subsequent builder changes do not mutate an earlier proposal. The builder is bounded by `CommandLimits.MaxCommands`.
+## Ownership
+
+Source: [CommandProposalBuilder.cs](../../CommandProposalBuilder.cs). Related type: [CommandInstructionBuilder](CommandInstructionBuilder.md).
+
+The builder does not resolve identities, evaluate preconditions, enforce idempotency, authorize, or execute.
 
 ## Verification
 
-Relevant tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs), including ordered construction, duplicate parameter rejection, command limits, immutable snapshots, and codec round-trip.
-
-## Related documentation
-
-- [Builder integration boundary](../BUILDER_INTEGRATION.md)
-- [Problem domain](../PROBLEM_DOMAIN.md)
-- [CommandProposal UML](../UML/CommandProposalBuilderUML.md)
+[CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs) covers command ordering, builder limits, and independent immutable snapshots. [Quickstart](../../examples/CommandAi.QuickStart/Program.cs) demonstrates host-owned extensions.
 
 ---
 
