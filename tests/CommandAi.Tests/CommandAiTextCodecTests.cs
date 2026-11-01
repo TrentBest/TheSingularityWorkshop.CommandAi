@@ -98,7 +98,7 @@ public sealed class CommandAiTextCodecTests
     public void Decode_RejectsDuplicateJsonPropertiesAtAnyLevel()
     {
         var json = """{"commandId":"00000000-0000-0000-0000-000000000001","commandId":"00000000-0000-0000-0000-000000000002","actionId":1,"target":{"kind":"IntegerIdentifier","identifier":1,"text":null},"scope":{"kind":"IntegerIdentifier","identifier":2,"text":null},"idempotencyKey":"key","outcomeContract":{"outcomeId":1,"fields":[]},"arguments":[],"preconditions":[]}""";
-        var text = $"[CommandAi]\\nProtocol=CommandAi/2\\nCommand={json}\\n[/CommandAi]";
+        var text = $"[CommandAi]\nProtocol=CommandAi/2\nCommand={json}\n[/CommandAi]";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
     }
 
@@ -106,7 +106,7 @@ public sealed class CommandAiTextCodecTests
     public void Decode_RejectsOutcomeFieldWhenRequiredFlagIsMissing()
     {
         var json = """{"commandId":"00000000-0000-0000-0000-000000000001","actionId":1,"target":{"kind":"IntegerIdentifier","identifier":1,"text":null},"scope":{"kind":"IntegerIdentifier","identifier":2,"text":null},"idempotencyKey":"key","outcomeContract":{"outcomeId":1,"fields":[{"fieldId":2,"valueKind":"LiteralText"}]},"arguments":[],"preconditions":[]}""";
-        var text = $"[CommandAi]\\nProtocol=CommandAi/2\\nCommand={json}\\n[/CommandAi]";
+        var text = $"[CommandAi]\nProtocol=CommandAi/2\nCommand={json}\n[/CommandAi]";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(text));
     }
 
