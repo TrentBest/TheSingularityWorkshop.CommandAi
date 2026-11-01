@@ -24,13 +24,15 @@
 
 ## Next evidence to gather
 
-1. **Tracked:** [Issue #2 — add a captured legacy compatibility corpus and differential tests](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/issues/2). The old decoder uses fixed action tables and supports only Surface/Repository, while the new package deliberately leaves identifier meaning external.
-2. Cross-check the current ProtocolAi/GrammarAi contracts before introducing a package dependency or claiming end-to-end interoperability.
-3. Decide whether a separate host/domain extension package should own shared named command definitions; do not add universal meanings to CommandAi.
+1. Add a small host-owned integration example that composes the current ProtocolAi vocabulary, GrammarAi structure, and CommandAi proposal model without coupling their generic packages unnecessarily.
+2. Exercise a domain-specific CommandProposalBuilder extension in tests, proving that named commands and semantic validation remain outside CommandAi while the result round-trips through the strict codec.
+3. Keep authorization, approval, and execution in the host; successful proposal construction or encoding is not permission to act.
+
+Legacy compatibility is intentionally not planned. The source-level observations are retained in [Legacy CommandAi — historical reference](LEGACY_COMPATIBILITY.md); no compatibility parser or fixture corpus should be built.
 
 No NuGet publication is authorized by this status page.
 
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
