@@ -24,6 +24,8 @@ A declared expected outcome is not an actual outcome. A parsed command is not au
 
 ## Compatibility decision
 
+CommandAi is an internal Workshop contract and is not being independently versioned for internal consumer coordination. Keep the current `CommandAi/2` identifier unchanged; evolve internal consumers together and verify them with exact-source integration tests. Revisit package or protocol versioning only if an external compatibility boundary is deliberately introduced.
+
 CommandAi/1 is intentionally removed from the supported contract. The package has not been externally released, so the model and wire format are being corrected as a breaking change rather than carrying a compatibility parser or adapter. Consumers in the Workshop repositories must migrate together before any package publication.
 
 ## Current evidence and active domain review
@@ -38,7 +40,7 @@ CommandAi/1 is intentionally removed from the supported contract. The package ha
 ## Remaining verification and decisions
 
 1. Complete the domain review and agree with ProtocolAi/Foundry on ownership before changing CommandAi/2 wire fields.
-2. Determine whether proposal identity, causal/correlation identity, or parameter schema metadata have enough generic consumer value to justify a versioned contract change.
+2. Determine whether proposal identity, causal/correlation identity, or parameter schema metadata have enough generic consumer value to add to the internal contract. Evolve internal Workshop consumers in lockstep; do not increment package or protocol versions merely for internal coordination. Revisit versioning only if a genuine external compatibility boundary is introduced.
 3. Verify deterministic serialization across operating systems before describing the current text codec as canonical.
 4. Add adversarial tests for remaining required-field/type combinations and resource-boundary edges.
 5. CiAi PR #37 now composes CommandAi/2 and both of its required workflows pass on PR head `2ae55ce7775d8f15ad4e5dcb83484fe1a76d6976`. However, its actual submodule gitlink is `d35845113dd67a0b8a3c4654c0e095146188f916`, 18 commits behind this verified CommandAi head. A follow-up request is posted on the PR to advance the pin, correct its stale summary, and rerun both workflows against the exact current CommandAi source. Keep the PR draft.
