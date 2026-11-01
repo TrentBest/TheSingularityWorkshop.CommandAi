@@ -6,29 +6,31 @@
 ## Current implementation
 
 - Immutable proposal, instruction, argument, and typed-value contracts.
-- Generic fluent `CommandProposalBuilder` and scoped `CommandInstructionBuilder`; application-specific named commands remain host/domain extensions.
+- Generic fluent CommandProposalBuilder and scoped CommandInstructionBuilder; application-specific named commands remain host/domain extensions.
 - Explicit command, argument, per-literal, aggregate-literal, and encoded-envelope resource bounds.
-- Line-oriented CommandAi/1 encoder/decoder.
-- Positive-integer validation and duplicate-parameter rejection.
-- Round-trip, malformed-input, builder behavior, immutable-snapshot, and resource-boundary unit tests.
-- Console quickstart.
+- Line-oriented CommandAi/1 encoder/decoder with explicit JSON-quoted literal values.
+- Positive-integer validation, duplicate-parameter rejection, strict envelope-entry handling, and normalized FormatException failures for malformed non-empty wire content.
+- Regression tests for empty proposals, duplicate parameter identities, invalid literals, resource limits, round trips, builder behavior, and immutable snapshots.
+- Console quickstart with compiled host-owned named-command extensions.
 - No runtime package references to the other AI packages.
-- No command execution, approval UI, authorization, or AI endpoint.
+- No command execution, approval UI, authorization, provider transport, durable observer, or outcome lifecycle.
 
-## Known limits
+## Known limits and explicit non-goals
 
 - Identifier meaning is host-defined and not resolved here.
 - The initial wire format is intentionally narrow and does not support nested objects or lists as values.
-- The only implemented envelope is `CommandAi/1`; version negotiation and migration policy are not implemented.
-- GitHub Actions run [#89](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283845342) verified the exact development head at commit [`96adbaa`](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/96adbaa023fd5a052479d809a2061801790e9f6a): Release build, all 20 tests, quickstart execution, package packing, packed-artifact audit, and compilation of the quickstart against the packed package. The NuGet publication job was skipped. The quickstart now compiles the host-owned named-command extension example. The package has not been validated against a live provider or end-to-end host integration.
+- The only implemented envelope is CommandAi/1; version negotiation and migration policy are not implemented.
+- An instruction is an atomic proposed action; a proposal is an ordered batch, not a transaction. Target, scope, precondition, idempotency, and outcome semantics are not universal CommandAi concepts in this version. Hosts may encode domain-owned values as arguments, while durable observer/evidence/gate lifecycles belong to host and sibling protocol contracts.
+- CommandAi does not poll, subscribe to events, evaluate CI evidence, change gates, or dispatch commands. A decoded or well-formed proposal is never authorization.
+- The last previously recorded full verification is GitHub Actions run [#92](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41283963463): build/test, quickstart execution, package packing, packed-artifact audit, and compilation against the packed package passed; NuGet publication was skipped. New decoder hardening and tests are not yet CI-verified.
 
 ## Next evidence to gather
 
-1. Add a small host-owned integration example that composes the current ProtocolAi vocabulary, GrammarAi structure, and CommandAi proposal model without coupling their generic packages unnecessarily.
-2. Exercise a domain-specific CommandProposalBuilder extension in tests, proving that named commands and semantic validation remain outside CommandAi while the result round-trips through the strict codec.
-3. Keep authorization, approval, and execution in the host; successful proposal construction or encoding is not permission to act.
+1. Run the complete workflow against the latest development commit and inspect the packed package/consumer compilation after the decoder changes.
+2. Add a host-owned integration example only when the current ProtocolAi and GrammarAi public contracts can be composed without introducing unnecessary generic-package coupling.
+3. Keep authorization, approval, event subscriptions, durable observer state, evidence evaluation, and execution in their owning host/protocol domains; document any cross-repository contract through linked issues before claiming end-to-end behavior.
 
-Legacy compatibility is intentionally not planned. The source-level observations are retained in [Legacy CommandAi — historical reference](LEGACY_COMPATIBILITY.md); no compatibility parser or fixture corpus should be built.
+Legacy compatibility is intentionally not planned. The source-level observations are retained in Legacy CommandAi — historical reference; no compatibility parser or fixture corpus should be built.
 
 No NuGet publication is authorized by this status page.
 
