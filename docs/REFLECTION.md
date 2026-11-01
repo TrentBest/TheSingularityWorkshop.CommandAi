@@ -26,15 +26,27 @@ A declared expected outcome is not an actual outcome. A parsed command is not au
 
 CommandAi/1 is intentionally removed from the supported contract. The package has not been externally released, so the model and wire format are being corrected as a breaking change rather than carrying a compatibility parser or adapter. Consumers in the Workshop repositories must migrate together before any package publication.
 
-## Remaining verification
+## Current evidence and active domain review
 
-1. Run the complete CommandAi workflow on the latest development head, including package artifact audit and quickstart compilation against the packed package.
-2. Migrate The and the CiAi CommandAi proposal-composer feature branch to the new public contract.
-3. Verify cross-repository project/submodule references and tests after the source migration.
-4. Update any remaining docs, examples, fixtures, and protocol prompts that describe the previous ActionId-plus-Arguments model.
-5. Keep NuGet publication disabled until the owner explicitly authorizes a package/version.
+- [Domain completeness and ownership inventory](DOMAIN_COMPLETENESS.md) now distinguishes implemented representation guarantees, opaque fields owned by other packages, intentionally excluded runtime/presentation concerns, and unresolved contract gaps.
+- All 34 Markdown pages present at the initial audit had the animated moniker at the top and the canonical Workshop PNG footer. CI now enforces both requirements for every Markdown file in the repository.
+- Coverage collection and optional Codecov upload are part of the CommandAi workflow. The workflow passed on development commit `ddb5617fb67d67341e05494e75bd4d1e7dc83a5b`, including branding validation, build, tests with coverage, Codecov upload, quickstart, package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The publication job was skipped.
+  - [Exact verified workflow run](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41361293710)
+- [Command-domain completeness review](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/issues/3) tracks proposal/correlation identity, parameter schemas, workflow semantics, strict codec compatibility, and education/presentation neutrality.
+- [GUI.SVG documentation-generation coordination](https://github.com/TrentBest/TheSingularityWorkshop.GUI/issues/69) asks for a supported docs-only path to generate source-derived SVGs without adding a GUI runtime dependency to CommandAi.
 
-No NuGet publication is authorized by this status page.
+## Remaining verification and decisions
+
+1. Complete the domain review and agree with ProtocolAi/Foundry on ownership before changing CommandAi/2 wire fields.
+2. Determine whether proposal identity, causal/correlation identity, or parameter schema metadata have enough generic consumer value to justify a versioned contract change.
+3. Verify deterministic serialization across operating systems before describing the current text codec as canonical.
+4. Add adversarial tests for remaining required-field/type combinations and resource-boundary edges.
+5. Coordinate the CiAi #37 submodule pin with the CommandAi development head; keep repository-specific commands in CiAi's adapter layer.
+6. Adopt GUI.SVG's supported docs-generation path once the GUI team confirms the correct integration mechanism.
+7. Re-run the complete workflow on the final release candidate and review package metadata and contents.
+
+No NuGet publication, master merge, or release is authorized by this status page.
+
 
 ---
 
