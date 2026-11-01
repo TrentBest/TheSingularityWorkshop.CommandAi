@@ -3,58 +3,33 @@
 
 # CommandAiTextCodec — UML neighborhood and use cases
 
-> **Target:** public static class CommandAiTextCodec. The relationships below are authored from the current source and identify source-level structure; they are not runtime traces or generated UML.
-
-## Neighborhood
-
-```mermaid
+~~~mermaid
 flowchart TD
-  C[Consumers and related types] --> T[CommandAiTextCodec]
-  T --> D[Declared contract and dependencies]
-  T -.-> H[Host policy remains external]
-```
+  I[Untrusted envelope] --> C[CommandAiTextCodec]
+  C --> P[CommandProposal]
+  P --> A[Complete CommandInstruction]
+  A --> M[Command identity, target, scope, parameters]
+  A --> R[Preconditions, idempotency, outcome contract]
+  P -.-> H[Host validation and authorization remain external]
+~~~
 
-### Source-supported relationships
+## Contract
 
-- **Target source:** [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs).
-- **Related types and consumers:** CommandProposal.cs; examples/CommandAi.QuickStart/Program.cs; tests/CommandAi.Tests/CommandAiTextCodecTests.cs.
-- **Package reference:** CommandAi core targets .NET 8 and has no runtime project reference to ProtocolAi, GrammarAi, or HeadlessAi.
-- **Provenance:** current C# declaration and repository references; no compiler-generated relationship inventory is claimed.
+CommandAiTextCodec serializes CommandAi/2 as a strict line-oriented envelope containing JSON command entries. The decoder rejects unsupported protocol versions, malformed JSON, unknown properties, missing fields, invalid typed-value combinations, duplicate identities, and resource-limit violations.
 
 ## Use cases
 
-### UC-1 — Consume a proposed command safely
+### Decode an untrusted proposal
+The host receives an envelope, decodes it into immutable typed data, then performs domain validation and policy checks. Decoding alone never authorizes or executes.
 
-- **Actor:** host application.
-- **Goal:** inspect a command proposal without confusing decoding with authorization.
-- **Trigger:** the host receives a candidate CommandAi envelope.
-- **Preconditions:** the host selects the expected CommandAi protocol version and trusted vocabulary.
-- **Outcome:** a parsed representation is available for host-owned validation; no side effect occurs in CommandAi.
-- **Failure/alternative:** malformed input or unsupported versions are rejected; the host logs/rejects the proposal rather than silently reinterpreting it.
-- **Evidence/status:** source-authored use case grounded in the current codec and domain boundary; no automatic use-case inference is claimed.
+### Encode a proposal for transport or inspection
+The consumer builds a complete command model and encodes it deterministically. The codec does not execute or mutate anything.
 
-### UC-2 — Inspect or encode a proposal in a test/example
+## Source and evidence
 
-- **Actor:** package consumer or test.
-- **Goal:** create a deterministic representation and verify round-trip behavior.
-- **Trigger:** a consumer constructs the typed model and calls the codec.
-- **Outcome:** a versioned text envelope can be inspected or decoded.
-- **Failure/alternative:** invalid IDs, duplicate parameters, empty proposals, or malformed literals are rejected.
-- **Evidence/status:** source-checked against the quickstart and test suite; actual CI status is reported by the repository workflow.
-
-## Detail levels
-
-- **Collapsed:** CommandAiTextCodec and declaration kind.
-- **Contract:** the public members and their argument/return types are defined by the source file.
-- **Implementation:** see the source link above; this static Markdown page does not provide interactive expansion.
-
-## Related pages
-
-- [Type page](../types/CommandAiTextCodec.md)
-- [Problem domain](../PROBLEM_DOMAIN.md)
-- [Shared documentation standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md)
+Source: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs). Focused tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). CI run [#41353191987](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41353191987) passed at commit cb17cc3; NuGet publication was skipped.
 
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
