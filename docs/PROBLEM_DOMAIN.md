@@ -46,7 +46,7 @@ The codec bounds envelope characters, command count, arguments per command, prec
 
 ## Evidence status
 
-The complete model, codec, builders, focused tests, and quickstart are being implemented on development. CI must verify the current head before claiming the contract is complete. NuGet publication is not authorized.
+The complete model, codec, builders, focused tests, and quickstart are implemented on development. CI verification of the current head is pending. Alpha consumers should follow the [migration guide](MIGRATION_COMMAND_AI_2.md). NuGet publication is not authorized.
 
 ---
 
