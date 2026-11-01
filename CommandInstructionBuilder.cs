@@ -1,7 +1,7 @@
 namespace TheSingularityWorkshop.CommandAi;
 
 /// <summary>Builds one generic command instruction from opaque action and parameter identities.</summary>
-/// <remarks>This builder does not resolve identifiers or attach application-specific meaning to them.</remarks>
+/// <remarks>This builder does not resolve identifiers or attach application-specific meaning to them. This mutable builder is not thread-safe.</remarks>
 public sealed class CommandInstructionBuilder
 {
     private readonly ulong _actionId;
