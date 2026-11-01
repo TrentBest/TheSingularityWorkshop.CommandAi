@@ -30,8 +30,8 @@ CommandAi/1 is intentionally removed from the supported contract. The package ha
 
 - [Domain completeness and ownership inventory](DOMAIN_COMPLETENESS.md) now distinguishes implemented representation guarantees, opaque fields owned by other packages, intentionally excluded runtime/presentation concerns, and unresolved contract gaps.
 - All 34 Markdown pages present at the initial audit had the animated moniker at the top and the canonical Workshop PNG footer. CI now enforces both requirements for every Markdown file in the repository.
-- Coverage collection and optional Codecov upload are part of the CommandAi workflow. The workflow passed on development commit `ddb5617fb67d67341e05494e75bd4d1e7dc83a5b`, including branding validation, build, tests with coverage, Codecov upload, quickstart, package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The publication job was skipped.
-  - [Exact verified workflow run](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41361293710)
+- Coverage collection and optional Codecov upload are part of the CommandAi workflow. The workflow passed on development commit `7835481ae444f0472a9ff974557558d23274ab5d`, including branding validation, build, adversarial tests with coverage, successful Codecov upload, quickstart, package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The publication job was skipped.
+  - [Exact verified workflow run](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41361427117)
 - [Command-domain completeness review](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/issues/3) tracks proposal/correlation identity, parameter schemas, workflow semantics, strict codec compatibility, and education/presentation neutrality.
 - [GUI.SVG documentation-generation coordination](https://github.com/TrentBest/TheSingularityWorkshop.GUI/issues/69) asks for a supported docs-only path to generate source-derived SVGs without adding a GUI runtime dependency to CommandAi.
 
@@ -41,8 +41,8 @@ CommandAi/1 is intentionally removed from the supported contract. The package ha
 2. Determine whether proposal identity, causal/correlation identity, or parameter schema metadata have enough generic consumer value to justify a versioned contract change.
 3. Verify deterministic serialization across operating systems before describing the current text codec as canonical.
 4. Add adversarial tests for remaining required-field/type combinations and resource-boundary edges.
-5. Coordinate the CiAi #37 submodule pin with the CommandAi development head; keep repository-specific commands in CiAi's adapter layer.
-6. Adopt GUI.SVG's supported docs-generation path once the GUI team confirms the correct integration mechanism.
+5. CiAi PR #37 now composes CommandAi/2 and both of its required workflows pass on PR head `2ae55ce7775d8f15ad4e5dcb83484fe1a76d6976`. However, its actual submodule gitlink is `d35845113dd67a0b8a3c4654c0e095146188f916`, 18 commits behind this verified CommandAi head. A follow-up request is posted on the PR to advance the pin, correct its stale summary, and rerun both workflows against the exact current CommandAi source. Keep the PR draft.
+6. GUI issue #69 requests a docs-only GUI.SVG generation path. No response has been posted yet; do not claim GUI.SVG-generated diagrams are integrated.
 7. Re-run the complete workflow on the final release candidate and review package metadata and contents.
 
 No NuGet publication, master merge, or release is authorized by this status page.
