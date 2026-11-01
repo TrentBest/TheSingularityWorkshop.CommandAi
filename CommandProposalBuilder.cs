@@ -1,7 +1,7 @@
 namespace TheSingularityWorkshop.CommandAi;
 
 /// <summary>Fluent, identity-neutral authoring surface for a command proposal.</summary>
-/// <remarks>Application-specific command names and semantic validation belong in host-owned extensions.</remarks>
+/// <remarks>Application-specific command names and semantic validation belong in host-owned extensions. This mutable builder is not thread-safe.</remarks>
 public sealed class CommandProposalBuilder
 {
     private readonly List<CommandInstruction> _commands = [];
