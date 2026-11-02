@@ -3,9 +3,9 @@
 
 # CommandAi theory
 
-## A command is a complete contract
+## A command is an atomic proposal
 
-A command proposal is more than an action name plus arguments. For a host to reason about a request, the atomic instruction must explicitly identify:
+CommandAi intentionally models a narrow atomic instruction: a positive action identity and ordered typed parameter/value pairs. The proposal groups these instructions into a bounded ordered batch. Domain-specific target, scope, precondition, idempotency, and outcome semantics belong to higher-level packages and the host.
 
 1. **Identity** — which proposed command is this?
 2. **Action** — which application-owned operation is requested?
@@ -16,21 +16,21 @@ A command proposal is more than an action name plus arguments. For a host to rea
 7. **Idempotency** — how can duplicate delivery of the same request be recognized?
 8. **Outcome contract** — what shape of result is expected?
 
-CommandAi/2 models all eight concerns. It deliberately does not interpret the values. The target and scope are CommandValue instances; preconditions are opaque expressions tagged with a GrammarAi version; the outcome contract declares an opaque outcome identity and typed fields.
+CommandAi/1 does not claim to model those higher-level concerns. It validates the bounded representation and preserves the action and parameter/value identities without assigning them application meaning.
 
-## Identity is not idempotency
+## Domain semantics remain outside the generic kernel
 
 A command identity distinguishes one proposed instruction from other instructions. An idempotency key lets a host recognize repeated delivery or retries of the same logical request. They are separate because a newly proposed command can target the same resource and action while still representing a distinct intent, and a retried delivery can repeat the same idempotency key.
 
 CommandAi validates that command IDs and idempotency keys are unique within a single proposal. It does not persist keys, coordinate across processes, or guarantee exactly-once effects. The host owns that lifecycle.
 
-## Preconditions are not evaluation
+## Typed values remain opaque
 
 A precondition expression is stored with the grammar version that defines its structure. CommandAi bounds and transports the expression but does not parse it, decide whether it is true, or inspect live application state. GrammarAi owns the grammar and structural validity; the host evaluates the accepted expression against current state at the appropriate point in the workflow.
 
 This separation avoids coupling the generic command package to a specific grammar implementation or application domain.
 
-## Expected outcome is not actual outcome
+## Proposal is not execution
 
 CommandOutcomeContract declares an outcome identity and the fields expected in a conforming result. It is attached to the proposed command so the consumer knows what kind of result the command promises to produce.
 
@@ -42,7 +42,7 @@ An integer identity is compact and avoids relying on model-generated spelling fo
 
 Literal text carries open-ended values explicitly as data. JSON encoding keeps quotes, whitespace, and backslashes unambiguous. Literal text is still untrusted input and remains bounded.
 
-## Wire format: CommandAi/2
+## Wire format: CommandAi/1
 
 The envelope is line-oriented. Each command line contains a JSON object with explicit fields:
 
@@ -53,7 +53,7 @@ Command={"commandId":"...","actionId":100,"target":{"kind":"IntegerIdentifier","
 [/CommandAi]
 ~~~
 
-The codec rejects unsupported versions, malformed JSON, unknown JSON properties, missing required contract fields, invalid value-kind combinations, invalid identifiers, duplicates, and resource-limit violations. The old CommandAi/1 token format is intentionally not accepted; the package has not been externally released and this is a breaking contract correction.
+The codec rejects unsupported versions, malformed tokens, invalid identifiers, duplicate parameters, malformed quoted literals, and resource-limit violations. This compact token format is the approved CommandAi/1 contract.
 
 ## Package ownership
 
