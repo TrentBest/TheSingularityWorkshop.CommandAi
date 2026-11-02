@@ -3,7 +3,7 @@
 
 # CommandProposal — UML neighborhood and use cases
 
-> **Target:** public sealed record CommandProposal. Relationships are authored from current source; they are not runtime traces or generated UML.
+> Relationships are authored from the approved source model; this is not a runtime trace or generated UML.
 
 ## Neighborhood
 
@@ -12,40 +12,52 @@ classDiagram
   class CommandProposal {
     +string ProtocolVersion
     +IReadOnlyList~CommandInstruction~ Commands
-    +CurrentProtocolVersion = CommandAi/2
+    +CurrentProtocolVersion = CommandAi/1
   }
-  CommandProposal --> CommandInstruction : ordered atomic commands
-  CommandInstruction --> CommandValue : target / scope
-  CommandInstruction --> CommandArgument : parameters
-  CommandInstruction --> CommandPrecondition : grammar-versioned conditions
-  CommandInstruction --> CommandOutcomeContract : expected outcome shape
+  class CommandInstruction {
+    +ulong ActionId
+    +IReadOnlyList~CommandArgument~ Arguments
+  }
+  class CommandArgument {
+    +ulong ParameterId
+    +CommandValue Value
+  }
+  class CommandValue {
+    +CommandValueKind Kind
+    +ulong? Identifier
+    +string? Text
+  }
+  CommandProposal --> CommandInstruction : ordered commands
+  CommandInstruction --> CommandArgument : ordered parameters
+  CommandArgument --> CommandValue : typed value
 ~~~
 
 ## Source-supported relationships
 
 - **Target source:** [CommandProposal.cs](../../CommandProposal.cs).
-- **Related source:** CommandInstruction.cs and CommandLimits.cs.
-- **Codec:** CommandAiTextCodec.cs serializes each command entry as JSON within the CommandAi/2 envelope.
-- **Invariants:** proposals are non-empty, ordered, bounded, and unique by command identity and idempotency key.
+- **Related source:** [CommandInstruction.cs](../../CommandInstruction.cs), [CommandArgument.cs](../../CommandArgument.cs), [CommandValue.cs](../../CommandValue.cs), and [CommandLimits.cs](../../CommandLimits.cs).
+- **Codec:** [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs) reads and writes the line-oriented CommandAi/1 envelope.
+- **Invariants:** proposals are non-empty, ordered, bounded; action and parameter identities are positive; duplicate parameter identities are rejected within a command.
 
 ## Use cases
 
-### UC-1 — Consume a proposed batch safely
-- **Actor:** host application.
-- **Trigger:** the host receives a candidate CommandAi/2 envelope.
-- **Outcome:** a parsed proposal is available for host-owned validation; no side effect occurs in CommandAi.
-- **Failure:** malformed content and unsupported versions are rejected.
+### UC-1 — Decode a proposed batch
+- **Actor:** consuming host.
+- **Trigger:** receive a candidate CommandAi/1 envelope.
+- **Outcome:** a structurally valid proposal is available for host-owned semantic validation.
+- **Failure:** malformed content, unsupported protocol, invalid identifiers, duplicates, or resource-limit violations are rejected.
 
-### UC-2 — Coordinate atomic commands
-- **Actor:** FSM_Foundry or another host.
-- **Goal:** inspect the ordered proposal, then independently validate and authorize each atomic command.
-- **Outcome:** the host may accept, reject, retry, or dispatch commands according to its policy. The proposal itself does not imply transaction semantics or all-or-nothing execution.
+### UC-2 — Compose atomic actions
+- **Actor:** application or host.
+- **Goal:** represent several ordered action proposals.
+- **Outcome:** the host receives an ordered list. The list does not imply transaction, dependency, retry, or rollback semantics.
 
 ## Related pages
 
 - [Type page](../types/CommandProposal.md)
+- [Theory](../THEORY.md)
 - [Problem domain](../PROBLEM_DOMAIN.md)
-- [Shared documentation standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md)
+
 
 ---
 
