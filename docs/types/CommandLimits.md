@@ -3,22 +3,18 @@
 
 # CommandLimits
 
-Central source constants that bound untrusted CommandAi/2 proposals and encoded envelopes.
+Central source constants that bound untrusted CommandAi/1 proposals and encoded envelopes.
 
 | Bound | Maximum |
 |---|---:|
-| Encoded envelope | 262,144 characters |
+| Encoded envelope | 262,144 UTF-16 characters |
 | Commands per proposal | 256 |
 | Arguments per command | 64 |
-| Preconditions per command | 32 |
-| Fields per outcome contract | 64 |
-| Individual literal text | 16,384 characters |
-| Aggregate literal, precondition, and idempotency text | 1,048,576 characters |
-| Grammar-version identifier | 128 characters |
-| Precondition expression | 16,384 characters |
-| Idempotency key | 256 characters |
+| Individual literal text | 16,384 UTF-16 characters |
+| Aggregate literal text per proposal | 1,048,576 characters |
 
 Source: [CommandLimits.cs](../../CommandLimits.cs). These are representation/resource limits, not semantic safety or authorization guarantees.
+
 
 ---
 
