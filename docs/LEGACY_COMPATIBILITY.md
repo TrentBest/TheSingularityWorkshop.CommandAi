@@ -5,44 +5,19 @@
 
 ## Status
 
-**Historical reference only.** The old CommandAi implementation is not a compatibility target. The repository owner has decided that preserving or recreating the legacy implementation is not worth the effort beyond the source-level observations already recorded here.
+This page records observations about an earlier implementation. It is not a compatibility target, and the modern package does not claim drop-in interoperability with it.
 
-Do not add a legacy parser, compatibility adapter, captured fixture corpus, or differential test project. Do not delay current package development to reproduce the old behavior.
+## Source observations
 
-## What the source review established
-
-The legacy implementation reviewed at [The / Architect/Workshop/Ai/CommandAi.cs](https://github.com/TrentBest/The/blob/6ad1971f3932654ea58f8dd8dbc0dde530e4e4c6/Architect/Workshop/Ai/CommandAi.cs) and its adjacent ProtocolAi/GrammarAi sources:
-
-- used a CommandAi/1 envelope marker;
-- accepted a Protocol header case-insensitively and permitted it to be absent;
-- parsed human-readable and compact integer command forms;
-- mapped integer action IDs through a fixed legacy ProtocolAi table;
-- supported legacy Surface and Repository parameters;
-- resolved Surface IDs through a fixed table and unquoted Repository strings;
-- mixed generic parsing with application-specific command meanings and approval/execution concerns.
-
-These are source-reviewed observations, not a verified interoperability contract. No captured historical input corpus or runtime compatibility claim is retained.
+The legacy implementation reviewed at [The / Architect/Workshop/Ai/CommandAi.cs](https://github.com/TrentBest/The/blob/6ad1971f3932654ea58f8dd8dbc0dde530e4e4c6/Architect/Workshop/Ai/CommandAi.cs) mixed generic parsing with application-specific vocabulary and approval/execution concerns. These observations are historical source notes, not a normative wire specification.
 
 ## Current package boundary
 
-The current CommandAi package intentionally provides a narrower, generic representation:
+The current package uses the CommandAi/1 model: immutable ordered proposals, action identifiers, typed parameter values, bounded literal text, generic builders, and a line-oriented codec. It intentionally does not resolve identifier meanings, authorize, approve, or execute commands.
 
-- exact `Protocol=CommandAi/2` envelope identity;
-- unique command identity, positive opaque action identity, typed target and scope;
-- typed parameters, grammar-versioned opaque preconditions, and a required idempotency key;
-- an explicit expected outcome contract;
-- ordered immutable command proposals and generic fluent builders;
-- strict JSON command encoding/decoding with explicit resource limits.
+The repository's earlier /2 candidate is not the approved contract. Internal consumers must retain /1; do not add /2-only fields or version bumps merely for internal coordination.
 
-The previous standalone package alpha shape (action plus arguments only) was also replaced. See the [alpha consumer migration guide](MIGRATION_COMMAND_AI_2.md).
-
-CommandAi does not resolve identifier meanings, authorize, approve, or execute commands. Application/domain extensions own named operations and semantic validation; the host owns trust, current-state checks, authorization, approval, and execution.
-
-## Decision
-
-The former compatibility-corpus work item, [Issue #2](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/issues/2), was closed as **not planned** by repository-owner direction. The source observations above are retained only to prevent accidental claims that the modern package is a drop-in replacement.
-
-For current implementation guidance, use the [builder integration guide](BUILDER_INTEGRATION.md), [usage guide](USAGE.md), and [architecture](ARCHITECTURE.md).
+For current implementation guidance, see the [theory chapter](THEORY.md), [builder integration](BUILDER_INTEGRATION.md), and [usage guide](USAGE.md).
 
 ---
 
