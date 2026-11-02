@@ -24,9 +24,9 @@ A declared expected outcome is not an actual outcome. A parsed command is not au
 
 ## Compatibility decision
 
-CommandAi is an internal Workshop contract and is not being independently versioned for internal consumer coordination. Keep the current `CommandAi/2` identifier unchanged; evolve internal consumers together and verify them with exact-source integration tests. Revisit package or protocol versioning only if an external compatibility boundary is deliberately introduced.
+**Owner correction (2026-11-02): retain `CommandAi/1`.** The Workshop owns the current consumers, so internal repositories must adapt together to the existing `/1` model and wire shape. Do not migrate consumers to `/2`, and do not increment package or protocol versions merely for internal coordination. Revisit versioning only if an actual external compatibility boundary is deliberately introduced.
 
-CommandAi/1 is intentionally removed from the supported contract. The package has not been externally released, so the model and wire format are being corrected as a breaking change rather than carrying a compatibility parser or adapter. Consumers in the Workshop repositories must migrate together before any package publication.
+The current `development` source still contains the `/2` migration candidate described above; that implementation and its documentation are now a known direction mismatch and must be brought back to `/1`. Retain only hardening that is compatible with the `/1` contract. Do not add `/2`-only fields to consumers. The `/1` restoration and exact-source integration verification are pending; do not describe the current `/2` candidate as the approved contract.
 
 ## Current evidence and active domain review
 
@@ -43,7 +43,7 @@ CommandAi/1 is intentionally removed from the supported contract. The package ha
 2. Determine whether proposal identity, causal/correlation identity, or parameter schema metadata have enough generic consumer value to add to the internal contract. Evolve internal Workshop consumers in lockstep; do not increment package or protocol versions merely for internal coordination. Revisit versioning only if a genuine external compatibility boundary is introduced.
 3. Verify deterministic serialization across operating systems before describing the current text codec as canonical.
 4. Add adversarial tests for remaining required-field/type combinations and resource-boundary edges.
-5. CiAi PR #37 now composes CommandAi/2 and both of its required workflows pass on PR head `2ae55ce7775d8f15ad4e5dcb83484fe1a76d6976`. However, its actual submodule gitlink is `d35845113dd67a0b8a3c4654c0e095146188f916`, 18 commits behind this verified CommandAi head. A follow-up request is posted on the PR to advance the pin, correct its stale summary, and rerun both workflows against the exact current CommandAi source. Keep the PR draft.
+5. CiAi PR #37's earlier `/2` migration and green workflows are superseded by the owner correction. The PR must return to the actual `/1` model and wire shape, update its source pin and opening summary accordingly, and rerun both required workflows against the exact corrected CommandAi source. Keep the PR draft. The latest owner direction is recorded on the PR and in CommandAi issue #3.
 6. GUI issue #69 requests a docs-only GUI.SVG generation path. No response has been posted yet; do not claim GUI.SVG-generated diagrams are integrated.
 7. Re-run the complete workflow on the final release candidate and review package metadata and contents.
 
