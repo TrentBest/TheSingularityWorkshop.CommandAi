@@ -5,29 +5,24 @@
 
 ~~~mermaid
 flowchart TD
-  I[Untrusted envelope] --> C[CommandAiTextCodec]
+  I[Untrusted CommandAi/1 envelope] --> C[CommandAiTextCodec]
   C --> P[CommandProposal]
-  P --> A[Complete CommandInstruction]
-  A --> M[Command identity, target, scope, parameters]
-  A --> R[Preconditions, idempotency, outcome contract]
+  P --> A[Ordered CommandInstruction records]
+  A --> M[Action identity and typed arguments]
   P -.-> H[Host validation and authorization remain external]
 ~~~
 
 ## Contract
 
-CommandAiTextCodec serializes CommandAi/2 as a strict line-oriented envelope containing JSON command entries. The decoder rejects unsupported protocol versions, malformed JSON, unknown properties, missing fields, invalid typed-value combinations, duplicate identities, and resource-limit violations.
+The codec reads and writes the line-oriented CommandAi/1 envelope. A command line contains a positive action identifier followed by ordered parameter/value pairs. Values are positive integer identifiers or JSON-quoted literal strings.
 
 ## Use cases
 
-### Decode an untrusted proposal
-The host receives an envelope, decodes it into immutable typed data, then performs domain validation and policy checks. Decoding alone never authorizes or executes.
+- Decode an untrusted envelope into bounded immutable data for host validation.
+- Encode a constructed proposal for transport or inspection.
+- Reject malformed envelopes, unsupported versions, duplicate declarations/parameters, invalid identifiers, and resource-limit violations.
 
-### Encode a proposal for transport or inspection
-The consumer builds a complete command model and encodes it deterministically. The codec does not execute or mutate anything.
-
-## Source and evidence
-
-Source: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs). Focused tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). CI run [#41353191987](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41353191987) passed at commit cb17cc3; NuGet publication was skipped.
+Source: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs). Tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). Parsing does not authorize or execute.
 
 ---
 
