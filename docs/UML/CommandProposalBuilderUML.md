@@ -6,27 +6,28 @@
 ~~~mermaid
 classDiagram
   class CommandProposalBuilder {
-    +AddCommand(Guid, ulong, CommandValue, CommandValue, string, CommandOutcomeContract, Action)
+    +AddCommand(ulong, Action)
     +Build() CommandProposal
   }
   class CommandInstructionBuilder {
     +WithIdentifier(ulong, ulong)
     +WithText(ulong, string)
     +WithValue(ulong, CommandValue)
-    +WithPrecondition(string, string)
     +Build() CommandInstruction
   }
   CommandProposalBuilder --> CommandInstructionBuilder : scopes authoring
   CommandProposalBuilder --> CommandProposal : snapshots
-  CommandInstructionBuilder --> CommandInstruction : builds complete command
+  CommandInstructionBuilder --> CommandInstruction : builds
 ~~~
 
 ## Use cases
 
-- Host extensions compose named application operations using the generic builder.
-- Each command must declare identity, action, target, scope, idempotency key, and outcome contract.
-- Parameters and optional preconditions are added through the scoped instruction builder.
-- Build snapshots the proposal; it does not validate domain meaning or grant execution authority.
+- Add ordered atomic commands to a proposal.
+- Configure action IDs and typed parameter values.
+- Build a non-empty immutable proposal.
+- Encode the proposal using CommandAiTextCodec and the CommandAi/1 wire contract.
+
+The builder creates representation only. Host-owned extensions supply named operations and trusted identity mappings; the host retains semantic validation, policy, authorization, and execution.
 
 Source: [CommandProposalBuilder.cs](../../CommandProposalBuilder.cs). Tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs).
 
