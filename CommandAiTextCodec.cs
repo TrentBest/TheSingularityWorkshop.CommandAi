@@ -68,7 +68,14 @@ public static class CommandAiTextCodec
         }
         if (!string.Equals(protocol, CommandProposal.CurrentProtocolVersion, StringComparison.Ordinal))
             throw new FormatException($"Unsupported or missing CommandAi protocol '{protocol ?? "(missing)"}'.");
-        return new CommandProposal(commands, protocol!);
+        try
+        {
+            return new CommandProposal(commands, protocol!);
+        }
+        catch (ArgumentException ex)
+        {
+            throw new FormatException("The CommandAi envelope does not describe a valid proposal.", ex);
+        }
     }
 
     private static CommandInstruction ParseCommand(string payload)
