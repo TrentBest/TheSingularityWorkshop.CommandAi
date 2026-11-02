@@ -1,79 +1,73 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-# CommandAi theory
+# CommandAi theory: proposals and atomic commands
 
-## A command is a complete contract
+## 1. The problem of expressing intent
 
-A command proposal is more than an action name plus arguments. For a host to reason about a request, the atomic instruction must explicitly identify:
+A model, agent, or application may propose an action, but a proposal is not permission to perform it. The receiver needs a stable, bounded representation of the requested action and its parameters, without confusing the request with the receiver's interpretation, policy, or execution.
 
-1. **Identity** — which proposed command is this?
-2. **Action** — which application-owned operation is requested?
-3. **Target** — which object or resource is acted upon?
-4. **Scope** — what boundary limits the operation?
-5. **Parameters** — what typed values configure the operation?
-6. **Preconditions** — which grammar-defined conditions must hold?
-7. **Idempotency** — how can duplicate delivery of the same request be recognized?
-8. **Outcome contract** — what shape of result is expected?
+CommandAi is the provider-neutral data contract at that boundary. It represents an ordered proposal containing one or more atomic command instructions. The model is immutable after construction and values are deliberately opaque: an integer identity or literal text carries data, not trusted domain meaning.
 
-CommandAi/2 models all eight concerns. It deliberately does not interpret the values. The target and scope are CommandValue instances; preconditions are opaque expressions tagged with a GrammarAi version; the outcome contract declares an opaque outcome identity and typed fields.
+## 2. What is a command?
 
-## Identity is not idempotency
+A command is an atomic declaration of intended action: an action identity plus ordered, typed arguments. It does not prescribe how the action is implemented, displayed, authorized, scheduled, or executed.
 
-A command identity distinguishes one proposed instruction from other instructions. An idempotency key lets a host recognize repeated delivery or retries of the same logical request. They are separate because a newly proposed command can target the same resource and action while still representing a distinct intent, and a retried delivery can repeat the same idempotency key.
+The current CommandAi/1 model intentionally remains compact:
+- `CommandProposal`: a non-empty ordered collection of instructions and its protocol version;
+- `CommandInstruction`: a positive action identity and ordered arguments;
+- `CommandArgument`: a positive parameter identity paired with a typed value;
+- `CommandValue`: either a positive integer identifier or bounded literal text.
 
-CommandAi validates that command IDs and idempotency keys are unique within a single proposal. It does not persist keys, coordinate across processes, or guarantee exactly-once effects. The host owns that lifecycle.
+Target, scope, command GUID, idempotency, precondition expressions, and expected-outcome fields are not part of this approved /1 contract. Do not silently infer them from the action or parameter data.
 
-## Preconditions are not evaluation
+## 3. Proposal is not execution
 
-A precondition expression is stored with the grammar version that defines its structure. CommandAi bounds and transports the expression but does not parse it, decide whether it is true, or inspect live application state. GrammarAi owns the grammar and structural validity; the host evaluates the accepted expression against current state at the appropriate point in the workflow.
+A proposal is untrusted input. Decoding proves only that the bytes/text conform to the supported representation and resource limits. It does not prove that an action exists, that an identifier is meaningful, that a request is safe, or that the sender is authorized.
 
-This separation avoids coupling the generic command package to a specific grammar implementation or application domain.
+The consuming host resolves identifiers against trusted definitions, validates domain rules and current state, applies authorization and approval policy, and owns dispatch and execution. Actual outcomes and errors are separate records owned by the runtime/protocol layer.
 
-## Expected outcome is not actual outcome
+## 4. Atomicity and composition
 
-CommandOutcomeContract declares an outcome identity and the fields expected in a conforming result. It is attached to the proposed command so the consumer knows what kind of result the command promises to produce.
+Each instruction describes one atomic action. A proposal preserves instruction order, but it is not a transaction: CommandAi does not promise all-or-nothing behavior, rollback, dependency scheduling, retries, cancellation, deadlines, or compensation. Those are orchestration concerns and belong to the host or a workflow-specific package.
 
-The contract is not the result itself. Actual execution events, correlation, provenance, replay metadata, and outcome records belong to ProtocolAi and the host runtime. CI evidence and pass/fail verdicts remain CiAi domain. A proposal cannot assert that its expected outcome has occurred.
+## 5. Wire representation
 
-## Why integer identities and literal text?
-
-An integer identity is compact and avoids relying on model-generated spelling for known vocabulary. It is still opaque: it can be stale, unknown, or inappropriate in context. ProtocolAi and the consuming application own the mapping.
-
-Literal text carries open-ended values explicitly as data. JSON encoding keeps quotes, whitespace, and backslashes unambiguous. Literal text is still untrusted input and remains bounded.
-
-## Wire format: CommandAi/2
-
-The envelope is line-oriented. Each command line contains a JSON object with explicit fields:
+The codec reads and writes the line-oriented CommandAi/1 envelope:
 
 ~~~text
 [CommandAi]
-Protocol=CommandAi/2
-Command={"commandId":"...","actionId":100,"target":{"kind":"IntegerIdentifier","identifier":300,"text":null},"scope":{"kind":"LiteralText","identifier":null,"text":"workspace"},"idempotencyKey":"inspect:resource:42","outcomeContract":{"outcomeId":400,"fields":[{"fieldId":401,"valueKind":"LiteralText","required":true}]},"arguments":[],"preconditions":[]}
+Protocol=CommandAi/1
+Command=100 200=300 201="diagnostic stream"
 [/CommandAi]
 ~~~
 
-The codec rejects unsupported versions, malformed JSON, unknown JSON properties, missing required contract fields, invalid value-kind combinations, invalid identifiers, duplicates, and resource-limit violations. The old CommandAi/1 token format is intentionally not accepted; the package has not been externally released and this is a breaking contract correction.
+The first token is a positive action identifier. Each following token is a positive parameter identifier, an equals sign, and either a positive integer identifier or a JSON-quoted literal. The codec rejects malformed envelopes, unsupported versions, duplicate declarations/parameters, invalid identifiers, malformed quoted literals, and resource-limit violations.
 
-## Package ownership
+## 6. Ownership across the Workshop
 
-| Package | Owns | Does not own |
-|---|---|---|
-| ProtocolAi | Vocabulary, protocol-qualified identity, correlated/provenance-bearing events and actual outcomes | Command representation, authorization, execution |
-| GrammarAi | Grammar definitions, productions, structural validation | Vocabulary meaning, live-state truth, authorization |
-| CommandAi | Complete atomic command representation and deterministic codec | Domain meaning, condition evaluation, idempotency enforcement, actual outcomes, authorization, execution |
-| HeadlessAi | Configured endpoint request/response communication | Command authority or host policy |
-| CiAi | CI evidence and verdicts | Command execution or general application authorization |
-| FSM_Foundry / host | Durable observer lifecycle, scheduling, live-state evaluation, authorization, approval, dispatch, execution | Reusable provider-neutral command representation |
+| Layer | Responsibility |
+|---|---|
+| ProtocolAi | Protocol vocabulary, identity meaning, correlated events and actual outcomes |
+| GrammarAi | Grammar definitions and structural validation where a grammar is used |
+| CommandAi | Immutable action/argument proposal model, bounds, builders, /1 codec |
+| HeadlessAi | Endpoint communication; not command authority |
+| CiAi | CI evidence and verdicts; not general command execution |
+| FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
 
-## Limits and non-goals
+The package remains independent of sibling AI packages. A host may add named operations and typed convenience APIs around the generic builder, but those extensions remain host-owned.
 
-- CommandAi does not negotiate versions or translate CommandAi/1.
-- It does not authenticate the sender or cryptographically bind the proposal.
-- It does not guarantee replay protection or exactly-once execution.
-- It does not parse natural language or evaluate preconditions.
-- It does not execute commands, generate CI verdicts, or treat an expected outcome as a completed outcome.
-- It has no runtime dependency on the other AI packages.
+## 7. Presentation neutrality
+
+A command's meaning must not prescribe a fixed screen, reading level, age, narration, haptic response, or teaching strategy. Future application layers can project the same semantic intent through different interfaces and accessibility modalities. CommandAi must not depend on UI, rendering, speech, haptics, user profiles, or pedagogy.
+
+## 8. Security and limits
+
+Opaque identifiers are not secrets, credentials, or authorization tokens. Literal text is untrusted and may contain sensitive data; callers must apply their own redaction and storage policy. CommandAi bounds input size and collection counts to limit resource consumption, but these limits do not establish semantic safety.
+
+## 9. Evidence and change policy
+
+The approved contract is CommandAi/1. Internal Workshop consumers are to evolve together; do not introduce /2 or bump package/protocol versions merely to coordinate internal code. Additive or breaking model changes require a concrete domain need, source-backed tests, and an explicit owner decision. No NuGet publication is implied.
 
 ---
 
