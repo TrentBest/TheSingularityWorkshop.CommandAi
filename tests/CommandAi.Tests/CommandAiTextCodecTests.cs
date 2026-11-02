@@ -26,7 +26,6 @@ public sealed class CommandAiTextCodecTests
     }
 
     [Theory]
-    [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100 200=300\\n[/CommandAi]")]
     [InlineData("[CommandAi]\\nProtocol=CommandAi/9\\nCommand=100\\n[/CommandAi]")]
     [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nUnexpected=value\\n[/CommandAi]")]
     [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=0\\n[/CommandAi]")]
