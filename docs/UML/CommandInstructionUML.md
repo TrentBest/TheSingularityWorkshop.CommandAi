@@ -3,62 +3,39 @@
 
 # CommandInstruction — UML neighborhood and use cases
 
-> **Target:** public sealed record CommandInstruction. Relationships are authored from current source; they are not runtime traces or generated UML.
-
-## Neighborhood
-
 ~~~mermaid
 classDiagram
   class CommandInstruction {
-    +Guid CommandId
     +ulong ActionId
-    +CommandValue Target
-    +CommandValue Scope
-    +string IdempotencyKey
     +IReadOnlyList~CommandArgument~ Arguments
-    +IReadOnlyList~CommandPrecondition~ Preconditions
-    +CommandOutcomeContract OutcomeContract
   }
-  CommandInstruction --> CommandValue : target / scope
-  CommandInstruction --> CommandArgument : parameters
-  CommandInstruction --> CommandPrecondition : opaque conditions
-  CommandInstruction --> CommandOutcomeContract : expected result shape
-  CommandProposal --> CommandInstruction : ordered batch
+  class CommandArgument {
+    +ulong ParameterId
+    +CommandValue Value
+  }
+  class CommandValue {
+    +CommandValueKind Kind
+    +ulong? Identifier
+    +string? Text
+  }
+  CommandInstruction --> CommandArgument : ordered parameters
+  CommandArgument --> CommandValue : typed value
 ~~~
 
 ## Source-supported relationships
 
 - **Target source:** [CommandInstruction.cs](../../CommandInstruction.cs).
-- **Related source:** CommandValue.cs, CommandArgument.cs, CommandPrecondition.cs, CommandOutcomeContract.cs, CommandProposal.cs.
-- **Codec:** CommandAiTextCodec.cs encodes/decodes the complete contract.
-- **Package boundary:** CommandAi stores precondition expressions without interpreting them and stores outcome declarations without treating them as actual results.
+- **Related source:** CommandArgument.cs, CommandValue.cs, CommandProposal.cs.
+- **Codec:** CommandAiTextCodec.cs encodes and decodes the CommandAi/1 representation.
+- **Invariant:** action and parameter identities are positive; parameter identities are unique within a command.
+
+A command is a representation of intent, not an authorization decision or execution record. The host owns domain validation and dispatch.
 
 ## Use cases
 
-### UC-1 — Inspect an untrusted proposal
-- **Actor:** host application.
-- **Trigger:** a candidate CommandAi/2 envelope arrives.
-- **Outcome:** the codec returns a bounded immutable representation for host validation.
-- **Failure:** malformed input or unsupported versions are rejected.
-- **Safety invariant:** parsing does not authorize or execute.
-
-### UC-2 — Evaluate and dispatch through the host
-- **Actor:** FSM_Foundry or another trusted host.
-- **Preconditions:** the host resolves action/target/scope identities, validates parameters, interprets preconditions with the appropriate grammar, enforces idempotency, and applies authorization/approval.
-- **Outcome:** the host may dispatch the accepted command and later record an actual correlated outcome.
-- **Ownership:** actual outcomes belong to ProtocolAi/host; CI verdicts belong to CiAi.
-
-## Detail levels
-
-- **Collapsed:** CommandInstruction and its role as one atomic proposal.
-- **Contract:** public members are defined by the linked source file.
-- **Implementation:** see source links; this static page is not interactive generated UML.
-
-## Related pages
-
-- [Type page](../types/CommandInstruction.md)
-- [Problem domain](../PROBLEM_DOMAIN.md)
-- [Shared documentation standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md)
+- Inspect a decoded atomic action and its typed arguments.
+- Construct an instruction with the fluent builder.
+- Preserve its argument order when placed into a proposal.
 
 ---
 
