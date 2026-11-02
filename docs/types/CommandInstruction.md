@@ -3,38 +3,18 @@
 
 # CommandInstruction
 
-## Purpose
+An immutable atomic action declaration consisting of a positive action identity and an ordered collection of typed arguments.
 
-An immutable complete atomic command proposal. It carries identity, action, target, scope, ordered parameters, optional preconditions, idempotency identity, and an expected outcome contract.
+## Contract
 
-## Public contract
+- `ActionId` is a positive unsigned integer.
+- `Arguments` preserves insertion order.
+- Parameter identities are positive and unique within the instruction.
+- Argument count and literal values are bounded by CommandLimits.
 
-- CommandId: Guid identity for this proposed instruction.
-- ActionId: positive application-owned opaque action identity.
-- Target and Scope: required opaque typed CommandValue instances.
-- Arguments: ordered, bounded, unique parameter identities paired with typed values.
-- Preconditions: bounded grammar-versioned expressions. CommandAi stores but does not parse or evaluate them.
-- IdempotencyKey: required bounded key. The host persists and enforces duplicate-delivery behavior.
-- OutcomeContract: required expected outcome identity and declared fields. It is not an actual execution result.
+The instruction does not carry command GUID, target/scope, preconditions, idempotency, or expected-outcome metadata in the approved CommandAi/1 model.
 
-## Ownership
-
-- **Declaration:** public sealed record.
-- **Source:** [CommandInstruction.cs](../../CommandInstruction.cs).
-- **Related types:** CommandArgument, CommandValue, CommandPrecondition, CommandOutcomeContract, CommandProposal.
-- **Consumers:** CommandAiTextCodec, CommandInstructionBuilder, CommandProposalBuilder, quickstart, and tests.
-- **Non-goals:** resolving action meaning, evaluating conditions, enforcing idempotency, granting authority, or executing.
-
-## Verification
-
-The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). The quickstart is [Program.cs](../../examples/CommandAi.QuickStart/Program.cs). These pages are human-authored and source-checked, not generated from a compiler AST.
-
-## Related documentation
-
-- [Problem domain](../PROBLEM_DOMAIN.md)
-- [Architecture](../ARCHITECTURE.md)
-- [Theory and wire format](../THEORY.md)
-- [Companion UML](../UML/CommandInstructionUML.md)
+Source: [CommandInstruction.cs](../../CommandInstruction.cs). Related: CommandArgument, CommandValue, CommandProposal.
 
 ---
 
