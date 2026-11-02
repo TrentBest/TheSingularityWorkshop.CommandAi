@@ -27,12 +27,12 @@ A compact envelope contains one JSON command object per line:
 
 ~~~text
 [CommandAi]
-Protocol=CommandAi/2
+Protocol=CommandAi/1
 Command={"commandId":"...","actionId":100,"target":{"kind":"IntegerIdentifier","identifier":300,"text":null},"scope":{"kind":"LiteralText","identifier":null,"text":"workspace"},"idempotencyKey":"inspect:resource:42","outcomeContract":{"outcomeId":400,"fields":[{"fieldId":401,"valueKind":"LiteralText","required":true}]},"arguments":[],"preconditions":[]}
 [/CommandAi]
 ~~~
 
-Each command declares identity, target, scope, parameters, grammar-versioned preconditions, an idempotency key, and an expected outcome shape. These values are opaque to CommandAi. A precondition is stored but not evaluated; an idempotency key is carried but not enforced; an outcome contract is a declaration, not an execution result or CI verdict.
+Each command begins with an action identifier followed by ordered parameter/value pairs. Values are positive integer identifiers or JSON-quoted literal strings. These values are opaque to CommandAi. A precondition is stored but not evaluated; an idempotency key is carried but not enforced; an outcome contract is a declaration, not an execution result or CI verdict.
 
 ## 04 See it in a minute
 
@@ -53,8 +53,8 @@ A direct consumer can compose a command with Guid identity, opaque target/scope 
 - [Problem domain](docs/PROBLEM_DOMAIN.md)
 - [Command domain completeness and ownership](docs/DOMAIN_COMPLETENESS.md)
 - [Architecture](docs/ARCHITECTURE.md)
-- [Theory and CommandAi/2 wire contract](docs/THEORY.md)
-- [Alpha consumer migration to CommandAi/2](docs/MIGRATION_COMMAND_AI_2.md)
+- [Theory and CommandAi/1 wire contract](docs/THEORY.md)
+- [Alpha consumer migration to CommandAi/1](docs/MIGRATION_COMMAND_AI_2.md (historical correction))
 - [Usage guide](docs/USAGE.md)
 - [Builder integration](docs/BUILDER_INTEGRATION.md)
 - [Type guides](docs/types/)
@@ -76,7 +76,7 @@ CommandAi has no runtime dependency on these sibling packages. Their contracts a
 
 ## Verification and release status
 
-The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. **NuGet publication remains disabled** unless the owner explicitly authorizes a specific release. The CommandAi/1 wire shape is intentionally not supported by this breaking CommandAi/2 contract; there is no external compatibility promise.
+The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. **NuGet publication remains disabled** unless the owner explicitly authorizes a specific release. The CommandAi/1 wire shape is the approved contract. Internal consumers must adapt together; no package or protocol version bump is needed for this coordination.
 
 ---
 
