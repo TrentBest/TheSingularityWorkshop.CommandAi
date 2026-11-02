@@ -3,66 +3,61 @@
 
 # CommandAi architecture
 
-## Component map
+## Component flow
 
-    Untrusted response text
-             |
-             v
-    CommandAiTextCodec -- parses/encodes --> CommandProposal
-                                                |
-                                                v
-                                    Complete atomic command
-                                    identity / action / target
-                                    scope / parameters
-                                    preconditions / idempotency
-                                    expected outcome contract
-                                                |
-                                                v
-                                      Host-owned validation
-                                                |
-                                                v
-                                      Host-owned authorization
-                                                |
-                                                v
-                                      Explicit approval policy
-                                                |
-                                                v
-                                      Host-owned dispatch/execution
+    Untrusted model / agent response
+                 |
+                 v
+        CommandAiTextCodec
+          decode / validate
+                 |
+                 v
+          CommandProposal
+                 |
+                 v
+       Host-owned semantic checks
+                 |
+                 v
+      Host-owned policy / approval
+                 |
+                 v
+       Host-owned dispatch / execute
+                 |
+                 v
+       Runtime-owned actual outcome
 
-This is an authored conceptual model, not a generated source diagram or runtime trace.
+The diagram describes responsibility boundaries, not an automatic runtime pipeline. CommandAi implements only the proposal model, its generic builders, resource bounds, and text codec.
 
-## Direct dependencies
+## Public model
 
-The core package uses only the .NET base class library. ProtocolAi, GrammarAi, HeadlessAi, CiAi, and application-specific systems are adjacent concepts, not required runtime dependencies. Integration adapters connect their contracts at the host boundary.
-
-## Atomic command contract
-
-Each CommandInstruction requires a unique command identity, positive action identity, opaque typed target and scope, ordered typed parameters, an idempotency key, and an expected outcome contract. It may also carry bounded precondition expressions tagged with a GrammarAi version. CommandAi validates and preserves these fields; it does not assign their domain meaning.
-
-A proposal is an ordered batch of atomic instructions, not a transaction. Commands may be independently accepted, rejected, retried, or executed according to host policy.
-
-## Responsibility boundaries
-
-- ProtocolAi owns application vocabulary, stable protocol-qualified symbol identity, correlated/provenance-bearing events, and actual outcome envelopes.
-- GrammarAi owns grammar definitions and structural validation for precondition expressions and other legal compositions.
-- CommandAi owns immutable bounded command proposal data and its deterministic codec.
-- CiAi owns CI evidence and verdicts. A command outcome contract is not a CI verdict.
-- FSM_Foundry and the host own durable observer lifecycle, scheduling, live-state condition evaluation, authorization, approval, dispatch, execution, and outcome lifecycle.
-
-A successful parse is never permission. Carrying an idempotency key does not enforce replay protection. Declaring an outcome contract does not prove the outcome occurred.
-
-## Failure behavior
-
-- Decode with null, empty, or whitespace-only input: argument exception because the caller did not supply an envelope.
-- Non-empty input with a missing/malformed envelope, unsupported version, invalid JSON, unknown JSON properties, missing fields, invalid identifiers, duplicates, or malformed contract data: format exception.
-- Direct model construction with invalid caller-supplied values: argument exceptions.
-- Encoding a valid in-memory proposal whose encoded representation exceeds CommandLimits.MaxEnvelopeCharacters: argument exception.
-
-The decoder normalizes model-construction failures caused by malformed wire content into FormatException. Callers should treat any parse failure as a rejected proposal and avoid fallback paths that silently reinterpret malformed data.
+- `CommandProposal` is an immutable, non-empty ordered collection of commands.
+- `CommandInstruction` identifies an action with a positive integer identity and carries ordered arguments.
+- `CommandArgument` pairs a positive parameter identity with a `CommandValue`.
+- `CommandValue` represents either a positive integer identifier or literal text.
+- `CommandLimits` defines representation bounds.
+- `CommandAiTextCodec` encodes and decodes the CommandAi/1 line-oriented envelope.
 
 ## Wire contract
 
-CommandAi/2 is the current and only supported wire contract. CommandAi/1 is intentionally not accepted; the earlier package was not externally released, and the expanded model is a deliberate breaking change.
+CommandAi/1 is the approved and only supported wire contract. A command line has an action identifier followed by zero or more `parameterId=value` tokens. Values are positive integer identifiers or JSON-quoted strings. The decoder rejects malformed envelopes, unsupported protocol versions, duplicate protocol declarations, duplicate parameters, invalid identifiers, and limit violations. It maps malformed model construction from wire input to `FormatException`; empty caller input remains an argument error.
+
+## Trust boundary
+
+A successful decode means only that the proposal is structurally representable. It is not validation of domain meaning, live-state truth, authorization, safety, or execution. The consuming host owns those decisions and must not use parsing success as an authorization shortcut.
+
+## Package boundaries
+
+- ProtocolAi supplies/owns vocabulary meaning and protocol-level event/outcome contracts.
+- GrammarAi owns grammar definitions and parsing/validation for grammar-bearing content when integrated.
+- HeadlessAi owns endpoint transport.
+- CiAi owns CI evidence and verdicts.
+- FSM_Foundry and the host own runtime lifecycle, policy, approval, scheduling, dispatch, execution, and actual outcome handling.
+
+CommandAi has no runtime dependency on these packages. Presentation, accessibility, narration, haptics, and pedagogy belong to observer/application layers, not this package.
+
+## Non-goals
+
+CommandAi does not own application screens, user profiles, command authorization, execution, transactions, retries, cancellation, compensation, persistence, exactly-once delivery, or actual results. Those capabilities must not be inferred from the compact /1 model.
 
 ---
 
