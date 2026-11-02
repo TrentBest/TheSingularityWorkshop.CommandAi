@@ -3,13 +3,13 @@
 
 # CommandAi gallery
 
-The console quickstart demonstrates a complete CommandAi/2 proposal with two host-owned operations. Each command has its own identity, action, target, scope, idempotency key, and expected outcome contract. The example prints the encoded proposal, decodes it, and explicitly states that no command was executed.
+The console quickstart demonstrates the approved CommandAi/1 flow: create an immutable proposal with the generic builder, encode it, decode it, and inspect the resulting data. It does not execute commands.
 
 - [Quickstart source](../examples/CommandAi.QuickStart/Program.cs) — reproduce with the command in [Usage](USAGE.md).
-- [Host-owned extensions](../examples/CommandAi.QuickStart/ResourceCommandExtensions.cs) — see how an application adds named operations without expanding generic CommandAi semantics.
 - [Wire format and design rationale](THEORY.md) — understand the contract and its limits.
+- [Builder integration](BUILDER_INTEGRATION.md) — add host-owned named operations around the generic model.
 
-The CommandAi/2 source, tests, quickstart, package packing, packed-artifact audit, and quickstart compilation passed GitHub Actions at development commit [cb17cc3](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/commit/cb17cc33a577ce2bdab3afef07cb61db31cb0c8e), run [#41353191987](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41353191987). NuGet publication was skipped. This verification does not prove host authorization, live precondition evaluation, or command execution.
+The earlier /2 candidate and its verification evidence are superseded by the owner decision to retain /1. Current verification is tracked in [REFLECTION](REFLECTION.md); do not treat historical green runs for /2 as evidence for the approved contract.
 
 ---
 
