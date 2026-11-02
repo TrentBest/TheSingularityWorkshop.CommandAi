@@ -37,7 +37,7 @@ The core package uses only the .NET base class library. ProtocolAi, GrammarAi, H
 
 ## Atomic command contract
 
-Each CommandInstruction requires a unique command identity, positive action identity, opaque typed target and scope, ordered typed parameters, an idempotency key, and an expected outcome contract. It may also carry bounded precondition expressions tagged with a GrammarAi version. CommandAi validates and preserves these fields; it does not assign their domain meaning.
+Each CommandInstruction contains a positive action identity and ordered typed parameter/value pairs. CommandProposal is a bounded ordered batch. CommandAi does not model domain target/scope, preconditions, idempotency, or outcome contracts; higher-level packages and the host own those concerns.
 
 A proposal is an ordered batch of atomic instructions, not a transaction. Commands may be independently accepted, rejected, retried, or executed according to host policy.
 
@@ -62,7 +62,7 @@ The decoder normalizes model-construction failures caused by malformed wire cont
 
 ## Wire contract
 
-CommandAi/2 is the current and only supported wire contract. CommandAi/1 is intentionally not accepted; the earlier package was not externally released, and the expanded model is a deliberate breaking change.
+CommandAi/1 is the current and only supported wire contract. Consumers must adapt to it; no /2 migration is authorized.
 
 ---
 
