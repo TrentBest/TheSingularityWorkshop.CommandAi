@@ -11,7 +11,7 @@
 
 ## 01 What is CommandAi?
 
-**CommandAi defines a provider-neutral, versioned representation for complete atomic commands proposed by an AI or another untrusted source.** A command explicitly carries its identity, action, target, scope, ordered parameters, preconditions, idempotency key, and expected outcome contract.
+**CommandAi defines a provider-neutral, versioned representation for complete atomic commands proposed by an AI or another untrusted source.** A command carries a positive action identifier and ordered typed parameter/value pairs. A proposal is a bounded ordered batch; domain-specific target, scope, preconditions, idempotency, outcomes, and authorization remain owned by consuming applications and hosts.
 
 The package stores opaque identities and typed values. It does not resolve application meaning, evaluate conditions, authorize actions, or execute them.
 
@@ -23,12 +23,12 @@ CommandAi provides one bounded immutable contract. It deliberately keeps the mea
 
 ## 03 How does it work?
 
-A compact envelope contains one JSON command object per line:
+The compact envelope contains an action identifier followed by ordered parameter/value tokens:
 
 ~~~text
 [CommandAi]
 Protocol=CommandAi/1
-Command={"commandId":"...","actionId":100,"target":{"kind":"IntegerIdentifier","identifier":300,"text":null},"scope":{"kind":"LiteralText","identifier":null,"text":"workspace"},"idempotencyKey":"inspect:resource:42","outcomeContract":{"outcomeId":400,"fields":[{"fieldId":401,"valueKind":"LiteralText","required":true}]},"arguments":[],"preconditions":[]}
+Command=100 200=300 201="workspace"
 [/CommandAi]
 ~~~
 
@@ -54,7 +54,7 @@ A direct consumer can compose a command with Guid identity, opaque target/scope 
 - [Command domain completeness and ownership](docs/DOMAIN_COMPLETENESS.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Theory and CommandAi/1 wire contract](docs/THEORY.md)
-- [Alpha consumer migration to CommandAi/1](docs/MIGRATION_COMMAND_AI_2.md (historical correction))
+- [Alpha consumer correction to CommandAi/1](docs/MIGRATION_COMMAND_AI_2.md (historical /2 correction) (historical correction))
 - [Usage guide](docs/USAGE.md)
 - [Builder integration](docs/BUILDER_INTEGRATION.md)
 - [Type guides](docs/types/)
