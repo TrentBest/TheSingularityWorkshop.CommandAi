@@ -3,36 +3,18 @@
 
 # CommandProposal
 
-## Purpose
+An immutable, non-empty ordered collection of `CommandInstruction` records plus the protocol version.
 
-A versioned ordered collection of one or more complete atomic command instructions.
+## Contract
 
-## Public contract
+- CurrentProtocolVersion is `CommandAi/1`.
+- Commands preserve insertion order.
+- The proposal enforces the source-defined maximum command count.
+- Empty proposals and unsupported protocol versions are rejected.
 
-- CurrentProtocolVersion is CommandAi/2.
-- Commands must be non-empty, bounded, and non-null.
-- Command identities must be unique within the proposal.
-- Idempotency keys must be unique within the proposal.
-- Aggregate literal/precondition/idempotency text is bounded.
-- A proposal is an ordered batch, not a transaction; it does not imply that all commands execute or succeed together.
+A proposal is an ordered representation, not a transaction or workflow. It does not imply dependency, rollback, retry, or all-or-nothing execution.
 
-## Ownership
-
-- **Declaration:** public sealed record.
-- **Source:** [CommandProposal.cs](../../CommandProposal.cs).
-- **Related types:** CommandInstruction, CommandLimits, CommandAiTextCodec.
-- **Non-goals:** resolving identifiers, evaluating preconditions, authorizing, executing, or enforcing idempotency across proposals or processes.
-
-## Verification
-
-The focused test suite is [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). The quickstart is [Program.cs](../../examples/CommandAi.QuickStart/Program.cs). These pages are human-authored and source-checked.
-
-## Related documentation
-
-- [Problem domain](../PROBLEM_DOMAIN.md)
-- [Architecture](../ARCHITECTURE.md)
-- [Theory and wire format](../THEORY.md)
-- [Companion UML](../UML/CommandProposalUML.md)
+Source: [CommandProposal.cs](../../CommandProposal.cs). Related: CommandInstruction, CommandLimits, CommandAiTextCodec.
 
 ---
 
