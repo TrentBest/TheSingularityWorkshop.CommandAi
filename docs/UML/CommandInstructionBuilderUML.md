@@ -6,18 +6,11 @@
 ~~~mermaid
 classDiagram
   class CommandInstructionBuilder {
-    -Guid commandId
     -ulong actionId
-    -CommandValue target
-    -CommandValue scope
-    -string idempotencyKey
-    -CommandOutcomeContract outcomeContract
     -List~CommandArgument~ arguments
-    -List~CommandPrecondition~ preconditions
     +WithIdentifier(ulong, ulong)
     +WithText(ulong, string)
     +WithValue(ulong, CommandValue)
-    +WithPrecondition(string, string)
     +Build() CommandInstruction
   }
   CommandInstructionBuilder --> CommandInstruction : immutable snapshot
@@ -25,10 +18,11 @@ classDiagram
 
 ## Use cases
 
-- Construct a command with all required identity and contract metadata.
-- Add ordered typed parameters.
-- Attach opaque grammar-versioned preconditions without evaluating them.
-- Build a validated immutable command snapshot.
+- Add a positive action identity.
+- Add ordered parameters as integer identifiers or literal text.
+- Build a validated immutable command instruction.
+
+The builder does not accept command GUID, target/scope, idempotency, preconditions, or expected-outcome metadata in the approved /1 model.
 
 Source: [CommandInstructionBuilder.cs](../../CommandInstructionBuilder.cs). Tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs).
 
