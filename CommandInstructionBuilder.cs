@@ -1,34 +1,18 @@
 namespace TheSingularityWorkshop.CommandAi;
 
-/// <summary>Builds one complete atomic command from opaque identities and typed values.</summary>
-/// <remarks>This mutable builder is not thread-safe and performs no semantic or authorization checks.</remarks>
+/// <summary>Builds one generic command instruction from opaque action and parameter identities.</summary>
+/// <remarks>This builder does not resolve identifiers or attach application-specific meaning to them. This mutable builder is not thread-safe.</remarks>
 public sealed class CommandInstructionBuilder
 {
-    private readonly Guid _commandId;
     private readonly ulong _actionId;
-    private readonly CommandValue _target;
-    private readonly CommandValue _scope;
-    private readonly string _idempotencyKey;
-    private readonly CommandOutcomeContract _outcomeContract;
     private readonly List<CommandArgument> _arguments = [];
-    private readonly List<CommandPrecondition> _preconditions = [];
 
-    public CommandInstructionBuilder(
-        Guid commandId,
-        ulong actionId,
-        CommandValue target,
-        CommandValue scope,
-        string idempotencyKey,
-        CommandOutcomeContract outcomeContract)
+    /// <summary>Creates a command builder.</summary>
+    /// <param name="actionId">Application-owned action identity; must be positive.</param>
+    public CommandInstructionBuilder(ulong actionId)
     {
-        if (commandId == Guid.Empty) throw new ArgumentException("A command identity is required.", nameof(commandId));
         if (actionId == 0) throw new ArgumentOutOfRangeException(nameof(actionId));
-        _commandId = commandId;
         _actionId = actionId;
-        _target = target ?? throw new ArgumentNullException(nameof(target));
-        _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-        _idempotencyKey = idempotencyKey;
-        _outcomeContract = outcomeContract ?? throw new ArgumentNullException(nameof(outcomeContract));
     }
 
     /// <summary>Adds an opaque integer identifier value for a parameter.</summary>
@@ -51,17 +35,6 @@ public sealed class CommandInstructionBuilder
         return this;
     }
 
-    /// <summary>Adds an opaque precondition expression associated with a GrammarAi version.</summary>
-    public CommandInstructionBuilder WithPrecondition(string grammarVersion, string expression)
-    {
-        if (_preconditions.Count >= CommandLimits.MaxPreconditionsPerCommand)
-            throw new InvalidOperationException($"A command cannot contain more than {CommandLimits.MaxPreconditionsPerCommand} preconditions.");
-        _preconditions.Add(new CommandPrecondition(grammarVersion, expression));
-        return this;
-    }
-
     /// <summary>Creates an immutable command snapshot.</summary>
-    public CommandInstruction Build() => new(
-        _commandId, _actionId, _target, _scope, _idempotencyKey,
-        _outcomeContract, _arguments, _preconditions);
+    public CommandInstruction Build() => new(_actionId, _arguments);
 }
