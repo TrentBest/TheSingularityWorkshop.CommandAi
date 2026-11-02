@@ -3,25 +3,18 @@
 
 # CommandProposalBuilder
 
-## Purpose
-
-Fluent, generic construction of an immutable ordered CommandProposal.
+Fluent construction API for an immutable `CommandProposal`.
 
 ## Contract
 
-AddCommand requires commandId, actionId, target, scope, idempotencyKey, and outcomeContract. Its optional configuration callback receives a CommandInstructionBuilder for ordered parameters and grammar-versioned preconditions. Build returns an immutable proposal snapshot and enforces the proposal command limit.
+- `AddCommand(actionId, configure)` appends an atomic instruction.
+- The configuration callback receives a scoped `CommandInstructionBuilder`.
+- `Build()` returns a proposal snapshot and enforces the proposal command limit.
+- A proposal must contain at least one command.
 
-Application-specific names and semantic validation belong in host-owned extension methods, not in the generic builder.
+The builder does not resolve identifiers, validate host-domain meaning, authorize, or execute.
 
-## Ownership
-
-Source: [CommandProposalBuilder.cs](../../CommandProposalBuilder.cs). Related type: [CommandInstructionBuilder](CommandInstructionBuilder.md).
-
-The builder does not resolve identities, evaluate preconditions, enforce idempotency, authorize, or execute.
-
-## Verification
-
-[CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs) covers command ordering, builder limits, and independent immutable snapshots. [Quickstart](../../examples/CommandAi.QuickStart/Program.cs) demonstrates host-owned extensions.
+Source: [CommandProposalBuilder.cs](../../CommandProposalBuilder.cs). Related: CommandInstructionBuilder, CommandProposal.
 
 ---
 
