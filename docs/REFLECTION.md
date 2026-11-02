@@ -1,54 +1,41 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-# CommandAi status and open questions
+# CommandAi status and release-readiness evidence
 
-## Current implementation on development
+## Approved direction
 
-- Immutable proposal and complete atomic instruction contracts.
-- Required command identity, action identity, target, scope, idempotency key, and expected outcome contract.
-- Ordered typed parameters and optional grammar-versioned opaque preconditions.
-- Bounded outcome fields, preconditions, literal values, aggregate text, command count, and envelope size.
-- CommandAi/2 JSON command entries with strict version, property, and value-shape validation.
-- Generic fluent proposal/instruction builder.
-- Focused tests for round-trip fields, malformed envelopes, duplicate identities, bounds, and builder snapshots.
-- Console quickstart with host-owned named command extensions.
-- No runtime package references to sibling AI packages.
-- No command execution, authorization, durable observer lifecycle, evidence evaluation, or outcome lifecycle.
+**Retain CommandAi/1.** The Workshop owns the current consumers, so internal repositories adapt together to the existing /1 model and wire shape. Do not migrate to /2, add /2-only fields, or bump the package/protocol version merely for internal coordination.
 
-## Ownership boundaries
+Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
-CommandAi describes the proposed atomic command. GrammarAi owns the structure of precondition expressions. ProtocolAi owns protocol-qualified vocabulary and correlated/provenance-bearing actual outcome events. CiAi owns CI evidence and verdicts. FSM_Foundry and the host own live-state evaluation, idempotency persistence/enforcement, durable observers, authorization, approval, scheduling, dispatch, execution, and runtime outcome lifecycle.
+## Current implementation
 
-A declared expected outcome is not an actual outcome. A parsed command is not authorized. An idempotency key is not replay protection until the host enforces it.
+- Immutable `CommandProposal` and `CommandInstruction` model.
+- Positive integer action and parameter identities.
+- Ordered typed arguments using integer identifiers or literal text.
+- Generic fluent proposal and instruction builders.
+- Line-oriented CommandAi/1 codec.
+- Bounds for envelope, command count, arguments, and literal text.
+- Decoder rejects unsupported versions, malformed envelopes, duplicate protocol declarations, duplicate parameters, and invalid values.
+- Host owns domain meaning, authorization, approval, execution, and actual outcomes.
 
-## Compatibility decision
+## Verification status
 
-**Owner correction (2026-11-02): retain `CommandAi/1`.** The Workshop owns the current consumers, so internal repositories must adapt together to the existing `/1` model and wire shape. Do not migrate consumers to `/2`, and do not increment package or protocol versions merely for internal coordination. Revisit versioning only if an actual external compatibility boundary is deliberately introduced.
+- Source revision: see the current `development` branch head.
+- Most recent full CI run: [run 41391145708](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41391145708) — pending at the time this status page was last reviewed.
+- Previous run 41390624598 built successfully and passed the branding check, but one malformed-envelope test case was incorrectly authored as a valid command. The test fixture was corrected in the next commit; the new run must complete before claiming green.
+- The publish job is configured to remain skipped unless the explicit publication gate is satisfied.
 
-The current `development` source still contains the `/2` migration candidate described above; that implementation and its documentation are now a known direction mismatch and must be brought back to `/1`. Retain only hardening that is compatible with the `/1` contract. Do not add `/2`-only fields to consumers. The `/1` restoration and exact-source integration verification are pending; do not describe the current `/2` candidate as the approved contract.
+## Remaining work
 
-## Current evidence and active domain review
+1. Complete CI on the corrected /1 source.
+2. Finish the source-to-doc audit, including public type guides and UML pages; remove obsolete /2-only type references.
+3. Update CiAi PR #37 to pin the exact verified /1 source and rerun its required workflows. Keep the PR draft.
+4. Complete issue #3's domain completeness review with evidence and owner dispositions.
+5. Review package contents and release readiness after all checks pass.
 
-- [Domain completeness and ownership inventory](DOMAIN_COMPLETENESS.md) now distinguishes implemented representation guarantees, opaque fields owned by other packages, intentionally excluded runtime/presentation concerns, and unresolved contract gaps.
-- All 34 Markdown pages present at the initial audit had the animated moniker at the top and the canonical Workshop PNG footer. CI now enforces both requirements for every Markdown file in the repository.
-- Coverage collection and optional Codecov upload are part of the CommandAi workflow. The workflow passed on development commit `7835481ae444f0472a9ff974557558d23274ab5d`, including branding validation, build, adversarial tests with coverage, successful Codecov upload, quickstart, package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The publication job was skipped.
-  - [Exact verified workflow run](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41361427117)
-- [Command-domain completeness review](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/issues/3) tracks proposal/correlation identity, parameter schemas, workflow semantics, strict codec compatibility, and education/presentation neutrality.
-- [GUI.SVG documentation-generation coordination](https://github.com/TrentBest/TheSingularityWorkshop.GUI/issues/69) asks for a supported docs-only path to generate source-derived SVGs without adding a GUI runtime dependency to CommandAi.
-
-## Remaining verification and decisions
-
-1. Complete the domain review and agree with ProtocolAi/Foundry on ownership before changing CommandAi/2 wire fields.
-2. Determine whether proposal identity, causal/correlation identity, or parameter schema metadata have enough generic consumer value to add to the internal contract. Evolve internal Workshop consumers in lockstep; do not increment package or protocol versions merely for internal coordination. Revisit versioning only if a genuine external compatibility boundary is introduced.
-3. Verify deterministic serialization across operating systems before describing the current text codec as canonical.
-4. Add adversarial tests for remaining required-field/type combinations and resource-boundary edges.
-5. CiAi PR #37's earlier `/2` migration and green workflows are superseded by the owner correction. The PR must return to the actual `/1` model and wire shape, update its source pin and opening summary accordingly, and rerun both required workflows against the exact corrected CommandAi source. Keep the PR draft. The latest owner direction is recorded on the PR and in CommandAi issue #3.
-6. GUI issue #69 requests a docs-only GUI.SVG generation path. No response has been posted yet; do not claim GUI.SVG-generated diagrams are integrated.
-7. Re-run the complete workflow on the final release candidate and review package metadata and contents.
-
-No NuGet publication, master merge, or release is authorized by this status page.
-
+No user-held decision currently blocks the /1 restoration. No NuGet publish, merge, release, deployment, master alteration, or branch deletion is authorized.
 
 ---
 
