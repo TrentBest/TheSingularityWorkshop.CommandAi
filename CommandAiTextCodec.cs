@@ -62,7 +62,14 @@ public static class CommandAiTextCodec
             {
                 if (commands.Count >= CommandLimits.MaxCommands)
                     throw new FormatException($"CommandAi envelope exceeds the {CommandLimits.MaxCommands}-command limit.");
-                commands.Add(ParseCommand(line["Command=".Length..].Trim()));
+                try
+                {
+                    commands.Add(ParseCommand(line["Command=".Length..].Trim()));
+                }
+                catch (ArgumentException ex)
+                {
+                    throw new FormatException("A command contains invalid or duplicate arguments.", ex);
+                }
             }
             else if (line.Length > 0) throw new FormatException($"Unrecognized envelope entry on line {i + 1}.");
         }
