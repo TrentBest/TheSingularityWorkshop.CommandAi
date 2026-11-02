@@ -79,7 +79,9 @@ public sealed class CommandAiTextCodecTests
     {
         var literal = new string('x', CommandLimits.MaxLiteralCharacters);
         var args = Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand).Select(i => new CommandArgument((ulong)i, CommandValue.FromText(literal)));
-        Assert.Throws<ArgumentException>(() => new CommandProposal([new CommandInstruction(1, args)]));
+        var first = new CommandInstruction(1, args);
+        var second = new CommandInstruction(2, args.Select(a => new CommandArgument(a.ParameterId, a.Value)));
+        Assert.Throws<ArgumentException>(() => new CommandProposal([first, second]));
     }
 
     [Fact]
