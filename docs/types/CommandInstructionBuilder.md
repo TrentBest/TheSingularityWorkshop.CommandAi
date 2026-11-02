@@ -3,23 +3,19 @@
 
 # CommandInstructionBuilder
 
-## Purpose
-
-Build one immutable atomic command with all required metadata.
+Fluent construction API for one immutable `CommandInstruction`.
 
 ## Contract
 
-The constructor requires command identity, action identity, target, scope, idempotency key, and expected outcome contract. The fluent methods add typed arguments through WithIdentifier, WithText, and WithValue, and add opaque grammar-versioned preconditions through WithPrecondition. Build validates and snapshots the command.
+- The builder is initialized with a positive action identity.
+- `WithIdentifier(parameterId, valueId)` adds a positive integer identifier value.
+- `WithText(parameterId, value)` adds bounded literal text.
+- `WithValue(parameterId, value)` adds a typed CommandValue.
+- `Build()` validates and snapshots the ordered arguments.
 
-The builder is mutable and not thread-safe. It performs representation validation only.
+The builder does not accept command GUID, target/scope, preconditions, idempotency, or expected-outcome metadata in CommandAi/1.
 
-## Ownership
-
-Source: [CommandInstructionBuilder.cs](../../CommandInstructionBuilder.cs). Related types: CommandInstruction, CommandArgument, CommandPrecondition, CommandOutcomeContract, CommandValue.
-
-## Verification
-
-[CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs) covers duplicate parameter rejection, metadata round-trip, precondition preservation, limits, and snapshot behavior.
+Source: [CommandInstructionBuilder.cs](../../CommandInstructionBuilder.cs). Related: CommandInstruction, CommandArgument, CommandValue.
 
 ---
 
