@@ -8,23 +8,10 @@
 ~~~csharp
 using TheSingularityWorkshop.CommandAi;
 
-var commandId = Guid.NewGuid();
-var outcome = new CommandOutcomeContract(400, [
-    new CommandOutcomeField(401, CommandValueKind.LiteralText),
-    new CommandOutcomeField(402, CommandValueKind.IntegerIdentifier, required: false)
-]);
-
 var proposal = new CommandProposalBuilder()
-    .AddCommand(
-        commandId,
-        actionId: 100,
-        target: CommandValue.FromIdentifier(300),
-        scope: CommandValue.FromText("workspace"),
-        idempotencyKey: "inspect:resource:42",
-        outcomeContract: outcome,
-        configure: command => command
-            .WithIdentifier(parameterId: 200, valueId: 42)
-            .WithPrecondition("GrammarAi/1", "resource.exists && resource.readable"))
+    .AddCommand(100, command => command
+        .WithIdentifier(parameterId: 200, valueId: 42)
+        .WithText(parameterId: 201, value: "workspace"))
     .Build();
 ~~~
 
@@ -37,18 +24,15 @@ var wireText = CommandAiTextCodec.Encode(proposal);
 var parsed = CommandAiTextCodec.Decode(wireText);
 ~~~
 
-The current wire contract is CommandAi/2. Earlier alpha consumers should follow the [migration guide](MIGRATION_COMMAND_AI_2.md). It serializes each complete command as a JSON object on a Command= line. JSON property names and value kinds are explicit; unknown properties and malformed contract fields are rejected. CommandAi/1 is a breaking predecessor and is not accepted by this decoder.
+The current wire contract is CommandAi/1. Earlier alpha consumers should follow the [migration guide](MIGRATION_COMMAND_AI_2.md). Each Command= line contains an action identifier followed by parameter=value tokens. Integer identifiers are positive decimal numbers; literal values are JSON-quoted strings.
 
 The codec validates representation only. It does not evaluate preconditions, enforce idempotency, resolve identities, authorize, or execute.
 
 ## Understand the model
 
-- CommandInstruction.CommandId identifies this proposal instruction. It is not the idempotency key.
-- Target and Scope are required opaque CommandValue instances.
-- Arguments carry ordered parameter IDs and typed values.
-- Preconditions carry an expression plus its grammar version. They are preserved, not interpreted.
-- IdempotencyKey is required and bounded. A host must persist and enforce its duplicate-delivery policy.
-- OutcomeContract describes the expected outcome shape. It is not the actual result of execution.
+- CommandInstruction contains a positive action identifier and ordered arguments.
+- Each argument pairs a positive parameter identifier with an integer identifier or literal text.
+- The host resolves identifiers and owns semantic validation, authorization, and execution.
 - CommandProposal is an ordered batch, not a transaction.
 
 ## Host-owned named operations
@@ -58,7 +42,7 @@ A consuming host may expose named extensions such as InspectResource(...) above 
 ## Failure behavior
 
 - Empty caller input: ArgumentException.
-- Non-empty malformed envelope, unsupported version, malformed JSON, unknown JSON properties, missing required fields, invalid identifiers, duplicate command/parameter identities, or resource-limit violations while decoding: FormatException.
+- Non-empty malformed envelope, unsupported version, malformed JSON, invalid identifiers, malformed quoted literals, duplicate parameters, or resource-limit violations while decoding: FormatException.
 - Direct construction with invalid caller-supplied values: ArgumentException.
 - Encoding a valid in-memory proposal that exceeds the envelope limit: ArgumentException.
 
