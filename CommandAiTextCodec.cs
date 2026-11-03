@@ -26,7 +26,7 @@ public static class CommandAiTextCodec
             lines.Add("Command=" + string.Join(' ', tokens));
         }
         lines.Add("[/CommandAi]");
-        var encoded = string.Join(Environment.NewLine, lines);
+        var encoded = string.Join("\n", lines);
         if (encoded.Length > CommandLimits.MaxEnvelopeCharacters)
             throw new ArgumentException($"Encoded proposal cannot exceed {CommandLimits.MaxEnvelopeCharacters} characters.", nameof(proposal));
         return encoded;
