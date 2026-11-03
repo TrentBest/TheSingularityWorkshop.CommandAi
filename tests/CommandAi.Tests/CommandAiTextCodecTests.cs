@@ -32,6 +32,23 @@ public sealed class CommandAiTextCodecTests
         Assert.Equal("[CommandAi]\nProtocol=CommandAi/1\nCommand=100\n[/CommandAi]", CommandAiTextCodec.Encode(proposal));
     }
 
+
+    [Fact]
+    public void Decode_AcceptsCrLfAndPreservesCommandOrder()
+    {
+        var proposal = new CommandProposal([
+            new CommandInstruction(100, [new CommandArgument(200, CommandValue.FromIdentifier(300))]),
+            new CommandInstruction(101, [new CommandArgument(201, CommandValue.FromText("second command"))])
+        ]);
+
+        var encoded = CommandAiTextCodec.Encode(proposal).Replace("\n", "\r\n");
+        var decoded = CommandAiTextCodec.Decode(encoded);
+
+        Assert.Equal(new ulong[] { 100, 101 }, decoded.Commands.Select(command => command.ActionId));
+        Assert.Equal(300UL, decoded.Commands[0].Arguments[0].Value.Identifier);
+        Assert.Equal("second command", decoded.Commands[1].Arguments[0].Value.Text);
+    }
+
     [Theory]
     [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100 200=\\n[/CommandAi]")]
     [InlineData("[CommandAi]\\nProtocol=CommandAi/9\\nCommand=100\\n[/CommandAi]")]
