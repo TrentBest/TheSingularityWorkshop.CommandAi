@@ -35,7 +35,7 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 - The domain matrix was corrected in `084dbe7ebcc9a1f224a36c22c86a835e19a3a5d3` to distinguish /1 exclusions from implemented fields and to keep correlation/provenance and actual outcomes with ProtocolAi/runtime.
 - Documentation status-head references were corrected in `b30c6cd933a7ddf5498c62b74d6c1fcbc7d3a962`.
 - Package metadata was corrected in `a92610be1b2c3d0b5b5f5d4cc5e6e0799e1ace14`; its description now accurately identifies the CommandAi/1 envelope rather than the superseded /2 candidate.
-- The status page is being updated after the successful exact-head run; its own documentation-only commit is expected to trigger the same push workflow.
+- The source/test/package-metadata state passed exact-head run 41591997190 on `8c2bf30a479a107271c914f0eb3e5e4228188d93`. Subsequent status-only documentation updates also passed: run 41592163224 on `357b7080b2549ea0e5bfe8fe5e5f8f81b3ad4860` and run 41592178061 on `cd462b21ae7ec9fbf6ec66ea7d72ff3b7c5e0187`.
 - Package version remains `0.1.0-alpha.2`; no package/protocol version increment or NuGet publication.
 
 ## Remaining work
