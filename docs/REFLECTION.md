@@ -22,7 +22,7 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Verification status
 
-- **Latest development head passed:** [run 41594181593](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594181593) completed successfully for exact head `3af6d5754d10e75837531fef14d5f1de11973b7b`.
+- **Latest development head passed:** [run 41711472222](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41711472222) completed successfully for exact head `3563bfcabdae9e4166c6b9f86a65edf959ab5631` on 2026-11-03. The `build-and-test` check succeeded; `publish_nuget` was skipped.
 - The immediately preceding source-fix head `14a0828fbce994eddef9f9d229afbbb8e3b16e8a` also passed [run 41594167943](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594167943).
 - These runs verify the null-command validation-order fix and its regression test. A null command in the proposal input now produces the intended `ArgumentException` (with parameter name `commands`) rather than an accidental `NullReferenceException` during aggregate literal-size inspection.
 - The earlier full workflow passed on exact development head `339f404b0c7ad0170ca1549da1161938047c1ca8`: [run 41592630562](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592630562). It completed Workshop Markdown branding validation, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, package pack, packed-artifact audit, and consumer compilation against the packed package.
@@ -31,6 +31,11 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 - The approved package version remains `0.1.0-alpha.2`. No package/protocol version increment or NuGet publication occurred.
 
 ## Latest development activity (2026-11-03)
+
+- Current `development` head is `3563bfcabdae9e4166c6b9f86a65edf959ab5631` (`ci: retain verified Codecov token upload`). Its parent is `a2edf58e5500a65507c95fa2ffe48a9734aec29f` (`ci: add CiAi commit evidence observer`). Exact-head workflow run 41711472222 passed `build-and-test`; `publish_nuget` was skipped.
+- The CiAi observer workflow is now present on `development`, but it is **not activated** by GitHub's `workflow_run` trigger until that workflow is present on the default branch. The owner-approved activation boundary remains unchanged: no `master` modification or merge is authorized.
+- PR #5 remains open/draft against `master`; its head `d782ed6c1979e57ab5d6443f07614990e4ad3194` is 4 commits ahead and 260 behind `development`. Its diff includes the observer workflow plus duplicate root-level model/test files that already exist on `development`; do not merge this stale branch as-is. Reconcile or retire it only with explicit branch/PR disposition authorization.
+- PR #4 is closed unmerged. Its five-commit branch remains 5 ahead and 57 behind `development`; the intended `/1` corrections are already represented in current development docs. The branch is not needed as a merge source; do not delete it without explicit authorization.
 
 - Approved CommandAi/1 source and API remain the only supported contract.
 - Adversarial codec and boundary tests were added in `b1f4abae7dc708f0345747c280eec22edc18e5f2`.
