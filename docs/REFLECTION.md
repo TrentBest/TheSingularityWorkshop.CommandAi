@@ -22,7 +22,7 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Verification status
 
-- **Latest full workflow passed:** [run 41592519656](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592519656) completed successfully on exact development head `9573974ed1887645f2a4153780c490acf9293874`.
+- **Latest full workflow passed:** [run 41592630562](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592630562) completed successfully on exact development head `339f404b0c7ad0170ca1549da1161938047c1ca8`.
 - The run completed Workshop Markdown branding validation, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, package pack, packed-artifact audit, and consumer compilation against the packed package.
 - The `publish_nuget` job was skipped. The package artifact was produced but not published.
 - This verification includes the adversarial codec tests and the deterministic-LF encoding regression test. The encoder emits LF line separators on every platform; the decoder accepts LF and CRLF.
@@ -36,7 +36,7 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 - Package metadata was corrected in `a92610be1b2c3d0b5b5f5d4cc5e6e0799e1ace14`; its description now accurately identifies the CommandAi/1 envelope.
 - Deterministic LF text encoding was implemented in `1b7211d2638de680a75edddced78f6a7a60ef4e0`, with an exact-envelope regression test in `c59601eb940952c51e09344224d3c95d0f422c61`.
 - The complete Markdown inventory was audited: all 31 Markdown pages have the animated moniker and canonical Workshop PNG footer. Removed /2-only model type references are absent; remaining /2 mentions are historical/correction notes.
-- CiAi PR #37 merged at `49a802fcab60fa7411b01892072d7e2c8a2c72a9`. Its current submodule pin remains at `a6615956d59633e290d6e86139bb2940abad918b`; a separate downstream pin-update PR is the next coordination step after this verified CommandAi head.
+- CiAi PR #37 merged at `49a802fcab60fa7411b01892072d7e2c8a2c72a9`. Its submodule pin is being advanced in draft CiAi PR #50 to `339f404b0c7ad0170ca1549da1161938047c1ca8`; exact-head CiAi Contract Verification and Cog Ecosystem Integration are running on PR head `6499e3a301dfeeeeafaff793ee392120efadedae`.
 - Package version remains `0.1.0-alpha.2`; no package/protocol version increment or NuGet publication.
 
 ## Remaining work
