@@ -71,6 +71,14 @@ public sealed class CommandAiTextCodecTests
     }
 
     [Fact]
+    public void Proposal_RejectsNullCommandsWithArgumentException()
+    {
+        var commands = new CommandInstruction[] { null! };
+        var exception = Assert.Throws<ArgumentException>(() => new CommandProposal(commands));
+        Assert.Equal("commands", exception.ParamName);
+    }
+
+    [Fact]
     public void Instruction_RejectsExcessiveArguments()
     {
         var args = Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand + 1).Select(i => new CommandArgument((ulong)i, CommandValue.FromIdentifier(1)));
