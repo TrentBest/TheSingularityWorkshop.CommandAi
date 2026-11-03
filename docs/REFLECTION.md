@@ -22,7 +22,7 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Verification status
 
-- <badge>Latest full workflow passed</badge> [Run 41591997190](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41591997190) completed successfully on exact development head `8c2bf30a479a107271c914f0eb3e5e4228188d93`.
+- **Latest full workflow passed:** [Run 41591997190](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41591997190) completed successfully on exact development head `8c2bf30a479a107271c914f0eb3e5e4228188d93`.
 - The run completed Workshop Markdown branding validation, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, package pack, packed-artifact audit, and consumer compilation against the packed package.
 - The `publish_nuget` job was skipped. The package artifact was produced but not published.
 - This verification includes the adversarial tests added in `b1f4abae7dc708f0345747c280eec22edc18e5f2` and the corrected CommandAi/1 package metadata.
