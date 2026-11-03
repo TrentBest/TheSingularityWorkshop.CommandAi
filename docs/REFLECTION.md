@@ -22,20 +22,21 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Verification status
 
-- **Latest full workflow passed:** [Run 41591997190](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41591997190) completed successfully on exact development head `8c2bf30a479a107271c914f0eb3e5e4228188d93`.
+- **Latest full workflow passed:** [run 41592519656](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592519656) completed successfully on exact development head `9573974ed1887645f2a4153780c490acf9293874`.
 - The run completed Workshop Markdown branding validation, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, package pack, packed-artifact audit, and consumer compilation against the packed package.
 - The `publish_nuget` job was skipped. The package artifact was produced but not published.
-- This verification includes the adversarial tests added in `b1f4abae7dc708f0345747c280eec22edc18e5f2` and the corrected CommandAi/1 package metadata.
-- Earlier source/test verification at `e1e7d183b1526c4f4fd0ec9cdac851243f4b97a8` passed run 41391145708; the later full workflow supersedes it.
+- This verification includes the adversarial codec tests and the deterministic-LF encoding regression test. The encoder emits LF line separators on every platform; the decoder accepts LF and CRLF.
+- The approved package version remains `0.1.0-alpha.2`. No package/protocol version increment or NuGet publication occurred.
 
 ## Latest development activity (2026-11-03)
 
-- Approved /1 source and API restoration remains the basis of the package.
-- Adversarial codec and boundary tests were added in `b1f4abae7dc708f0345747c280eec22edc18e5f2`: malformed JSON literals, nested/trailing envelope content, oversized decode/encode envelopes, and configured command/argument boundaries.
+- Approved CommandAi/1 source and API remain the only supported contract.
+- Adversarial codec and boundary tests were added in `b1f4abae7dc708f0345747c280eec22edc18e5f2`.
 - The domain matrix was corrected in `084dbe7ebcc9a1f224a36c22c86a835e19a3a5d3` to distinguish /1 exclusions from implemented fields and to keep correlation/provenance and actual outcomes with ProtocolAi/runtime.
-- Documentation status-head references were corrected in `b30c6cd933a7ddf5498c62b74d6c1fcbc7d3a962`.
-- Package metadata was corrected in `a92610be1b2c3d0b5b5f5d4cc5e6e0799e1ace14`; its description now accurately identifies the CommandAi/1 envelope rather than the superseded /2 candidate.
-- The source/test/package-metadata state passed exact-head run 41591997190 on `8c2bf30a479a107271c914f0eb3e5e4228188d93`. Subsequent status-only documentation updates also passed: run 41592163224 on `357b7080b2549ea0e5bfe8fe5e5f8f81b3ad4860` and run 41592178061 on `cd462b21ae7ec9fbf6ec66ea7d72ff3b7c5e0187`.
+- Package metadata was corrected in `a92610be1b2c3d0b5b5f5d4cc5e6e0799e1ace14`; its description now accurately identifies the CommandAi/1 envelope.
+- Deterministic LF text encoding was implemented in `1b7211d2638de680a75edddced78f6a7a60ef4e0`, with an exact-envelope regression test in `c59601eb940952c51e09344224d3c95d0f422c61`.
+- The complete Markdown inventory was audited: all 31 Markdown pages have the animated moniker and canonical Workshop PNG footer. Removed /2-only model type references are absent; remaining /2 mentions are historical/correction notes.
+- CiAi PR #37 merged at `49a802fcab60fa7411b01892072d7e2c8a2c72a9`. Its current submodule pin remains at `a6615956d59633e290d6e86139bb2940abad918b`; a separate downstream pin-update PR is the next coordination step after this verified CommandAi head.
 - Package version remains `0.1.0-alpha.2`; no package/protocol version increment or NuGet publication.
 
 ## Remaining work
