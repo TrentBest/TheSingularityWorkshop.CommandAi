@@ -27,6 +27,15 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 - Previous run 41390624598 built successfully and passed the branding check, but one malformed-envelope test case was incorrectly authored as a valid command. The test fixture was corrected in the next commit; the new run must complete before claiming green.
 - The publish job is configured to remain skipped unless the explicit publication gate is satisfied.
 
+## Latest development activity (2026-11-03)
+
+- Current reviewed head: `084dbe7ebcc9a1f224a36c22c86a835e19a3a5d3`.
+- Added adversarial codec and boundary tests in `b1f4abae7dc708f0345747c280eec22edc18e5f2`.
+- Clarified the domain-completeness matrix so the current owner-approved /1 exclusions are not confused with implemented structured fields.
+- Recorded the source audit and remaining cross-repository ownership questions in CommandAi issue #3.
+- The previously successful full CI run (41391559191) verifies the earlier head `a6615956d59633e290d6e86139bb2940abad918b`; it does **not** verify the two newer commits. Exact-head CI for `084dbe7` remains unconfirmed.
+- No package version change or NuGet publication.
+
 ## Remaining work
 
 1. Complete CI on the corrected /1 source.
