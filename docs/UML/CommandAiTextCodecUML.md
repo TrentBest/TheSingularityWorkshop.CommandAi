@@ -14,7 +14,7 @@ flowchart TD
 
 ## Contract
 
-The codec reads and writes the line-oriented CommandAi/1 envelope. A command line contains a positive action identifier followed by ordered parameter/value pairs. Values are positive integer identifiers or JSON-quoted literal strings.
+The codec reads and writes the line-oriented CommandAi/1 envelope. Encoding uses LF line separators on every platform; decoding accepts LF and CRLF input. A command line contains a positive action identifier followed by ordered parameter/value pairs. Values are positive integer identifiers or JSON-quoted literal strings.
 
 ## Use cases
 
