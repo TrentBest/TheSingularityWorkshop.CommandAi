@@ -22,10 +22,12 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Verification status
 
-- **Latest full workflow passed:** [run 41592630562](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592630562) completed successfully on exact development head `339f404b0c7ad0170ca1549da1161938047c1ca8`.
-- The run completed Workshop Markdown branding validation, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, package pack, packed-artifact audit, and consumer compilation against the packed package.
+- **Latest development head passed:** [run 41594181593](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594181593) completed successfully for exact head `3af6d5754d10e75837531fef14d5f1de11973b7b`.
+- The immediately preceding source-fix head `14a0828fbce994eddef9f9d229afbbb8e3b16e8a` also passed [run 41594167943](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594167943).
+- These runs verify the null-command validation-order fix and its regression test. A null command in the proposal input now produces the intended `ArgumentException` (with parameter name `commands`) rather than an accidental `NullReferenceException` during aggregate literal-size inspection.
+- The earlier full workflow passed on exact development head `339f404b0c7ad0170ca1549da1161938047c1ca8`: [run 41592630562](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592630562). It completed Workshop Markdown branding validation, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, package pack, packed-artifact audit, and consumer compilation against the packed package.
 - The `publish_nuget` job was skipped. The package artifact was produced but not published.
-- This verification includes the adversarial codec tests and the deterministic-LF encoding regression test. The encoder emits LF line separators on every platform; the decoder accepts LF and CRLF.
+- The verified implementation includes adversarial codec tests and deterministic-LF encoding. The encoder emits LF line separators on every platform; the decoder accepts LF and CRLF.
 - The approved package version remains `0.1.0-alpha.2`. No package/protocol version increment or NuGet publication occurred.
 
 ## Latest development activity (2026-11-03)
@@ -35,17 +37,17 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 - The domain matrix was corrected in `084dbe7ebcc9a1f224a36c22c86a835e19a3a5d3` to distinguish /1 exclusions from implemented fields and to keep correlation/provenance and actual outcomes with ProtocolAi/runtime.
 - Package metadata was corrected in `a92610be1b2c3d0b5b5f5d4cc5e6e0799e1ace14`; its description now accurately identifies the CommandAi/1 envelope.
 - Deterministic LF text encoding was implemented in `1b7211d2638de680a75edddced78f6a7a60ef4e0`, with an exact-envelope regression test in `c59601eb940952c51e09344224d3c95d0f422c61`.
+- A null-command validation-order defect was fixed in `14a0828fbce994eddef9f9d229afbbb8e3b16e8a`; regression coverage was added in `3af6d5754d10e75837531fef14d5f1de11973b7b`. Both exact-head CI runs passed (41594167943 and 41594181593).
 - The complete Markdown inventory was audited: all 31 Markdown pages have the animated moniker and canonical Workshop PNG footer. Removed /2-only model type references are absent; remaining /2 mentions are historical/correction notes.
 - CiAi PR #37 merged at `49a802fcab60fa7411b01892072d7e2c8a2c72a9`. Draft CiAi PR #50 advances its submodule pin to `339f404b0c7ad0170ca1549da1161938047c1ca8`; both required workflows passed on exact PR head `6499e3a301dfeeeeafaff793ee392120efadedae` (runs 41592774387 and 41592774359). PR #50 remains open/draft; no merge or publication was performed.
 - Package version remains `0.1.0-alpha.2`; no package/protocol version increment or NuGet publication.
 
 ## Remaining work
 
-1. Confirm the workflow triggered by this status-page-only update.
-2. Complete the optionality/default/schema and compatibility-policy review without inventing unsupported /1 semantics; add generic schema features only when a concrete consumer need and owner are established.
-3. Coordinate cross-repository ownership for observer registration, event correlation/replay, and evidence-bound gate transitions through the relevant issues.
-4. Resolve the package-distribution strategy for consumers of CiAi's transitive CommandAi dependency before any package release.
-5. Keep CiAi PR #50 draft until the owner explicitly authorizes its merge; both required exact-head workflows have passed.
+1. Review optionality/default/schema and compatibility policy without inventing unsupported /1 semantics; add generic schema features only when a concrete consumer need and owner are established.
+2. Coordinate cross-repository ownership for observer registration, event correlation/replay, and evidence-bound gate transitions through the relevant issues.
+3. Resolve the package-distribution strategy for consumers of CiAi's transitive CommandAi dependency before any package release.
+4. Keep CiAi PR #50 draft until the owner explicitly authorizes its merge; both required exact-head workflows have passed.
 
 No user-held decision currently blocks the /1 source audit. Cross-repository runtime semantics remain agent-owned coordination work; they do not block the package's current /1 representation review.
 
