@@ -25,6 +25,13 @@ public sealed class CommandAiTextCodecTests
         Assert.Equal("Logs.Diagnostic Stream with \"quotes\" and \\slashes", command.Arguments[1].Value.Text);
     }
 
+    [Fact]
+    public void Encode_UsesDeterministicLfLineEndings()
+    {
+        var proposal = new CommandProposal([new CommandInstruction(100)]);
+        Assert.Equal("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100\\n[/CommandAi]", CommandAiTextCodec.Encode(proposal));
+    }
+
     [Theory]
     [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100 200=\\n[/CommandAi]")]
     [InlineData("[CommandAi]\\nProtocol=CommandAi/9\\nCommand=100\\n[/CommandAi]")]
