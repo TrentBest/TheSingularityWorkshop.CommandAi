@@ -29,7 +29,7 @@ public sealed class CommandAiTextCodecTests
     public void Encode_UsesDeterministicLfLineEndings()
     {
         var proposal = new CommandProposal([new CommandInstruction(100)]);
-        Assert.Equal("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100\\n[/CommandAi]", CommandAiTextCodec.Encode(proposal));
+        Assert.Equal("[CommandAi]\nProtocol=CommandAi/1\nCommand=100\n[/CommandAi]", CommandAiTextCodec.Encode(proposal));
     }
 
     [Theory]
