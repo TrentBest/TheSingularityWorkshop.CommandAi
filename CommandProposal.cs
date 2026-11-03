@@ -15,7 +15,6 @@ public sealed record CommandProposal
         if (items.Length > CommandLimits.MaxCommands)
             throw new ArgumentException($"A proposal cannot contain more than {CommandLimits.MaxCommands} commands.", nameof(commands));
         if (items.Any(item => item is null)) throw new ArgumentException("Commands cannot contain null items.", nameof(commands));
-        if (items.Any(item => item is null)) throw new ArgumentException("Commands cannot contain null items.", nameof(commands));
         var totalLiteralCharacters = items.SelectMany(item => item.Arguments)
             .Where(argument => argument.Value.Kind == CommandValueKind.LiteralText)
             .Sum(argument => (long)argument.Value.Text!.Length);
