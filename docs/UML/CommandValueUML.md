@@ -36,7 +36,7 @@ flowchart TD
 ### UC-2 — Inspect or encode a proposal in a test/example
 
 - **Actor:** package consumer or test.
-- **Goal:** create a deterministic representation and verify round-trip behavior.
+- **Goal:** encode a proposal and verify round-trip behavior.
 - **Trigger:** a consumer constructs the typed model and calls the codec.
 - **Outcome:** a versioned text envelope can be inspected or decoded.
 - **Failure/alternative:** invalid IDs, duplicate parameters, empty proposals, or malformed literals are rejected.
@@ -57,4 +57,4 @@ flowchart TD
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop avatar" width="200" /></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
