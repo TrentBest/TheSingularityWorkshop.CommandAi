@@ -34,7 +34,7 @@ The same action meaning can be presented through different application experienc
 | Ordering | Proposal preserves insertion order | CommandAi — representation only; no dependency semantics |
 | Transaction, branching, workflow, retry, cancellation, compensation | Not represented or executed | Orchestrator / host |
 | Resource bounds | Envelope, command, argument, and literal bounds are source-defined | CommandAi — implemented representation safeguards |
-| Encoding and decoding | Strict line-oriented /1 envelope and typed values | CommandAi — implemented |
+| Encoding and decoding | Strict line-oriented /1 envelope; encoder emits LF separators and decoder accepts LF/CRLF | CommandAi — implemented |
 | Canonical bytes, signatures, hashes | No canonical signing/digest contract | Not implemented |
 | Unknown extensions | No extension bag; malformed/unknown entries rejected | Strict /1 contract |
 | Secret classification and redaction | No secret metadata or redaction API | Host/security layer; opaque does not mean secret-safe |
