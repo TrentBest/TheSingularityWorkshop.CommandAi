@@ -92,4 +92,49 @@ public sealed class CommandAiTextCodecTests
         Assert.Single(proposal.Commands);
         Assert.Equal("hello", proposal.Commands[0].Arguments[1].Value.Text);
     }
+
+    [Theory]
+    [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100 2=\"valid\"trailing\\n[/CommandAi]")]
+    [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100 2=\"invalid\\q\"\\n[/CommandAi]")]
+    [InlineData("[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100 2=\"   \"\\n[/CommandAi]")]
+    public void Decode_RejectsInvalidLiteralRepresentations(string value) =>
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(value.Replace("\\n", "\n")));
+
+    [Fact]
+    public void Decode_RejectsUnexpectedContentAndNestedEnvelope()
+    {
+        var trailing = "[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100\\n[/CommandAi]\\nextra".Replace("\\n", "\n");
+        var nested = "[CommandAi]\\n[CommandAi]\\nProtocol=CommandAi/1\\nCommand=100\\n[/CommandAi]\\n[/CommandAi]".Replace("\\n", "\n");
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(trailing));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(nested));
+    }
+
+    [Fact]
+    public void Decode_RejectsEnvelopeAboveConfiguredCharacterLimit()
+    {
+        var oversized = "[CommandAi]\\n" + new string('x', CommandLimits.MaxEnvelopeCharacters) + "\\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(oversized));
+    }
+
+    [Fact]
+    public void Encode_RejectsProposalWhoseEncodedEnvelopeExceedsLimit()
+    {
+        var text = new string('x', CommandLimits.MaxLiteralCharacters);
+        var arguments = Enumerable.Range(1, 16)
+            .Select(i => new CommandArgument((ulong)i, CommandValue.FromText(text)));
+        var proposal = new CommandProposal([new CommandInstruction(1, arguments)]);
+        Assert.Throws<ArgumentException>(() => CommandAiTextCodec.Encode(proposal));
+    }
+
+    [Fact]
+    public void Proposal_AcceptsConfiguredCommandAndArgumentBoundaries()
+    {
+        var command = new CommandInstruction(1, Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand)
+            .Select(i => new CommandArgument((ulong)i, CommandValue.FromIdentifier(1))));
+        var proposal = new CommandProposal(Enumerable.Range(1, CommandLimits.MaxCommands)
+            .Select(i => new CommandInstruction((ulong)i)));
+        Assert.Equal(CommandLimits.MaxArgumentsPerCommand, command.Arguments.Count);
+        Assert.Equal(CommandLimits.MaxCommands, proposal.Commands.Count);
+    }
+
 }
