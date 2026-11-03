@@ -42,14 +42,14 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 ## Remaining work
 
 1. Confirm the workflow triggered by this status-page-only update.
-2. Finish the source-to-doc audit across all public type guides and UML pages; remove any stale /2-only references and verify the required moniker/footer on every Markdown page.
-3. Complete the optionality/default/schema and compatibility-policy review without inventing unsupported /1 semantics.
-4. Coordinate cross-repository ownership for observer registration, event correlation/replay, and evidence-bound gate transitions through the relevant issues.
-5. Keep CiAi PR #37 draft until its submodule pin and description reference the approved /1 source and its required workflows pass on the exact updated PR head.
+2. Complete the optionality/default/schema and compatibility-policy review without inventing unsupported /1 semantics; add generic schema features only when a concrete consumer need and owner are established.
+3. Coordinate cross-repository ownership for observer registration, event correlation/replay, and evidence-bound gate transitions through the relevant issues.
+4. Resolve the package-distribution strategy for consumers of CiAi's transitive CommandAi dependency before any package release.
+5. Keep CiAi PR #50 draft until the owner explicitly authorizes its merge; both required exact-head workflows have passed.
 
 No user-held decision currently blocks the /1 source audit. Cross-repository runtime semantics remain agent-owned coordination work; they do not block the package's current /1 representation review.
 
-No NuGet publish, merge, release, deployment, master alteration, or branch deletion is authorized.
+No further merge, NuGet publication, release, deployment, master alteration, or branch deletion is authorized by this work.
 
 ---
 
