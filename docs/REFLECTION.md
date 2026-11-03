@@ -29,7 +29,8 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Latest development activity (2026-11-03)
 
-- Current reviewed head: `084dbe7ebcc9a1f224a36c22c86a835e19a3a5d3`.
+- Latest source/test and domain-matrix audit head: `084dbe7ebcc9a1f224a36c22c86a835e19a3a5d3`.
+- Latest documentation-only head (this status update): `e1af3e7362fc026db0f52b966888faf9087a4fe9`.
 - Added adversarial codec and boundary tests in `b1f4abae7dc708f0345747c280eec22edc18e5f2`.
 - Clarified the domain-completeness matrix so the current owner-approved /1 exclusions are not confused with implemented structured fields.
 - Recorded the source audit and remaining cross-repository ownership questions in CommandAi issue #3.
