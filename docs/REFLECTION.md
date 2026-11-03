@@ -32,20 +32,15 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Latest development activity (2026-11-03)
 
-- The implementation baseline `3563bfcabdae9e4166c6b9f86a65edf959ab5631` (`ci: retain verified Codecov token upload`) follows `a2edf58e5500a65507c95fa2ffe48a9734aec29f` (`ci: add CiAi commit evidence observer`). Exact-head workflow run 41711472222 passed `build-and-test`; `publish_nuget` was skipped. This reflection refresh is a subsequent documentation-only commit and must be verified separately.
-- The CiAi observer workflow is now present on `development`, but it is **not activated** by GitHub's `workflow_run` trigger until that workflow is present on the default branch. The owner-approved activation boundary remains unchanged: no `master` modification or merge is authorized.
-- PR #5 remains open/draft against `master`; its head `d782ed6c1979e57ab5d6443f07614990e4ad3194` is 4 commits ahead and 260 behind `development`. Its diff includes the observer workflow plus duplicate root-level model/test files that already exist on `development`; do not merge this stale branch as-is. Reconcile or retire it only with explicit branch/PR disposition authorization.
-- PR #4 is closed unmerged. Its five-commit branch remains 5 ahead and 57 behind `development`; the intended `/1` corrections are already represented in current development docs. The branch is not needed as a merge source; do not delete it without explicit authorization.
-
-- Approved CommandAi/1 source and API remain the only supported contract.
-- Adversarial codec and boundary tests were added in `b1f4abae7dc708f0345747c280eec22edc18e5f2`.
-- The domain matrix was corrected in `084dbe7ebcc9a1f224a36c22c86a835e19a3a5d3` to distinguish /1 exclusions from implemented fields and to keep correlation/provenance and actual outcomes with ProtocolAi/runtime.
-- Package metadata was corrected in `a92610be1b2c3d0b5b5f5d4cc5e6e0799e1ace14`; its description now accurately identifies the CommandAi/1 envelope.
-- Deterministic LF text encoding was implemented in `1b7211d2638de680a75edddced78f6a7a60ef4e0`, with an exact-envelope regression test in `c59601eb940952c51e09344224d3c95d0f422c61`.
-- A null-command validation-order defect was fixed in `14a0828fbce994eddef9f9d229afbbb8e3b16e8a`; regression coverage was added in `3af6d5754d10e75837531fef14d5f1de11973b7b`. Both exact-head CI runs passed (41594167943 and 41594181593).
-- The complete Markdown inventory was audited: all 31 Markdown pages have the animated moniker and canonical Workshop PNG footer. Removed /2-only model type references are absent; remaining /2 mentions are historical/correction notes.
-- CiAi PR #37 merged at `49a802fcab60fa7411b01892072d7e2c8a2c72a9`. Draft CiAi PR #50 advances its submodule pin to `339f404b0c7ad0170ca1549da1161938047c1ca8`; both required workflows passed on exact PR head `6499e3a301dfeeeeafaff793ee392120efadedae` (runs 41592774387 and 41592774359). PR #50 remains open/draft; no merge or publication was performed.
-- Package version remains `0.1.0-alpha.2`; no package/protocol version increment or NuGet publication.
+- Development implementation baseline `3563bfcabdae9e4166c6b9f86a65edf959ab5631` (`ci: retain verified Codecov token upload`) passed exact-head workflow run [41711472222](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41711472222); `build-and-test` succeeded and `publish_nuget` was skipped.
+- The CiAi observer workflow is now present on **both** `master` and `development`. The files have the same blob SHA (`95328575a903121248b49f83b9170673d0b88164`), and the master copy arrived through merged PR #5 at merge commit `181b0ef6a9c3ffb779a94898cf2c0653ff3ac8e9`.
+- PR #5 is closed and merged. The observer's first qualifying post-merge `CommandAi CI` completion and its `commandai-ciai-evidence` artifact still need live verification; workflow registration alone is not evidence that observation has run successfully.
+- The source branch `ci/register-ciai-observer` remains after the merge and is safe for the owner to delete manually. No branch was deleted.
+- Current branch comparison: `development` is 262 commits ahead and 4 behind `master`; GitHub reports the refs as diverged. The compare includes the development implementation/docs and the master-only workflow merge history. Do not reset, force-push, merge, or otherwise reconcile these refs without a dedicated ancestry/content audit and explicit authorization.
+- Current branch inventory: `master`, `development`, `ci/register-ciai-observer`, and `fix/commandai-v1-contract-docs`. There are no open CommandAi pull requests. The fix branch should be compared with current development before the owner removes it.
+- Approved CommandAi/1 source and API remain the only supported contract. No /2-only fields or compatibility parser are to be added.
+- The earlier exact-head CI runs continue to establish the current model/codec test baseline: [41594167943](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594167943) and [41594181593](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594181593). The full package/consumer validation run remains [41592630562](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592630562).
+- Package version remains `0.1.0-alpha.2`; no package/protocol version increment or NuGet publication occurred.
 
 ## Remaining work
 
