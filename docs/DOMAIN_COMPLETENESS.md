@@ -25,11 +25,11 @@ The same action meaning can be presented through different application experienc
 | Parameter identity | Positive opaque integer; duplicate parameter IDs rejected within a command | CommandAi — implemented |
 | Parameter value | Integer identifier or literal text | CommandAi — implemented |
 | Parameter schema, optionality, defaults, constraints | Not represented in /1 | Gap — add only with concrete generic consumer need |
-| Target and scope | Not represented in /1 | Host/domain context; not inferred |
-| Command/proposal GUID, causal/correlation identity | Not represented in /1 | Protocol/runtime coordination gap |
-| Preconditions | Not represented in /1 | Grammar/host concern; no hidden expression field |
-| Idempotency and replay | Not represented in /1 | Host/runtime concern |
-| Expected outcome contract | Not represented in /1 | Protocol/runtime outcome contract, not CommandAi |
+| Target and scope | Not represented in /1 | Explicitly excluded from the owner-approved /1 contract; consuming domain/host must carry and validate target context outside the generic model |
+| Command/proposal GUID, causal/correlation identity | Not represented in /1 | Protocol/runtime coordination gap; do not mistake proposal order or action IDs for correlation identity |
+| Preconditions | Not represented in /1 | Explicitly excluded from /1; GrammarAi/host may validate domain conditions supplied through an owning layer, but /1 has no structured precondition field |
+| Idempotency and replay | Not represented in /1 | Explicitly excluded from /1; deduplication and replay safety remain host/protocol responsibilities, not guarantees of the proposal model |
+| Expected outcome contract | Not represented in /1 | Explicitly excluded from /1; ProtocolAi/runtime owns correlated outcome contracts and actual outcomes |
 | Actual result and errors | Not represented in /1 | ProtocolAi and runtime |
 | Ordering | Proposal preserves insertion order | CommandAi — representation only; no dependency semantics |
 | Transaction, branching, workflow, retry, cancellation, compensation | Not represented or executed | Orchestrator / host |
