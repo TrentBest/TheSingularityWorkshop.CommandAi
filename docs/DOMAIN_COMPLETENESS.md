@@ -34,7 +34,7 @@ The same action meaning can be presented through different application experienc
 | Ordering | Proposal preserves insertion order | CommandAi — representation only; no dependency semantics |
 | Transaction, branching, workflow, retry, cancellation, compensation | Not represented or executed | Orchestrator / host |
 | Resource bounds | Envelope (262,144 UTF-16 characters), command (256), per-command arguments (64), per-literal text (16,384 UTF-16 characters), and aggregate in-memory literal text (1,048,576 UTF-16 characters) are source-defined | CommandAi — implemented representation safeguards; the model's aggregate in-memory allowance is intentionally larger than the codec envelope, so a proposal can be constructible but not encodable. This is a documented boundary, not a guarantee that every model instance has a wire representation. Issue #3 should decide whether these independent limits are desirable or should be aligned. |
-| Encoding and decoding | Strict line-oriented /1 envelope; encoder emits LF separators and decoder accepts LF/CRLF | CommandAi — implemented |
+| Encoding and decoding | Line-oriented /1 envelope; encoder emits LF separators; decoder accepts LF/CRLF, trims line boundaries, and ignores blank or whitespace-only lines | CommandAi — implemented; non-empty unexpected entries and malformed markers remain rejected |
 | Canonical bytes, signatures, hashes | No canonical signing/digest contract | Not implemented |
 | Unknown extensions | No extension bag; malformed/unknown entries rejected | Strict /1 contract |
 | Secret classification and redaction | No secret metadata or redaction API | Host/security layer; opaque does not mean secret-safe |
