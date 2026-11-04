@@ -33,7 +33,7 @@ Each instruction describes one atomic action. A proposal preserves instruction o
 
 ## 5. Wire representation
 
-The codec reads and writes the line-oriented CommandAi/1 envelope. Encoding uses LF line separators on every platform; decoding accepts LF and CRLF input. This stabilizes the text envelope's line endings, but does not define a canonical byte, signature, or digest contract:
+The codec reads and writes the line-oriented CommandAi/1 envelope. Encoding uses LF line separators on every platform; decoding accepts LF and CRLF input, trims surrounding whitespace on each line, and ignores blank or whitespace-only lines. The first and last non-empty entries must still be the opening and closing envelope markers. This is bounded by the overall envelope character limit. This stabilizes the text envelope's line endings, but does not define a canonical byte, signature, or digest contract:
 
 ~~~text
 [CommandAi]
