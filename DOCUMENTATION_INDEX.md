@@ -24,7 +24,7 @@ CommandAi/1 is the approved provider-neutral representation for immutable, order
 
 The approved /1 model is centered on `CommandProposal`, `CommandInstruction`, `CommandArgument`, `CommandValue`, `CommandValueKind`, `CommandLimits`, `CommandAiTextCodec`, `CommandProposalBuilder`, and `CommandInstructionBuilder`.
 
-The prior /2 candidate introduced `CommandPrecondition`, `CommandOutcomeContract`, and `CommandOutcomeField`. These are not part of the approved /1 contract and their old type-guide links are historical/stale until the type-guide cleanup is complete.
+The prior /2 candidate introduced `CommandPrecondition`, `CommandOutcomeContract`, and `CommandOutcomeField`. Those types and their type guides are not present in the current source tree and are not part of the approved /1 contract; historical context is recorded in [Legacy compatibility](docs/LEGACY_COMPATIBILITY.md).
 
 All Markdown pages must retain the animated moniker at the top and canonical Workshop PNG footer. CI validates those branding requirements. No NuGet publication is authorized.
 
