@@ -3,11 +3,11 @@
 
 # Command domain completeness and ownership
 
-> Status: this inventory describes the approved CommandAi/1 source contract. Candidate features are not treated as implemented merely because they appeared in an earlier design.
+> Status: this inventory describes the enriched CommandAi/1 source contract. Compact legacy commands remain supported without invented metadata.
 
 ## 1. What a command is
 
-A command is a bounded declaration of an intended atomic action: an action identity plus ordered, typed parameters. A proposal is a non-empty ordered collection of such commands.
+A command is a bounded declaration of intended atomic action: a positive application-owned action identity and ordered typed arguments. An enriched command additionally declares a distinct command identity, target, scope, grammar-versioned preconditions, idempotency identity, and expected-outcome contract. A proposal is a non-empty ordered collection.
 
 A command is not authorization, proof of live-state truth, an execution result, a transaction, a workflow, a retry policy, or a user-interface instruction. A proposal is untrusted input.
 
@@ -19,33 +19,35 @@ The same action meaning can be presented through different application experienc
 
 | Concern | Current /1 evidence | Owner and disposition |
 |---|---|---|
-| Protocol identity | `CommandProposal.CurrentProtocolVersion` is `CommandAi/1`; decoder rejects unsupported versions | CommandAi — implemented |
-| Proposal structure | Non-empty ordered collection of instructions | CommandAi — implemented |
+| Protocol identity | CommandProposal.CurrentProtocolVersion is CommandAi/1 | CommandAi — implemented |
+| Proposal structure | Non-empty ordered collection; compact and enriched entries may coexist | CommandAi — implemented |
+| Command identity | Non-empty GUID, distinct from action identity; unique among enriched commands in one proposal | CommandAi — data shape and uniqueness implemented; host owns lifecycle/correlation |
 | Action identity | Positive opaque integer | CommandAi — implemented |
-| Parameter identity | Positive opaque integer; duplicate parameter IDs rejected within a command | CommandAi — implemented |
-| Parameter value | Integer identifier or literal text | CommandAi — implemented |
-| Parameter schema, optionality, defaults, constraints | Not represented in /1 | Gap — add only with concrete generic consumer need |
-| Target and scope | Not represented in /1 | Explicitly excluded from the owner-approved /1 contract; consuming domain/host must carry and validate target context outside the generic model |
-| Command/proposal GUID, causal/correlation identity | Not represented in /1 | Protocol/runtime coordination gap; do not mistake proposal order or action IDs for correlation identity |
-| Preconditions | Not represented in /1 | Explicitly excluded from /1; GrammarAi/host may validate domain conditions supplied through an owning layer, but /1 has no structured precondition field |
-| Idempotency and replay | Not represented in /1 | Explicitly excluded from /1; deduplication and replay safety remain host/protocol responsibilities, not guarantees of the proposal model |
-| Expected outcome contract | Not represented in /1 | Explicitly excluded from /1; ProtocolAi/runtime owns correlated outcome contracts and actual outcomes |
-| Actual result and errors | Not represented in /1 | ProtocolAi and runtime |
+| Target and scope | Required typed opaque values for enriched commands; absent for compact legacy commands | CommandAi — bounded representation; consuming domain/host defines meaning and validates current state |
+| Parameter identity | Positive opaque integer; duplicate IDs rejected within a command | CommandAi — implemented |
+| Parameter value | Positive integer identifier or bounded literal text | CommandAi — implemented |
+| Parameter schema/defaults | Not represented | Consuming domain/host — intentionally outside generic command model |
+| Preconditions | Bounded expression paired with grammar-version identifier; optional on enriched command | CommandAi carries opaque data; GrammarAi owns grammar and structural validation; host evaluates against live state |
+| Idempotency identity | Required bounded string for enriched commands; unique among enriched commands in a proposal | CommandAi carries identity only; host owns replay/deduplication behavior. No exactly-once guarantee |
+| Expected outcome | Required outcome identity and bounded unique field declarations for enriched commands | CommandAi declares shape only; ProtocolAi/runtime carries actual correlated outcomes |
+| Actual result and errors | Not represented as command intent | ProtocolAi and runtime/host |
 | Ordering | Proposal preserves insertion order | CommandAi — representation only; no dependency semantics |
 | Transaction, branching, workflow, retry, cancellation, compensation | Not represented or executed | Orchestrator / host |
-| Resource bounds | Envelope (262,144 UTF-16 characters), command (256), per-command arguments (64), per-literal text (16,384 UTF-16 characters), and aggregate in-memory literal text (1,048,576 UTF-16 characters) are source-defined | CommandAi — implemented representation safeguards; the model's aggregate in-memory allowance is intentionally larger than the codec envelope, so a proposal can be constructible but not encodable. This is a documented boundary, not a guarantee that every model instance has a wire representation. Issue #3 should decide whether these independent limits are desirable or should be aligned. |
-| Encoding and decoding | Line-oriented /1 envelope; encoder emits LF separators; decoder accepts LF/CRLF, removes empty lines, and trims remaining lines; whitespace-only lines are ignored as entries but count toward the maximum-line guard | CommandAi — implemented; non-empty unexpected entries and malformed markers remain rejected |
+| Resource bounds | Envelope 262,144; commands 256; arguments/command 64; preconditions/command 32; outcome fields 64; literal 16,384; grammar version 128; precondition expression 16,384; idempotency identity 256; aggregate in-memory literal data 1,048,576; JSON depth 16 | CommandAi — implemented representation safeguards |
+| Encoding and decoding | Legacy Command line unchanged; enriched AtomicCommand JSON line; mixed proposals supported; strict duplicate/unknown JSON property rejection | CommandAi — implemented /1 codec |
+| Older-reader compatibility | Older compact-only /1 readers reject AtomicCommand entries | Consumer upgrade required before enriched forms are emitted/accepted; not universal forward compatibility |
 | Canonical bytes, signatures, hashes | No canonical signing/digest contract | Not implemented |
-| Unknown extensions | No extension bag; malformed/unknown entries rejected | Strict /1 contract |
 | Secret classification and redaction | No secret metadata or redaction API | Host/security layer; opaque does not mean secret-safe |
 | Authorization and execution | No policy, credential, dispatch, or execution API | Foundry / host — intentionally excluded |
 | Presentation, narration, haptics, pedagogy | No presentation model | Application/observer layers — intentionally excluded |
 
 ## 4. Implemented guarantees
 
-The model and tests establish positive identifiers, typed values, ordered arguments and commands, non-empty proposals, immutable snapshots from builders, and configured resource bounds. The codec rejects malformed envelopes, unsupported versions, duplicate protocol declarations, duplicate parameters, invalid values, and oversized input.
+The model and tests establish positive action/parameter/outcome identities, non-empty command GUIDs, bounded typed values, ordered immutable arguments and commands, unique parameter IDs, unique enriched command and idempotency identities within a proposal, optional grammar-versioned preconditions, and configured resource bounds.
 
-These are representation guarantees. They do not establish that an ID exists in a host vocabulary, that a command is semantically correct, or that execution is safe or authorized.
+The codec preserves the original compact /1 line, round-trips enriched AtomicCommand entries, supports mixed proposals, and rejects malformed envelopes, unsupported versions, duplicate protocol declarations, duplicate JSON properties, unknown JSON members, invalid typed values, and oversized input.
+
+These are representation guarantees. They do not establish that an ID exists in a host vocabulary, that a precondition is true, that an idempotency key has been enforced, or that execution is safe or authorized.
 
 ## 5. Composition boundary
 
@@ -53,7 +55,7 @@ Several ordered commands may be transported together, but order alone does not i
 
 ## 6. Extension policy
 
-Retain CommandAi/1 for internal Workshop coordination. Do not add /2-only fields or increment package/protocol versions merely to align internal consumers. Before adding schema metadata, correlation identity, extensions, or other cross-cutting fields, identify the semantic owner, validation rules, resource bounds, compatibility behavior, and source-backed tests. No publication or release is implied.
+The wire identifier remains CommandAi/1. The compact legacy Command entry remains supported. The enriched AtomicCommand entry is a bounded additive extension. Older readers may reject the enriched entry and must be upgraded before consuming it. Future fields require an identified semantic owner, validation rules, resource bounds, compatibility behavior, and source-backed tests. No publication or release is implied.
 
 ---
 
