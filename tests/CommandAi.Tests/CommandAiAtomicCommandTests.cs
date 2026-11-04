@@ -44,6 +44,9 @@ public sealed class CommandAiAtomicCommandTests
         Assert.Equal("idem-1", decoded.IdempotencyKey);
         Assert.Equal(700UL, decoded.OutcomeContract!.OutcomeId);
         Assert.Equal(701UL, decoded.OutcomeContract.Fields[0].FieldId);
+        Assert.Equal(CommandValueKind.LiteralText, decoded.OutcomeContract.Fields[0].ValueKind);
+        Assert.True(decoded.OutcomeContract.Fields[0].Required);
+        Assert.False(decoded.OutcomeContract.Fields[1].Required);
         Assert.Equal("bounded payload", decoded.Arguments[1].Value.Text);
         Assert.Equal("GrammarAi/Observer/1", decoded.Preconditions[0].GrammarVersion);
         Assert.Equal("candidate.sha == expected.sha", decoded.Preconditions[0].Expression);
@@ -99,6 +102,26 @@ public sealed class CommandAiAtomicCommandTests
         const string missingTarget = "{\"commandId\":\"11111111-2222-3333-4444-555555555555\",\"actionId\":7,\"scope\":{\"kind\":\"LiteralText\",\"identifier\":null,\"text\":\"branch\"},\"idempotencyKey\":\"key\",\"outcomeContract\":{\"outcomeId\":1,\"fields\":[]},\"arguments\":[],\"preconditions\":[]}";
         var input = "[CommandAi]\nProtocol=CommandAi/1\nAtomicCommand=" + missingTarget + "\n[/CommandAi]";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(input));
+    }
+
+    [Fact]
+    public void EnrichedAtomicCommand_RoundTripsIntegerTargetAndScope()
+    {
+        var command = new CommandInstruction(
+            Guid.Parse("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"),
+            1002,
+            CommandValue.FromIdentifier(3001),
+            CommandValue.FromIdentifier(3002),
+            "integer-target-operation",
+            new CommandOutcomeContract(701, [new CommandOutcomeField(702, CommandValueKind.IntegerIdentifier)]));
+
+        var decoded = Assert.Single(CommandAiTextCodec.Decode(
+            CommandAiTextCodec.Encode(new CommandProposal([command]))).Commands);
+
+        Assert.Equal(3001UL, decoded.Target!.Identifier);
+        Assert.Equal(3002UL, decoded.Scope!.Identifier);
+        Assert.Null(decoded.Target.Text);
+        Assert.Null(decoded.Scope.Text);
     }
 
     [Fact]
