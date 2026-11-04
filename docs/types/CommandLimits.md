@@ -10,11 +10,18 @@ Central source constants that bound untrusted CommandAi/1 proposals and encoded 
 | Encoded envelope | 262,144 UTF-16 characters |
 | Commands per proposal | 256 |
 | Arguments per command | 64 |
-| Individual literal text | 16,384 UTF-16 characters |
-| Aggregate literal text per proposal | 1,048,576 characters |
+| Preconditions per command | 32 |
+| Outcome fields per contract | 64 |
+| Individual literal / target / scope value | 16,384 UTF-16 characters |
+| Grammar-version identifier | 128 UTF-16 characters |
+| Precondition expression | 16,384 UTF-16 characters |
+| Idempotency identity | 256 UTF-16 characters |
+| Aggregate in-memory literal data per proposal | 1,048,576 UTF-16 characters |
+| Enriched JSON nesting depth | 16 |
+
+The aggregate in-memory literal bound is intentionally independent of the smaller encoded envelope bound. A constructible proposal may still be too large to encode.
 
 Source: [CommandLimits.cs](../../CommandLimits.cs). These are representation/resource limits, not semantic safety or authorization guarantees.
-
 
 ---
 

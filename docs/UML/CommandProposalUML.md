@@ -15,49 +15,53 @@ classDiagram
     +CurrentProtocolVersion = CommandAi/1
   }
   class CommandInstruction {
+    +Guid? CommandId
     +ulong ActionId
+    +CommandValue? Target
+    +CommandValue? Scope
+    +string? IdempotencyKey
     +IReadOnlyList~CommandArgument~ Arguments
+    +IReadOnlyList~CommandPrecondition~ Preconditions
+    +CommandOutcomeContract? OutcomeContract
   }
-  class CommandArgument {
-    +ulong ParameterId
-    +CommandValue Value
+  class CommandPrecondition {
+    +string GrammarVersion
+    +string Expression
   }
-  class CommandValue {
-    +CommandValueKind Kind
-    +ulong? Identifier
-    +string? Text
+  class CommandOutcomeContract {
+    +ulong OutcomeId
+    +IReadOnlyList~CommandOutcomeField~ Fields
   }
-  CommandProposal --> CommandInstruction : ordered commands
-  CommandInstruction --> CommandArgument : ordered parameters
-  CommandArgument --> CommandValue : typed value
+  CommandProposal --> CommandInstruction : ordered compact/enriched commands
+  CommandInstruction --> CommandPrecondition : opaque conditions
+  CommandInstruction --> CommandOutcomeContract : expected shape
 ~~~
 
 ## Source-supported relationships
 
-- **Target source:** [CommandProposal.cs](../../CommandProposal.cs).
-- **Related source:** [CommandInstruction.cs](../../CommandInstruction.cs), [CommandArgument.cs](../../CommandArgument.cs), [CommandValue.cs](../../CommandValue.cs), and [CommandLimits.cs](../../CommandLimits.cs).
-- **Codec:** [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs) reads and writes the line-oriented CommandAi/1 envelope.
-- **Invariants:** proposals are non-empty, ordered, bounded; action and parameter identities are positive; duplicate parameter identities are rejected within a command.
+- Target source: [CommandProposal.cs](../../CommandProposal.cs).
+- Related source: CommandInstruction.cs, CommandArgument.cs, CommandValue.cs, CommandPrecondition.cs, CommandOutcomeContract.cs, CommandLimits.cs.
+- Codec: CommandAiTextCodec.cs reads and writes compact and enriched CommandAi/1 entries.
+- Invariants: proposals are non-empty, ordered, bounded; enriched command IDs and idempotency identities are unique; legacy compact instructions do not receive invented metadata.
 
 ## Use cases
 
 ### UC-1 — Decode a proposed batch
-- **Actor:** consuming host.
-- **Trigger:** receive a candidate CommandAi/1 envelope.
-- **Outcome:** a structurally valid proposal is available for host-owned semantic validation.
-- **Failure:** malformed content, unsupported protocol, invalid identifiers, duplicates, or resource-limit violations are rejected.
+- Actor: consuming host.
+- Trigger: receive a candidate CommandAi/1 envelope.
+- Outcome: a structurally valid proposal is available for host-owned semantic validation.
+- Failure: malformed content, unsupported protocol, invalid identities, duplicates, or resource-limit violations are rejected.
 
 ### UC-2 — Compose atomic actions
-- **Actor:** application or host.
-- **Goal:** represent several ordered action proposals.
-- **Outcome:** the host receives an ordered list. The list does not imply transaction, dependency, retry, or rollback semantics.
+- Actor: application or host.
+- Goal: represent several ordered action proposals.
+- Outcome: the host receives an ordered list. The list does not imply transaction, dependency, retry, replay, or rollback semantics.
 
 ## Related pages
 
 - [Type page](../types/CommandProposal.md)
 - [Theory](../THEORY.md)
 - [Problem domain](../PROBLEM_DOMAIN.md)
-
 
 ---
 

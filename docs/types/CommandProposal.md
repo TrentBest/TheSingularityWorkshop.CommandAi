@@ -3,16 +3,19 @@
 
 # CommandProposal
 
-An immutable, non-empty ordered collection of `CommandInstruction` records plus the protocol version.
+An immutable, non-empty ordered collection of compact or enriched CommandInstruction records plus the protocol version.
 
 ## Contract
 
-- CurrentProtocolVersion is `CommandAi/1`.
+- CurrentProtocolVersion remains CommandAi/1.
 - Commands preserve insertion order.
-- The proposal enforces the source-defined maximum command count.
+- Compact and enriched instructions may coexist in one proposal.
 - Empty proposals and unsupported protocol versions are rejected.
+- Enriched command GUIDs must be unique within the proposal.
+- Enriched idempotency identities must be unique within the proposal.
+- Aggregate literal bounds include target, scope, arguments, idempotency identity, grammar-version identifiers, and precondition expressions.
 
-A proposal is an ordered representation, not a transaction or workflow. It does not imply dependency, rollback, retry, or all-or-nothing execution.
+A proposal is an ordered representation, not a transaction or workflow. It does not imply dependency, rollback, retry, replay, or all-or-nothing execution.
 
 Source: [CommandProposal.cs](../../CommandProposal.cs). Related: CommandInstruction, CommandLimits, CommandAiTextCodec.
 

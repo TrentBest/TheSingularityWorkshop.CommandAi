@@ -5,17 +5,34 @@
 
 ## Status
 
-This page records observations about an earlier implementation. It is not a compatibility target, and the modern package does not claim drop-in interoperability with it.
+This page records observations about earlier implementations and the compact CommandAi/1 wire form. It is not a claim of drop-in interoperability with the old Architect-specific parser.
 
-## Source observations
+## Historical source observations
 
-The legacy implementation reviewed at [The / Architect/Workshop/Ai/CommandAi.cs](https://github.com/TrentBest/The/blob/6ad1971f3932654ea58f8dd8dbc0dde530e4e4c6/Architect/Workshop/Ai/CommandAi.cs) mixed generic parsing with application-specific vocabulary and approval/execution concerns. These observations are historical source notes, not a normative wire specification.
+The earlier implementation reviewed at [The / Architect/Workshop/Ai/CommandAi.cs](https://github.com/TrentBest/The/blob/6ad1971f3932654ea58f8dd8dbc0dde530e4e4c6/Architect/Workshop/Ai/CommandAi.cs) mixed generic parsing with application-specific vocabulary and approval/execution concerns. These observations are historical source notes, not a normative wire specification.
 
-## Current package boundary
+## Compact CommandAi/1 compatibility
 
-The current package uses the CommandAi/1 model: immutable ordered proposals, action identifiers, typed parameter values, bounded literal text, generic builders, and a line-oriented codec. It intentionally does not resolve identifier meanings, authorize, approve, or execute commands.
+The original compact CommandAi/1 line remains supported without changing its serialized form:
 
-The repository's earlier /2 candidate is not the approved contract. Internal consumers must retain /1; do not add /2-only fields or version bumps merely for internal coordination.
+~~~text
+[CommandAi]
+Protocol=CommandAi/1
+Command=100 200=42 201="diagnostic stream"
+[/CommandAi]
+~~~
+
+Existing compact proposals continue to decode into action identity plus ordered typed arguments. The new model does not invent command identity, target, scope, preconditions, idempotency, or outcome defaults for these legacy instructions. Those fields remain absent and HasAtomicContract is false.
+
+## Enriched CommandAi/1 extension
+
+The enriched atomic-command form uses an explicit AtomicCommand JSON entry under the same protocol identifier. It carries command identity, action identity, target, scope, idempotency identity, expected-outcome contract, ordered arguments, and optional grammar-versioned preconditions.
+
+A new decoder accepts both compact and enriched entries, including mixed proposals. Older compact-only readers reject the unknown AtomicCommand entry; they must be upgraded before consuming enriched commands. Retaining the /1 identifier does not imply that old readers understand new entry types.
+
+## Ownership
+
+CommandAi validates bounded representation only. GrammarAi owns precondition grammar structure; the host evaluates against current state. ProtocolAi owns correlated message/event outcomes. The host owns authorization, approval, replay/delivery, and execution. Neither a parsed command nor a declared idempotency key grants authority or guarantees execution semantics.
 
 For current implementation guidance, see the [theory chapter](THEORY.md), [builder integration](BUILDER_INTEGRATION.md), and [usage guide](USAGE.md).
 
