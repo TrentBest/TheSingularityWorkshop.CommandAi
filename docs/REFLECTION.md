@@ -93,6 +93,23 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 - The model aggregate literal bound (1,048,576 UTF-16 characters) remains distinct from the codec envelope bound (262,144 UTF-16 characters). This allows a constructible in-memory proposal that is not encodable; the theory chapter now explains the distinction. Issue #3 remains open for a deliberate owner/domain disposition; no limit or protocol change was made speculatively.
 - Package version remains `0.1.0-alpha.2`. No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
 
+## Enriched CommandAi/1 implementation — 2026-11-04
+
+- Owner decision: keep the protocol identifier CommandAi/1 and add generic atomic-command fields in CommandAi itself. This supersedes earlier compact-only statements in historical notes above.
+- Isolated implementation branch: work/enriched-atomic-command-v1. It was based on the then-current development head 436bef4adfb9a80566501f3653a68944bb6c0566. The branch is not merged.
+- Public model: compact legacy instructions remain supported; enriched instructions add a GUID command identity distinct from action identity, typed opaque target and scope, bounded idempotency identity, optional GrammarAi-versioned opaque preconditions, and an expected-outcome contract with typed fields. Compact instructions retain null/absent enriched metadata; no defaults are invented.
+- Proposal invariants: command order is preserved; enriched command IDs and idempotency identities are unique within a proposal; aggregate literal bounds include target, scope, arguments, idempotency identity, grammar versions, and precondition expressions.
+- Wire contract: compact Command entries retain their original serialized form. Enriched commands use AtomicCommand JSON entries under CommandAi/1. New readers accept compact, enriched, and mixed proposals. Older compact-only readers reject AtomicCommand and must be upgraded before consuming enriched proposals.
+- Codec validation: enriched JSON is limited to depth 16, rejects unknown members and duplicate properties, and validates required fields and typed value combinations. The codec does not parse/evaluate preconditions, enforce idempotency, authorize, or execute.
+- Added model types: CommandPrecondition, CommandOutcomeContract, and CommandOutcomeField. Added enriched builder overloads while preserving legacy compact builder overloads.
+- Added adversarial tests for enriched round-trip, mixed proposals, byte-for-byte compact encoding, missing/unknown/duplicate JSON properties, duplicate command/idempotency identities, bounds, integer and text targets/scopes, expected-outcome metadata, and no inferred defaults for legacy instructions.
+- Exact-head [CommandAi CI run 41754885831](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41754885831) passed on commit f39246d2b60b6786646347ca98a4690ad5fffe50: branding, restore/build, tests with coverage, Codecov upload, quickstart, package pack, packed-artifact audit, and consumer compilation. The package artifact was uploaded for validation only; publish_nuget was skipped.
+- The first aggregate-literal test fixture did not exceed the configured 1,048,576-character bound; CI caught it. The fixture was corrected to exercise maximum argument and precondition counts, and the corrected exact-head run above passed.
+- Documentation was updated across README, theory, architecture, problem domain, usage, builder integration, domain completeness, status, type guides, AI-series ownership, and UML. The new type guides are indexed. The animated moniker remains at the top and canonical PNG footer is used.
+- Downstream consumer migration is tracked in CiAi issue #52 and The issue #19. CiAi PR #50 remains draft because its current source pin validates compact /1 only. The/Architect still has /2 expectations and must migrate to enriched /1; draft The PR #35 corrects its ownership documentation only. GrammarAi, ProtocolAi, Foundry, Experiences, and FSM_COS integration issues now record their respective boundaries. No downstream source migration is claimed complete.
+- Current CommandAi branch inventory includes master, development, and this isolated work branch. Do not delete the work branch or reconcile master/development as part of this task.
+- Package version remains 0.1.0-alpha.2. No protocol bump, NuGet publication, merge, master write, release, deployment, or branch deletion occurred.
+
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
