@@ -169,4 +169,28 @@ public sealed class CommandAiTextCodecTests
         Assert.Equal(CommandLimits.MaxCommands, proposal.Commands.Count);
     }
 
+
+    [Fact]
+    public void EncodeThenDecode_RoundTripsEscapedControlCharacters()
+    {
+        var literal = "line one\nline two\t\u0001";
+        var proposal = new CommandProposal([
+            new CommandInstruction(100, [new CommandArgument(200, CommandValue.FromText(literal))])
+        ]);
+
+        var decoded = CommandAiTextCodec.Decode(CommandAiTextCodec.Encode(proposal));
+
+        Assert.Equal(literal, decoded.Commands[0].Arguments[0].Value.Text);
+    }
+
+    [Fact]
+    public void Decode_IgnoresBlankAndWhitespaceOnlyLines()
+    {
+        var input = "[CommandAi]\n\nProtocol=CommandAi/1\n \t\nCommand=100\n\n[/CommandAi]";
+
+        var decoded = CommandAiTextCodec.Decode(input);
+
+        Assert.Equal(100UL, Assert.Single(decoded.Commands).ActionId);
+    }
+
 }
