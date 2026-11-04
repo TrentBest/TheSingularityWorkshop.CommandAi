@@ -13,12 +13,16 @@ This distinction matters whenever a model, agent, service, or application propos
 
 ## 2. Concepts and vocabulary
 
+- **Command identity:** a non-empty GUID identifying one proposed command, distinct from action identity and idempotency identity.
 - **Action identity:** a positive opaque integer identifying an action in a vocabulary owned by the consuming application.
+- **Target and scope:** typed opaque values identifying the intended resource and the boundary in which the action is proposed.
 - **Parameter identity:** a positive opaque integer identifying a parameter in that same application-owned vocabulary.
 - **Argument value:** either another positive integer identifier or literal text.
-- **Command instruction:** one atomic declaration of intended action, with an action identity and ordered arguments.
-- **Proposal:** an immutable, non-empty ordered collection of command instructions.
-- **Protocol version:** the explicit representation contract. The approved and only supported version is `CommandAi/1`.
+- **Precondition:** an opaque expression paired with the GrammarAi version required to interpret it.
+- **Idempotency identity:** a bounded caller-supplied key that the host may use to recognize repeated handling; it is not a replay guarantee.
+- **Expected-outcome contract:** an opaque declaration of expected outcome fields, not an actual result or verdict.
+- **Proposal:** an immutable, non-empty ordered collection of compact or enriched command instructions.
+- **Protocol version:** the explicit representation contract. The approved and only supported version remains `CommandAi/1`.
 
 An identifier is not a name. The integer `1001` has no universal meaning; the host maps it to a trusted action definition. Likewise, the order of arguments is preserved, but the generic package does not know whether a parameter is a resource, a mode, a path, or a diagnostic selector.
 
@@ -31,10 +35,12 @@ The public model is deliberately small:
 | Type | Responsibility | Important invariant |
 |---|---|---|
 | `CommandProposal` | Proposal envelope | At least one command; at most the configured command limit; immutable collection snapshot |
-| `CommandInstruction` | One action declaration | Positive action ID; ordered immutable arguments; bounded argument count |
+| `CommandInstruction` | Compact or enriched command declaration | Positive action ID and ordered immutable arguments; enriched form additionally requires command ID, target, scope, idempotency identity, outcome contract, and optional bounded preconditions |
 | `CommandArgument` | One named parameter value | Positive parameter ID and non-null typed value |
-| `CommandValue` | Typed argument representation | Positive integer identifier or non-empty bounded literal text |
-| `CommandLimits` | Resource safeguards | Bounds for wire characters, commands, arguments, and literal text |
+| `CommandValue` | Typed target, scope, and argument representation | Positive integer identifier or non-empty bounded literal text |
+| `CommandPrecondition` | Grammar-versioned opaque condition | Required bounded grammar version and expression; no parsing/evaluation in CommandAi |
+| `CommandOutcomeContract` / `CommandOutcomeField` | Expected outcome shape | Positive unique identities and bounded field count; not actual results |
+| `CommandLimits` | Resource safeguards | Bounds for wire characters, commands, arguments, preconditions, outcome fields, identities, and literal text |
 | `CommandAiTextCodec` | Text serialization boundary | Validates the /1 envelope; does not resolve meaning or grant authority |
 
 Within one instruction, parameter IDs are unique. Proposal order and argument order are preserved. Builders are mutable authoring helpers; `Build()` creates immutable model snapshots. The builders are not thread-safe and do not perform application-specific semantic validation.
@@ -46,9 +52,11 @@ The proposal's ordering is only a representation guarantee. It does not imply th
 The implementation is dependency-free and remains separate from adjacent Workshop packages.
 
 - [`CommandProposal.cs`](../CommandProposal.cs) owns the non-empty bounded collection and protocol identity.
-- [`CommandInstruction.cs`](../CommandInstruction.cs) owns action identity and ordered arguments.
+- [`CommandInstruction.cs`](../CommandInstruction.cs) owns command/action identity, target, scope, idempotency identity, expected-outcome contract, and ordered arguments.
 - [`CommandArgument.cs`](../CommandArgument.cs) pairs parameter identity with a value.
 - [`CommandValue.cs`](../CommandValue.cs) distinguishes integer identifiers from literal text.
+- [`CommandPrecondition.cs`](../CommandPrecondition.cs) carries opaque grammar-versioned precondition data.
+- [`CommandOutcomeContract.cs`](../CommandOutcomeContract.cs) and [`CommandOutcomeField.cs`](../CommandOutcomeField.cs) declare expected outcome shape.
 - [`CommandLimits.cs`](../CommandLimits.cs) centralizes representation bounds.
 - [`CommandAiTextCodec.cs`](../CommandAiTextCodec.cs) encodes and decodes the line-oriented /1 envelope.
 - [`CommandAiTextCodecTests.cs`](../tests/CommandAi.Tests/CommandAiTextCodecTests.cs) exercises round trips, ordering, malformed input, whitespace handling, and resource boundaries.
@@ -59,7 +67,7 @@ The builder API is convenience, not a second semantic model. A consuming domain 
 
 The encoder emits LF line separators on every platform. The decoder accepts LF and CRLF. It removes empty lines and trims surrounding whitespace from each remaining line. Whitespace-only lines become empty entries and are ignored semantically, but still count toward the parser's maximum-line guard. The opening and closing markers must still bound the first and last non-empty entries. Non-empty unknown entries, nested envelopes, duplicate protocol declarations, duplicate parameter IDs, unsupported versions, malformed identifiers, malformed JSON literals, and oversized input are rejected.
 
-The wire shape is:
+The legacy compact wire shape remains unchanged:
 
 ~~~text
 [CommandAi]
@@ -69,7 +77,18 @@ Command=1002 2003="Diagnostics"
 [/CommandAi]
 ~~~
 
-A command line begins with a positive action identifier. Each subsequent token is a positive parameter identifier, an equals sign, and either a positive integer identifier or a JSON-quoted string. JSON quoting preserves spaces, quotes, backslashes, and escaped control characters inside literal values.
+An enriched atomic command uses an explicit JSON entry within the same protocol version:
+
+~~~text
+[CommandAi]
+Protocol=CommandAi/1
+AtomicCommand={"commandId":"11111111-2222-3333-4444-555555555555","actionId":1001,"target":{"kind":"LiteralText","identifier":null,"text":"repository"},"scope":{"kind":"LiteralText","identifier":null,"text":"feature/ref"},"idempotencyKey":"operation-001","outcomeContract":{"outcomeId":700,"fields":[]},"arguments":[],"preconditions":[]}
+[/CommandAi]
+~~~
+
+The codec accepts compact and enriched entries in one ordered proposal. New readers decode both. Older compact-only readers reject the unknown AtomicCommand entry; they must be upgraded before consuming enriched commands. Retaining the /1 identifier does not promise universal forward compatibility. Enriched JSON rejects unknown members, duplicate properties, invalid field combinations, and nesting deeper than 16.
+
+A compact Command line begins with a positive action identifier. Each subsequent token is a positive parameter identifier, an equals sign, and either a positive integer identifier or a JSON-quoted string.
 
 LF output makes line endings deterministic, but this does not establish canonical bytes, canonical JSON rules beyond the current serializer behavior, signatures, hashes, or a digest contract. Those must not be inferred from deterministic line separators.
 
@@ -107,8 +126,14 @@ The current limits are measured in UTF-16 characters unless otherwise stated:
 | Encoded envelope | 262,144 |
 | Commands per proposal | 256 |
 | Arguments per command | 64 |
-| One literal text value | 16,384 |
-| Aggregate in-memory literal text | 1,048,576 |
+| Preconditions per command | 32 |
+| Outcome fields per contract | 64 |
+| One literal/target/scope value | 16,384 |
+| Grammar-version identifier | 128 |
+| Precondition expression | 16,384 |
+| Idempotency identity | 256 |
+| Aggregate in-memory literal data | 1,048,576 |
+| Enriched JSON depth | 16 |
 
 The model aggregate literal limit is currently independent of the smaller transport envelope limit. The recommendation to retain that separation remains open for owner review in issue #3. A proposal may be valid as in-memory data and still be too large to encode. The model bound limits aggregate literal storage; the codec bound limits the serialized transport representation. This is not a promise that every constructible model has a wire representation.
 
@@ -126,7 +151,7 @@ Opaque identifiers are not secrets, credentials, or authorization tokens. Litera
 |---|---|
 | ProtocolAi | Protocol vocabulary, identity meaning, correlation/provenance, event and outcome envelopes |
 | GrammarAi | Grammar definitions and structural validation where a grammar is used |
-| CommandAi | Immutable action/argument proposal model, representation bounds, builders, /1 codec |
+| CommandAi | Immutable compact/enriched atomic-command model, representation bounds, builders, /1 codec |
 | HeadlessAi | Configured endpoint request/response communication; not command authority |
 | CiAi | CI evidence and verdicts; not general command execution |
 | FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution, and lifecycle |
@@ -139,7 +164,7 @@ The exact-head [CommandAi CI run 41752954762](https://github.com/TrentBest/TheSi
 
 Subsequent regression tests add explicit coverage for escaped control characters and blank/whitespace-only lines. Their own exact-head CI is tracked in [REFLECTION](REFLECTION.md); do not treat the earlier run as evidence for later commits.
 
-The following are intentionally outside the current /1 contract or remain open at their owning layers: proposal/correlation identity, parameter schemas and defaults, target/scope, preconditions, idempotency/replay, expected outcomes, actual results, canonical signing/digests, workflow semantics, secret classification, authorization, and execution. Their absence is not a hidden feature. Add a generic field only when a concrete consumer need, semantic owner, validation rule, compatibility policy, resource bound, and source-backed tests have been established.
+The enriched /1 contract now represents command identity, target/scope, grammar-versioned preconditions, idempotency identity, and expected-outcome shape. It does not interpret or enforce those values. Proposal-level correlation, parameter schemas/defaults, actual results, canonical signing/digests, workflow semantics, secret classification, authorization, and execution remain outside CommandAi. A declared idempotency identity does not implement replay protection; a declared precondition does not prove it true; an expected-outcome contract is not an actual outcome.
 
 ## 10. Practice and assessment
 
@@ -147,7 +172,7 @@ The following are intentionally outside the current /1 contract or remain open a
 2. Why is a positive action ID insufficient to authorize an operation?
 3. Construct a literal containing a newline, a tab, a quote, and a backslash. Predict its encoded form, then round-trip it through the codec.
 4. Build a proposal that is below the aggregate in-memory literal limit but above the encoded envelope limit. Which operation should succeed, and which should fail?
-5. Identify which layer must own a replay key, a target resource, and the actual execution result. Explain why those concerns do not belong to this minimal proposal representation.
+5. Identify which layer carries a command idempotency identity, which layer enforces replay/deduplication, where target meaning comes from, and which layer records the actual execution result. Explain why carrying a field does not transfer semantic or runtime ownership.
 
 For an implementation exercise, add a test for a malformed token or a boundary condition before changing the codec. State the invariant the test protects and the exact CI revision that verifies it.
 

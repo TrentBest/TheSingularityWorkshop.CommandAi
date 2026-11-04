@@ -6,8 +6,15 @@
 ~~~mermaid
 classDiagram
   class CommandInstruction {
+    +Guid? CommandId
     +ulong ActionId
+    +CommandValue? Target
+    +CommandValue? Scope
+    +string? IdempotencyKey
     +IReadOnlyList~CommandArgument~ Arguments
+    +IReadOnlyList~CommandPrecondition~ Preconditions
+    +CommandOutcomeContract? OutcomeContract
+    +bool HasAtomicContract
   }
   class CommandArgument {
     +ulong ParameterId
@@ -18,24 +25,28 @@ classDiagram
     +ulong? Identifier
     +string? Text
   }
+  class CommandPrecondition {
+    +string GrammarVersion
+    +string Expression
+  }
+  class CommandOutcomeContract {
+    +ulong OutcomeId
+    +IReadOnlyList~CommandOutcomeField~ Fields
+  }
   CommandInstruction --> CommandArgument : ordered parameters
+  CommandInstruction --> CommandPrecondition : opaque conditions
+  CommandInstruction --> CommandOutcomeContract : expected shape
   CommandArgument --> CommandValue : typed value
-~~~
+~~~ 
 
 ## Source-supported relationships
 
-- **Target source:** [CommandInstruction.cs](../../CommandInstruction.cs).
-- **Related source:** CommandArgument.cs, CommandValue.cs, CommandProposal.cs.
-- **Codec:** CommandAiTextCodec.cs encodes and decodes the CommandAi/1 representation.
-- **Invariant:** action and parameter identities are positive; parameter identities are unique within a command.
+- Target source: [CommandInstruction.cs](../../CommandInstruction.cs).
+- Related source: CommandArgument.cs, CommandValue.cs, CommandPrecondition.cs, CommandOutcomeContract.cs, CommandProposal.cs.
+- Codec: CommandAiTextCodec.cs encodes compact and enriched CommandAi/1 entries.
+- Invariant: action and parameter identities are positive; parameter identities are unique within a command. Enriched metadata is all-or-nothing; compact legacy instructions retain absent/null metadata and HasAtomicContract is false.
 
 A command is a representation of intent, not an authorization decision or execution record. The host owns domain validation and dispatch.
-
-## Use cases
-
-- Inspect a decoded atomic action and its typed arguments.
-- Construct an instruction with the fluent builder.
-- Preserve its argument order when placed into a proposal.
 
 ---
 
