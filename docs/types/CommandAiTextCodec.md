@@ -9,6 +9,8 @@ Encoder and decoder for the line-oriented CommandAi/1 envelope.
 
 - `Encode(proposal)` serializes the protocol header and ordered command lines.
 - `Decode(text)` validates the envelope and reconstructs typed immutable data.
+- Encoding emits LF line endings; decoding accepts LF or CRLF.
+- Decoding trims surrounding whitespace on each line and ignores blank or whitespace-only lines; the opening and closing markers must be the first and last non-empty entries.
 - Integer values are positive decimal identifiers.
 - Literal values are JSON-quoted strings.
 - Malformed input, unsupported versions, duplicate protocol declarations, duplicate parameters, invalid identifiers, and resource-limit violations are rejected.
