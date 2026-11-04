@@ -5,19 +5,18 @@
 
 ## Approved direction
 
-**Retain CommandAi/1.** The Workshop owns all current consumers, so internal repositories adapt together to the existing /1 model and wire shape. Do not migrate to /2, add /2-only fields, or bump the package/protocol version merely for internal coordination.
+**Retain CommandAi/1 and extend it with generic atomic-command fields.** The owner explicitly approved adding command identity distinct from action identity, target, scope, structured grammar-versioned preconditions, idempotency identity, and expected-outcome contract to CommandAi itself. Preserve ordered typed arguments and the existing compact /1 wire form. The enriched form uses an explicit AtomicCommand JSON entry; older compact-only readers reject it and must be upgraded before consuming enriched proposals. This is an additive /1 evolution, not a /2 migration.
 
 Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 
 ## Current implementation
 
-- Immutable `CommandProposal` and `CommandInstruction` model.
-- Positive integer action and parameter identities.
-- Ordered typed arguments using integer identifiers or literal text.
-- Generic fluent proposal and instruction builders.
-- Line-oriented CommandAi/1 codec.
-- Bounds for envelope, command count, arguments, individual literal text, and aggregate literal text.
-- Decoder rejects unsupported versions, malformed envelopes, duplicate protocol declarations, duplicate parameters, invalid values, malformed quoted literals, and resource-limit violations.
+- Immutable `CommandProposal` and `CommandInstruction` model supporting compact and enriched commands.
+- Distinct command GUID, positive action identity, typed target/scope, ordered typed arguments, bounded idempotency identity, optional grammar-versioned preconditions, and expected-outcome contract on enriched commands.
+- Generic fluent proposal and instruction builders preserve the original compact overloads and add enriched overloads.
+- CommandAi/1 codec retains the legacy Command line and adds an explicit AtomicCommand JSON line; mixed proposals are supported.
+- Bounds cover envelope, command/argument/precondition/outcome counts, target/scope/argument literals, grammar version, precondition expression, idempotency identity, aggregate literal data, and JSON depth.
+- Decoder rejects malformed envelopes, unsupported versions, duplicate protocol/command/idempotency/parameter identities, duplicate/unknown JSON properties, invalid values, and resource-limit violations.
 - Host owns domain meaning, authorization, approval, execution, and actual outcomes.
 
 ## Verification status
@@ -37,18 +36,19 @@ Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
 - PR #5 is closed and merged. The first automatic observer run [41721956351](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41721956351) completed successfully. Its `commandai-ciai-evidence` artifact (ID `13272482468`) contains JSON and Markdown reports. The report observed candidate `4141b2776a79133c998ce2b4e94d6f69c199dcd4`; discovery was complete, the required `.github/workflows/build.yml` evidence was complete and terminal, and the matching `CommandAi CI` run [41721841220](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41721841220) passed with complete job/step evidence. The `publish_nuget` job was skipped. This is read-only CI observation, not release-readiness certification or publication authorization.
 - Current branch comparison (refreshed 2026-11-04): `development` and `master` remain diverged, with `development` 4 commits behind `master`; its ahead count increases as development-only work continues. The four master-only commits are the observer PR merge history and its observer/source/test additions. Do not reset, force-push, merge, or otherwise reconcile these refs without a dedicated ancestry/content audit and explicit authorization.
 - Current branch inventory (refreshed 2026-11-04): only `master` and `development` remain. GitHub branch search returned those two names and no additional results on its next page. The former observer and contract-fix working branches are no longer present. There are no open CommandAi pull requests.
-- Approved CommandAi/1 source and API remain the only supported contract. No /2-only fields or compatibility parser are to be added.
+- CommandAi/1 remains the only protocol identifier. Its enriched atomic-command fields are now part of /1; no /2 protocol migration is planned. The compact legacy form remains supported.
 - The earlier exact-head CI runs continue to establish the current model/codec test baseline: [41594167943](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594167943) and [41594181593](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594181593). The full package/consumer validation run remains [41592630562](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592630562).
 - Package version remains `0.1.0-alpha.2`; no package/protocol version increment or NuGet publication occurred.
 
 ## Remaining work
 
-1. Review optionality/default/schema and compatibility policy without inventing unsupported /1 semantics; add generic schema features only when a concrete consumer need and owner are established.
-2. Coordinate cross-repository ownership for observer registration, event correlation/replay, and evidence-bound gate transitions through the relevant issues.
-3. Resolve the package-distribution strategy for consumers of CiAi's transitive CommandAi dependency before any package release.
-4. Keep CiAi PR #50 draft until the owner explicitly authorizes its merge; both required exact-head workflows have passed.
+1. Complete enriched /1 codec/model adversarial tests, legacy differential coverage, docs, and exact-head CI.
+2. Migrate the direct downstream consumers: CiAi's AiCi composer (CiAi #52) and The/Architect's /2 expectations (The #19); pin exact source SHAs and verify their consumer workflows after the enriched /1 API lands.
+3. Add the cross-package contract test connecting CommandAi precondition data to GrammarAi structural validation and ProtocolAi outcome correlation without adding sibling package dependencies.
+4. Resolve package-distribution strategy for CiAi's transitive CommandAi dependency before any package release.
+5. Keep CiAi PR #50 draft until its pin and consumer implementation target enriched /1 and the owner separately authorizes merge.
 
-No user-held decision currently blocks the /1 source audit. Cross-repository runtime semantics remain agent-owned coordination work; they do not block the package's current /1 representation review.
+The owner-held contract decision is resolved. The enriched /1 implementation and its exact-head CI are now the active upstream work. Downstream source migrations remain blocked until this API is verified; issue/PR instructions have been updated so consumers do not adopt stale compact-only or /2 guidance.
 
 No further merge, NuGet publication, release, deployment, master alteration, or branch deletion is authorized by this work.
 
@@ -75,7 +75,7 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 - The proposal model and codec remain CommandAi/1. Package version remains `0.1.0-alpha.2`.
 - Current branch comparison: `development` and `master` remain diverged, with `development` 4 commits behind `master`; its ahead count changes as development-only work continues. The four master-only commits are the observer PR merge history and its observer/source/test additions. Do not reconcile refs without a dedicated ancestry/content audit and explicit authorization.
 - Branch inventory remains exactly `master` and `development`; GitHub returned no other branches. There are no open CommandAi pull requests.
-- The repository scope explicitly excludes CiAi. During this session, the pre-existing draft CiAi PR #50 was nevertheless advanced from CommandAi pin `339f404b0c7ad0170ca1549da1161938047c1ca8` to `cda1a11b26bd9269baf5325b431122a42eb3e73d`, and its PR description was updated. This cross-repository action was outside this repository's `AGENTS.md` scope. The PR remains draft/open and unmerged; no further CiAi work should be performed from CommandAi without owner direction.
+- A later owner-directed ecosystem review identified CiAi and The/Architect as direct CommandAi consumers. CiAi issue #52 tracks migration of its merged AiCi composer; PR #50 is explicitly held in draft because its current pin validates compact /1 only. The/Architect issue #19 and draft docs PR #35 track migration from its stale /2 expectations. These are coordination records, not claims that downstream source migration is complete.
 - This reflection refresh and the immediately preceding problem-domain status update are documentation-only commits after the verified baseline above; their own exact-head push workflow must be checked separately. No NuGet publication, merge, release, deployment, master alteration, branch deletion, or ref reconciliation was performed.
 
 ---
@@ -88,7 +88,7 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 - Current reviewed `development` baseline: `498088218a7d241078981462412aa20b62af9f20` (`docs: qualify resource limit recommendation`). Exact-head [CommandAi CI run 41753703942](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41753703942) passed: all 16 build-and-test steps succeeded, including branding, restore/build, tests/coverage, Codecov, quickstart, package pack, packed-artifact audit, and packed-package consumer compilation. `publish_nuget` was skipped.
 - The verified source/test additions cover JSON-escaped control characters and the documented decoder whitespace policy. The decoder accepts LF/CRLF, trims surrounding whitespace from each line, ignores blank/whitespace-only lines as entries, and still bounds total input and line count. The opening and closing markers must remain the first and last non-empty entries.
 - The theory chapter now includes a worked proposal/encode/decode example, trust-boundary and resource-limit explanation, failure categories, ownership matrix, practice questions, and further reading. The documentation index now points to the actual /1 type guides and treats prior /2 types as historical only.
-- CiAi PR #50 is still draft/open. It now pins CommandAi at verified source head `cda1a11b26bd9269baf5325b431122a42eb3e73d`; both required workflows passed on exact PR head `3525b1e805b3a3ce27d3a660648bae7c4e9f8dee`: [Contract Verification 41753026435](https://github.com/TrentBest/TheSingularityWorkshop.CiAi/actions/runs/41753026435) and [Cog Ecosystem Integration 41753026456](https://github.com/TrentBest/TheSingularityWorkshop.CiAi/actions/runs/41753026456). The PR remains owner-controlled for merge.
+- CiAi PR #50 remains draft/open and pins `cda1a11b26bd9269baf5325b431122a42eb3e73d`, which predates the enriched /1 implementation. Its earlier passing workflows validate the compact /1 consumer only; issue #52 requires updating the pin and AiCi builder before the PR can be considered ready.
 - CommandAi branch inventory remains exactly `master` and `development`; there are no open CommandAi PRs. The refs remain diverged and must not be reconciled without a separate ancestry/content audit and explicit authorization.
 - The model aggregate literal bound (1,048,576 UTF-16 characters) remains distinct from the codec envelope bound (262,144 UTF-16 characters). This allows a constructible in-memory proposal that is not encodable; the theory chapter now explains the distinction. Issue #3 remains open for a deliberate owner/domain disposition; no limit or protocol change was made speculatively.
 - Package version remains `0.1.0-alpha.2`. No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
