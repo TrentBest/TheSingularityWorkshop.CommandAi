@@ -3,14 +3,15 @@
 
 # CommandProposalBuilder
 
-Fluent construction API for an immutable `CommandProposal`.
+Fluent construction API for an immutable CommandProposal containing compact or enriched instructions.
 
 ## Contract
 
-- `AddCommand(actionId, configure)` appends an atomic instruction.
-- The configuration callback receives a scoped `CommandInstructionBuilder`.
-- `Build()` returns a proposal snapshot and enforces the proposal command limit.
-- A proposal must contain at least one command.
+- AddCommand(actionId, configure) appends a compact legacy instruction.
+- AddCommand(commandId, actionId, target, scope, idempotencyKey, outcomeContract, configure) appends a fully specified enriched atomic command.
+- Both overloads preserve insertion order.
+- Build returns a proposal snapshot and enforces non-empty and configured proposal limits.
+- The proposal model rejects duplicate enriched command IDs and idempotency identities.
 
 The builder does not resolve identifiers, validate host-domain meaning, authorize, or execute.
 
