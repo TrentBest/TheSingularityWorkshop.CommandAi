@@ -80,3 +80,14 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
 <p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
+
+
+## Domain review verification refresh (2026-11-04)
+
+- Current reviewed `development` head: `d66db6bf9b53a893f8c83bca03efaf525b3ce07b` (`docs: clarify whitespace line limits`). Exact-head [CommandAi CI run 41753414951](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41753414951) passed: all 16 build-and-test steps succeeded, including branding, restore/build, tests/coverage, Codecov, quickstart, package pack, packed-artifact audit, and packed-package consumer compilation. `publish_nuget` was skipped.
+- The verified source/test additions cover JSON-escaped control characters and the documented decoder whitespace policy. The decoder accepts LF/CRLF, trims surrounding whitespace from each line, ignores blank/whitespace-only lines as entries, and still bounds total input and line count. The opening and closing markers must remain the first and last non-empty entries.
+- The theory chapter now includes a worked proposal/encode/decode example, trust-boundary and resource-limit explanation, failure categories, ownership matrix, practice questions, and further reading. The documentation index now points to the actual /1 type guides and treats prior /2 types as historical only.
+- CiAi PR #50 is still draft/open. It now pins CommandAi at verified source head `cda1a11b26bd9269baf5325b431122a42eb3e73d`; both required workflows passed on exact PR head `3525b1e805b3a3ce27d3a660648bae7c4e9f8dee`: [Contract Verification 41753026435](https://github.com/TrentBest/TheSingularityWorkshop.CiAi/actions/runs/41753026435) and [Cog Ecosystem Integration 41753026456](https://github.com/TrentBest/TheSingularityWorkshop.CiAi/actions/runs/41753026456). The PR remains owner-controlled for merge.
+- CommandAi branch inventory remains exactly `master` and `development`; there are no open CommandAi PRs. The refs remain diverged and must not be reconciled without a separate ancestry/content audit and explicit authorization.
+- The model aggregate literal bound (1,048,576 UTF-16 characters) remains distinct from the codec envelope bound (262,144 UTF-16 characters). This allows a constructible in-memory proposal that is not encodable; the theory chapter now explains the distinction. Issue #3 remains open for a deliberate owner/domain disposition; no limit or protocol change was made speculatively.
+- Package version remains `0.1.0-alpha.2`. No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
