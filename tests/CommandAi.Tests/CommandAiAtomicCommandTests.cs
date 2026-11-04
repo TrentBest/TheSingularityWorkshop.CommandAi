@@ -169,14 +169,19 @@ public sealed class CommandAiAtomicCommandTests
     public void Proposal_EnforcesAggregateLiteralBoundAcrossAtomicFields()
     {
         var oversized = new string('x', CommandLimits.MaxLiteralCharacters);
+        var arguments = Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand)
+            .Select(i => new CommandArgument((ulong)i, CommandValue.FromText(oversized)));
+        var preconditions = Enumerable.Range(1, CommandLimits.MaxPreconditionsPerCommand)
+            .Select(_ => new CommandPrecondition("G", oversized));
         var command = new CommandInstruction(
             Guid.NewGuid(),
             1001,
-            CommandValue.FromText(oversized),
+            CommandValue.FromText("target"),
             CommandValue.FromText("scope"),
-            new string('i', CommandLimits.MaxIdempotencyKeyCharacters),
+            "idempotency",
             new CommandOutcomeContract(700),
-            preconditions: [new CommandPrecondition("GrammarAi/1", oversized)]);
+            arguments,
+            preconditions);
         Assert.Throws<ArgumentException>(() => new CommandProposal([command]));
     }
 }
