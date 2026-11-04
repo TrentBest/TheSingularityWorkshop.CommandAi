@@ -3,19 +3,44 @@
 
 # Use CommandAi
 
-## Construct a proposal
+## Construct a compact legacy proposal
 
 ~~~csharp
 using TheSingularityWorkshop.CommandAi;
 
-var proposal = new CommandProposalBuilder()
+var compact = new CommandProposalBuilder()
     .AddCommand(100, command => command
         .WithIdentifier(parameterId: 200, valueId: 42)
         .WithText(parameterId: 201, value: "diagnostic stream"))
     .Build();
 ~~~
 
-The numeric IDs are examples. The consuming host defines their meanings and supplies trusted mappings. CommandAi treats them as opaque identities.
+The numeric IDs are examples. The consuming host defines their meanings and supplies trusted mappings. Compact commands preserve the original /1 action-plus-arguments representation.
+
+## Construct an enriched atomic command
+
+~~~csharp
+var outcome = new CommandOutcomeContract(700, [
+    new CommandOutcomeField(701, CommandValueKind.LiteralText),
+    new CommandOutcomeField(702, CommandValueKind.IntegerIdentifier, required: false)
+]);
+
+var proposal = new CommandProposalBuilder()
+    .AddCommand(
+        commandId: Guid.NewGuid(),
+        actionId: 100,
+        target: CommandValue.FromText("repository"),
+        scope: CommandValue.FromText("feature/isolated-work"),
+        idempotencyKey: "operation-001",
+        outcomeContract: outcome,
+        configure: command => command
+            .WithIdentifier(parameterId: 200, valueId: 42)
+            .WithText(parameterId: 201, value: "diagnostic stream")
+            .WithPrecondition("GrammarAi/Observer/1", "candidate.sha == expected.sha"))
+    .Build();
+~~~
+
+The fields are generic opaque data. CommandAi does not know what the repository, branch, action, outcome, or precondition means. GrammarAi owns the named grammar and validates its structure; the host evaluates it against live trusted state.
 
 ## Encode and decode
 
@@ -24,7 +49,7 @@ var wireText = CommandAiTextCodec.Encode(proposal);
 var parsed = CommandAiTextCodec.Decode(wireText);
 ~~~
 
-The only approved wire contract is CommandAi/1:
+The protocol identifier remains CommandAi/1. Compact commands use the original Command line:
 
 ~~~text
 [CommandAi]
@@ -33,28 +58,34 @@ Command=100 200=42 201="diagnostic stream"
 [/CommandAi]
 ~~~
 
-Each command line starts with a positive action ID, followed by zero or more ordered parameter/value pairs. Values are positive integer identifiers or JSON-quoted literal strings.
+Enriched commands use an AtomicCommand JSON line:
+
+~~~text
+[CommandAi]
+Protocol=CommandAi/1
+AtomicCommand={"commandId":"11111111-2222-3333-4444-555555555555","actionId":100,"target":{"kind":"LiteralText","identifier":null,"text":"repository"},"scope":{"kind":"LiteralText","identifier":null,"text":"feature/isolated-work"},"idempotencyKey":"operation-001","outcomeContract":{"outcomeId":700,"fields":[]},"arguments":[],"preconditions":[]}
+[/CommandAi]
+~~~
+
+A proposal can mix compact and enriched commands. The new decoder reads both. Older compact-only readers reject AtomicCommand as an unknown envelope entry and must be upgraded before consuming enriched proposals.
 
 ## Model and ownership
 
-- `CommandProposal` is a non-empty ordered collection; it is not a transaction.
-- `CommandInstruction` contains a positive action ID and ordered arguments.
-- `CommandArgument` pairs a positive parameter ID with a typed `CommandValue`.
-- `CommandValue` distinguishes integer identifiers from literal text.
+- CommandProposal is a non-empty ordered collection; it is not a transaction.
+- CommandInstruction always has an action ID and ordered arguments. Its HasAtomicContract property distinguishes enriched commands from compact legacy commands.
+- CommandPrecondition stores grammar-versioned opaque data; it is not parsed or evaluated by CommandAi.
+- CommandOutcomeContract declares an expected shape, not an actual result.
+- CommandAi carries an idempotency identity but does not implement deduplication or replay.
 - The host owns vocabulary meaning, semantic validation, live-state checks, policy, authorization, approval, execution, and actual outcomes.
 
 Successful decoding proves only that the input is structurally valid and within limits. It does not authorize any action.
 
-## Host-owned named operations
-
-A consuming application can expose methods such as `InspectResource(...)` that map domain concepts to action and parameter IDs. These names and mappings are not built into CommandAi. See [Builder integration](BUILDER_INTEGRATION.md) and the [quickstart](../examples/CommandAi.QuickStart/Program.cs).
-
 ## Failure behavior
 
-- Empty caller input: `ArgumentException`.
-- Non-empty malformed envelope, unsupported protocol, invalid identifiers, malformed quoted literal, duplicate declarations/parameters, or wire resource-limit violation: `FormatException`.
-- Direct construction with invalid caller-supplied values: `ArgumentException`.
-- Encoding a valid in-memory proposal that exceeds the envelope limit: `ArgumentException`.
+- Empty caller input: ArgumentException.
+- Non-empty malformed envelope, unsupported protocol, invalid identifiers, malformed JSON, unknown/duplicate JSON properties, duplicate command identities/idempotency keys, duplicate parameters, or resource-limit violation: FormatException.
+- Direct construction with invalid caller-supplied values: ArgumentException.
+- Encoding a valid in-memory proposal that exceeds the envelope limit: ArgumentException.
 
 ## Verify
 
