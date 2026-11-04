@@ -108,7 +108,7 @@ public sealed class CommandAiAtomicCommandTests
     public void AtomicCommandJson_RejectsOutcomeFieldMissingRequiredFlag()
     {
         const string missingRequired = "{\"commandId\":\"11111111-2222-3333-4444-555555555555\",\"actionId\":7,\"target\":{\"kind\":\"LiteralText\",\"identifier\":null,\"text\":\"repo\"},\"scope\":{\"kind\":\"LiteralText\",\"identifier\":null,\"text\":\"branch\"},\"idempotencyKey\":\"key\",\"outcomeContract\":{\"outcomeId\":1,\"fields\":[{\"fieldId\":2,\"valueKind\":\"LiteralText\"}]},\"arguments\":[],\"preconditions\":[]}";
-        var input = "[CommandAi]\\nProtocol=CommandAi/1\\nAtomicCommand=" + missingRequired + "\\n[/CommandAi]";
+        var input = "[CommandAi]\nProtocol=CommandAi/1\nAtomicCommand=" + missingRequired + "\n[/CommandAi]";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(input));
     }
 
