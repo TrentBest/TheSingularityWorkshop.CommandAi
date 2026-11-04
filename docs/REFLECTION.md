@@ -66,15 +66,17 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 
 ## Latest exact-head verification (2026-11-04)
 
-- Current `development` head: `2b488e1d25f746322d411b16fbcf088bd88d6b38` (`docs: record exact-head verification for current development`).
-- Exact matching [CommandAi CI run 41752954762](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41752954762) completed successfully on that exact SHA.
-- Verified steps: Workshop Markdown branding, .NET restore/build, tests with coverage, Codecov upload, coverage artifact upload, quickstart execution, package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The separate `publish_nuget` job was skipped.
-- This exact-head run supersedes the previous reflection snapshot at `cda1a11...`; it confirms the current documentation head and all source/test changes included in its ancestry. It does not resolve the open model-versus-wire resource-limit design question in issue #3 or certify cross-repository runtime behavior.
-- The decoder accepts LF and CRLF, preserves command order, and uses JSON-quoted literals. Its current line normalization also ignores blank lines; this is bounded by the overall envelope character limit. Decide whether that whitespace tolerance should be explicitly guaranteed or rejected by a future parser-hardening change before calling the envelope grammar fully strict.
-- Current branch comparison: `development` is 271 commits ahead of and 4 commits behind `master`; the refs remain diverged. The four master-only commits are the observer PR merge history and its observer/source/test additions. Do not reconcile refs without a dedicated ancestry/content audit and explicit authorization.
-- Branch inventory remains exactly `master` and `development`. No extra working branches remain.
-- CiAi PR #50 remains draft/open and pins CommandAi at `339f404b0c7ad0170ca1549da1161938047c1ca8`, not this newer head. Its two required workflows passed on exact PR head `6499e3a301dfeeeeafaff793ee392120efadedae`; advancing that submodule pin is a separate downstream synchronization task, and merge remains owner-controlled.
-- Package version remains `0.1.0-alpha.2`. No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
+- Latest verified implementation and documentation baseline: `d66db6bf9b53a893f8c83bca03efaf525b3ce07b`.
+- Exact matching [CommandAi CI run 41753414951](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41753414951) completed successfully on that exact SHA.
+- Verified: Workshop Markdown branding, .NET restore/build, tests with coverage, Codecov upload, coverage artifact upload, quickstart execution, NuGet package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The separate `publish_nuget` job was skipped.
+- The exact-head suite includes regression coverage for LF/CRLF decoding and command order, escaped control characters in JSON-quoted literals, and blank/whitespace-only lines. The decoder removes empty lines and trims remaining lines; whitespace-only lines are ignored as entries but still count toward the parser's maximum-line guard.
+- The theory chapter was expanded into a progressive learning path with implementation mapping, a worked proposal/encoding example, trust/resource-limit analysis, exercises, and further reading. Architecture, domain completeness, codec type documentation, and codec UML were aligned with the observed whitespace behavior.
+- Resource-limit disposition: retain the distinct in-memory aggregate literal cap (1,048,576 UTF-16 characters) and encoded envelope cap (262,144 UTF-16 characters) as separate safeguards. A model can be constructible yet not encodable; the existing test proves the codec rejects an over-limit wire representation. This is an explicit transport boundary, not a defect. Issue #3 remains open for the broader ownership/gap review.
+- The proposal model and codec remain CommandAi/1. Package version remains `0.1.0-alpha.2`.
+- Current branch comparison: `development` is 285 commits ahead of and 4 commits behind `master`; the refs remain diverged. The four master-only commits are the observer PR merge history and its observer/source/test additions. Do not reconcile refs without a dedicated ancestry/content audit and explicit authorization.
+- Branch inventory remains exactly `master` and `development`; GitHub returned no other branches. There are no open CommandAi pull requests.
+- The CiAi downstream pin PR #50 remains draft/open at its separately verified head. This repository's `AGENTS.md` explicitly places CiAi outside CommandAi scope; no CiAi changes or coordination were performed in this work.
+- This reflection refresh and the immediately preceding problem-domain status update are documentation-only commits after the verified baseline above; their own exact-head push workflow must be checked separately. No NuGet publication, merge, release, deployment, master alteration, branch deletion, or ref reconciliation was performed.
 
 ---
 
