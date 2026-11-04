@@ -110,7 +110,7 @@ The current limits are measured in UTF-16 characters unless otherwise stated:
 | One literal text value | 16,384 |
 | Aggregate in-memory literal text | 1,048,576 |
 
-The model aggregate literal limit is intentionally independent of the smaller transport envelope limit. A proposal may be valid as in-memory data and still be too large to encode. The model bound limits aggregate literal storage; the codec bound limits the serialized transport representation. This is not a promise that every constructible model has a wire representation.
+The model aggregate literal limit is currently independent of the smaller transport envelope limit. The recommendation to retain that separation remains open for owner review in issue #3. A proposal may be valid as in-memory data and still be too large to encode. The model bound limits aggregate literal storage; the codec bound limits the serialized transport representation. This is not a promise that every constructible model has a wire representation.
 
 Failure categories are also distinct:
 - Empty caller input is an `ArgumentException`.
