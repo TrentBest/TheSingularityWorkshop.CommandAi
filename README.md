@@ -11,17 +11,19 @@
 
 ## 01 What is CommandAi?
 
-**CommandAi defines a provider-neutral, immutable representation for proposed atomic actions.** The approved CommandAi/1 model contains an ordered proposal, action identities, and ordered typed arguments. Each value is either a positive integer identifier or bounded literal text.
+**CommandAi defines a provider-neutral, immutable representation for proposed atomic actions.** Its CommandAi/1 model supports both the original compact action-plus-arguments form and an enriched atomic-command form with distinct command identity, target, scope, structured preconditions, idempotency identity, expected-outcome contract, and ordered typed arguments.
 
-CommandAi represents intent. It does not resolve application meaning, validate live state, authorize, or execute commands.
+The compact form remains readable and writable. The enriched form is an additive /1 extension. It uses an explicit AtomicCommand entry so compact-only readers reject it rather than silently misinterpreting it. Consumers must upgrade before accepting enriched commands.
+
+CommandAi represents intent. It does not resolve application meaning, parse or evaluate precondition grammar, validate live state, authorize, guarantee idempotent delivery, or execute commands.
 
 ## 02 Why does it exist?
 
-AI-generated and agent-generated content is untrusted. A host needs a small, bounded interchange contract instead of relying on ad-hoc prose or application-specific parsing. CommandAi provides that shared representation while leaving domain meaning and authority with the consuming application.
+AI-generated and agent-generated content is untrusted. A host needs a bounded, provider-neutral contract for command identity, target/scope, conditions, arguments, and expected outcomes without confusing a proposal with permission or execution. CommandAi supplies the generic data shape while leaving semantics and authority with the owning layers.
 
 ## 03 How does it work?
 
-The line-oriented CommandAi/1 envelope:
+A legacy compact CommandAi/1 entry remains unchanged:
 
 ~~~text
 [CommandAi]
@@ -30,7 +32,16 @@ Command=100 200=300 201="diagnostic stream"
 [/CommandAi]
 ~~~
 
-The first token is a positive action identifier. Each following token is a positive parameter identifier and a typed value. Integer identifiers remain opaque; literal strings are JSON-quoted. A proposal preserves command order but is not a transaction or workflow.
+An enriched atomic command uses a distinct JSON entry within the same protocol version:
+
+~~~text
+[CommandAi]
+Protocol=CommandAi/1
+AtomicCommand={"commandId":"11111111-2222-3333-4444-555555555555","actionId":100,"target":{"kind":"LiteralText","identifier":null,"text":"repository"},"scope":{"kind":"LiteralText","identifier":null,"text":"feature/ref"},"idempotencyKey":"operation-001","outcomeContract":{"outcomeId":700,"fields":[]},"arguments":[],"preconditions":[]}
+[/CommandAi]
+~~~
+
+The codec accepts compact and enriched entries in one ordered proposal. The enriched JSON is bounded and rejects unknown or duplicate properties. Older compact-only readers do not understand AtomicCommand entries and must be upgraded before consuming them.
 
 ## 04 See it in a minute
 
@@ -38,7 +49,7 @@ The first token is a positive action identifier. Each following token is a posit
 dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
 ~~~
 
-The quickstart builds a proposal with the generic fluent builder, encodes it, and decodes it. Its sample identifiers are illustrative; a consuming host owns the trusted vocabulary and named operations.
+The quickstart demonstrates the legacy compact form. See the [usage guide](docs/USAGE.md) and [builder integration](docs/BUILDER_INTEGRATION.md) for enriched atomic commands.
 
 ## 05 Documentation and theory
 
@@ -58,18 +69,18 @@ The quickstart builds a proposal with the generic fluent builder, encodes it, an
 
 | Package | Responsibility |
 |---|---|
-| ProtocolAi | Protocol vocabulary, identity meaning, correlated events and actual outcomes |
-| GrammarAi | Grammar definitions and structural validation |
-| CommandAi | Immutable action/argument proposals, bounds, builders, CommandAi/1 codec |
+| ProtocolAi | Vocabulary identity, correlated event and outcome envelopes |
+| GrammarAi | Grammar definitions and structural validation of grammar-versioned conditions |
+| CommandAi | Atomic-command proposal data, compact/enriched /1 codec, builders and representation bounds |
 | HeadlessAi | Configured endpoint communication |
-| CiAi | CI evidence and verdicts |
+| CiAi | CI evidence and verdicts; may compose repository-specific CommandAi proposals |
 | FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
 
-CommandAi has no runtime dependency on sibling packages. Presentation, accessibility, narration, haptics, and pedagogy belong to observer/application layers.
+CommandAi has no runtime dependency on sibling packages. It carries precondition grammar identity and opaque expression data but does not parse or evaluate it. It carries an idempotency identity but does not implement replay or exactly-once delivery. It declares expected outcomes but does not produce actual outcomes.
 
 ## Verification and release status
 
-The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. Package version remains `0.1.0-alpha.2`. Internal consumers adapt to the approved /1 contract; no version bump is required for this coordination. **NuGet publication is not authorized unless explicitly approved by the owner.**
+The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. Package version remains `0.1.0-alpha.2`. The protocol identifier remains `CommandAi/1`; this additive contract work does not authorize a package version change or publication. **NuGet publication is not authorized unless explicitly approved by the owner.**
 
 ---
 
