@@ -39,7 +39,7 @@ The diagram describes responsibility boundaries, not an automatic runtime pipeli
 
 ## Wire contract
 
-CommandAi/1 is the approved and only supported wire contract. A command line has an action identifier followed by zero or more `parameterId=value` tokens. Values are positive integer identifiers or JSON-quoted strings. The encoder emits LF line endings. The decoder accepts LF and CRLF, trims surrounding whitespace from each line, and ignores blank or whitespace-only lines while requiring the opening and closing markers to bound the first and last non-empty entries. It rejects malformed envelopes, unsupported protocol versions, duplicate protocol declarations, duplicate parameters, invalid identifiers, and limit violations. It maps malformed model construction from wire input to `FormatException`; empty caller input remains an argument error.
+CommandAi/1 is the approved and only supported wire contract. A command line has an action identifier followed by zero or more `parameterId=value` tokens. Values are positive integer identifiers or JSON-quoted strings. The encoder emits LF line endings. The decoder accepts LF and CRLF, removes empty lines and trims surrounding whitespace from remaining lines. Whitespace-only lines are ignored as entries but still count toward the parser's maximum-line guard; the opening and closing markers must bound the first and last non-empty entries. It rejects malformed envelopes, unsupported protocol versions, duplicate protocol declarations, duplicate parameters, invalid identifiers, and limit violations. It maps malformed model construction from wire input to `FormatException`; empty caller input remains an argument error.
 
 ## Trust boundary
 
