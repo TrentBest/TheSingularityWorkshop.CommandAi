@@ -18,46 +18,67 @@
        Host-owned semantic checks
                  |
                  v
-      Host-owned policy / approval
+      GrammarAi structural validation
                  |
                  v
-       Host-owned dispatch / execute
+      Host-owned live-state policy
                  |
                  v
-       Runtime-owned actual outcome
+        Host authorization / approval
+                 |
+                 v
+        Host-owned dispatch / execute
+                 |
+                 v
+        Protocol/runtime outcome
 
-The diagram describes responsibility boundaries, not an automatic runtime pipeline. CommandAi implements only the proposal model, its generic builders, resource bounds, and text codec.
+The diagram describes responsibility boundaries, not an automatic runtime pipeline. CommandAi implements only the proposal model, generic builders, representation bounds, and text codec. GrammarAi may validate the structure of grammar-versioned preconditions; the host evaluates them against trusted current state.
 
 ## Public model
 
-- `CommandProposal` is an immutable, non-empty ordered collection of commands.
-- `CommandInstruction` identifies an action with a positive integer identity and carries ordered arguments.
-- `CommandArgument` pairs a positive parameter identity with a `CommandValue`.
-- `CommandValue` represents either a positive integer identifier or literal text.
-- `CommandLimits` defines representation bounds.
-- `CommandAiTextCodec` encodes and decodes the CommandAi/1 line-oriented envelope.
+- CommandProposal is an immutable, non-empty ordered collection of compact or enriched commands.
+- CommandInstruction always has an action identity and ordered arguments. An enriched instruction additionally has a command GUID, typed target and scope, idempotency identity, preconditions, and expected-outcome contract.
+- CommandArgument pairs a positive parameter identity with a CommandValue.
+- CommandValue represents either a positive integer identifier or bounded literal text.
+- CommandPrecondition carries a GrammarAi version and opaque expression. CommandAi does not parse or evaluate it.
+- CommandOutcomeContract and CommandOutcomeField declare the shape expected from a future/runtime outcome. They are not an actual result or success signal.
+- CommandLimits defines bounds for every public field and serialized representation.
+- CommandAiTextCodec encodes and decodes compact and enriched CommandAi/1 entries.
 
 ## Wire contract
 
-CommandAi/1 is the approved and only supported wire contract. A command line has an action identifier followed by zero or more `parameterId=value` tokens. Values are positive integer identifiers or JSON-quoted strings. The encoder emits LF line endings. The decoder accepts LF and CRLF, removes empty lines and trims surrounding whitespace from remaining lines. Whitespace-only lines are ignored as entries but still count toward the parser's maximum-line guard; the opening and closing markers must bound the first and last non-empty entries. It rejects malformed envelopes, unsupported protocol versions, duplicate protocol declarations, duplicate parameters, invalid identifiers, and limit violations. It maps malformed model construction from wire input to `FormatException`; empty caller input remains an argument error.
+The protocol identifier remains CommandAi/1. The original compact line remains byte-for-byte unchanged:
+
+~~~text
+Command=100 200=42 201="diagnostic stream"
+~~~
+
+The enriched representation uses an explicit AtomicCommand JSON entry. Its required fields are commandId, actionId, target, scope, idempotencyKey, outcomeContract, arguments, and preconditions. The JSON object is bounded, limited to depth 16, rejects unknown members, and rejects duplicate properties. A proposal may contain compact and enriched commands in the same order-preserving envelope.
+
+A new reader decodes both forms. A compact-only older reader rejects the unknown AtomicCommand entry; it must be upgraded before consuming enriched proposals. Retaining the /1 identifier does not promise universal forward compatibility.
+
+The encoder emits LF line endings. The decoder accepts LF and CRLF, removes empty lines, trims remaining lines, and bounds both envelope size and command count. Malformed values, duplicate declarations/identities, unknown entries, invalid JSON, and resource-limit violations are rejected.
 
 ## Trust boundary
 
-A successful decode means only that the proposal is structurally representable. It is not validation of domain meaning, live-state truth, authorization, safety, or execution. The consuming host owns those decisions and must not use parsing success as an authorization shortcut.
+A successful decode proves only that the proposal is structurally representable within configured bounds. It does not prove that an action exists, that target/scope values are valid, that a precondition is true, that a resource is still available, or that the sender is authorized.
+
+A command GUID identifies a proposed command. An idempotency key is a separate caller-supplied identity that the host may use to enforce idempotent handling. CommandAi does not guarantee deduplication or exactly-once execution. The expected-outcome contract describes a shape; it does not assert that the outcome occurred.
 
 ## Package boundaries
 
-- ProtocolAi supplies/owns vocabulary meaning and protocol-level event/outcome contracts.
-- GrammarAi owns grammar definitions and parsing/validation for grammar-bearing content when integrated.
+- ProtocolAi owns vocabulary identity and interoperable event/outcome envelopes.
+- GrammarAi owns grammar definitions and structural validation of grammar-bearing content.
+- CommandAi owns generic command proposal data and its codec.
 - HeadlessAi owns endpoint transport.
 - CiAi owns CI evidence and verdicts.
-- FSM_Foundry and the host own runtime lifecycle, policy, approval, scheduling, dispatch, execution, and actual outcome handling.
+- FSM_Foundry and the host own runtime lifecycle, live-state validation, policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, and actual outcome handling.
 
-CommandAi has no runtime dependency on these packages. Presentation, accessibility, narration, haptics, and pedagogy belong to observer/application layers, not this package.
+CommandAi has no runtime dependency on these packages. Application-specific action catalogs, parameter meanings, repository rules, and capabilities remain in the consuming domain/host.
 
 ## Non-goals
 
-CommandAi does not own application screens, user profiles, command authorization, execution, transactions, retries, cancellation, compensation, persistence, exactly-once delivery, or actual results. Those capabilities must not be inferred from the compact /1 model.
+CommandAi does not own application screens, user profiles, command authorization, execution, transactions, retries, cancellation, compensation, persistence, replay ledgers, exactly-once delivery, or actual results. Proposal ordering is not workflow ordering semantics.
 
 ---
 
