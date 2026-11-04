@@ -64,16 +64,19 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 
 ---
 
-<!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
-
-
 ## Latest exact-head verification (2026-11-04)
 
-- Current `development` head: `cda1a11b26bd9269baf5325b431122a42eb3e73d` (`docs: avoid stale ahead-count snapshot`).
-- Exact matching `CommandAi CI` run [41743918823](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41743918823) completed successfully on that exact SHA.
-- Verified steps: Workshop Markdown branding, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, NuGet package pack, packed-artifact audit, and packed-package consumer compilation. The `publish_nuget` job was skipped.
-- CI artifacts were produced for the package and coverage only. Artifact production is not publication or release authorization.
-- This confirms the latest documentation head and the preceding domain/source follow-ups are CI-green; it does not resolve the open resource-limit design question in issue #3 or certify cross-repository runtime behavior.
-- CiAi PR #50 remains draft/open and pins CommandAi at `339f404b0c7ad0170ca1549da1161938047c1ca8`, not this newer head. The PR's two workflows passed on its exact PR head `6499e3a301dfeeeeafaff793ee392120efadedae`; updating that pin to the latest CommandAi head is a separate downstream synchronization task and remains owner-controlled at merge time.
-- No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
+- Current `development` head: `2b488e1d25f746322d411b16fbcf088bd88d6b38` (`docs: record exact-head verification for current development`).
+- Exact matching [CommandAi CI run 41752954762](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41752954762) completed successfully on that exact SHA.
+- Verified steps: Workshop Markdown branding, .NET restore/build, tests with coverage, Codecov upload, coverage artifact upload, quickstart execution, package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The separate `publish_nuget` job was skipped.
+- This exact-head run supersedes the previous reflection snapshot at `cda1a11...`; it confirms the current documentation head and all source/test changes included in its ancestry. It does not resolve the open model-versus-wire resource-limit design question in issue #3 or certify cross-repository runtime behavior.
+- The decoder accepts LF and CRLF, preserves command order, and uses JSON-quoted literals. Its current line normalization also ignores blank lines; this is bounded by the overall envelope character limit. Decide whether that whitespace tolerance should be explicitly guaranteed or rejected by a future parser-hardening change before calling the envelope grammar fully strict.
+- Current branch comparison: `development` is 271 commits ahead of and 4 commits behind `master`; the refs remain diverged. The four master-only commits are the observer PR merge history and its observer/source/test additions. Do not reconcile refs without a dedicated ancestry/content audit and explicit authorization.
+- Branch inventory remains exactly `master` and `development`. No extra working branches remain.
+- CiAi PR #50 remains draft/open and pins CommandAi at `339f404b0c7ad0170ca1549da1161938047c1ca8`, not this newer head. Its two required workflows passed on exact PR head `6499e3a301dfeeeeafaff793ee392120efadedae`; advancing that submodule pin is a separate downstream synchronization task, and merge remains owner-controlled.
+- Package version remains `0.1.0-alpha.2`. No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
+
+---
+
+<!-- THE SINGULARITY WORKSHOP FOOTER -->
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
