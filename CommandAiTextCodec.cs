@@ -231,9 +231,10 @@ public static class CommandAiTextCodec
             {
                 if (field is null ||
                     !Enum.TryParse<CommandValueKind>(field.ValueKind, false, out var kind) ||
-                    !Enum.IsDefined(kind))
-                    throw new FormatException("An outcome field contains an unsupported value kind.");
-                return new CommandOutcomeField(field.FieldId, kind, field.Required);
+                    !Enum.IsDefined(kind) ||
+                    field.Required is null)
+                    throw new FormatException("An outcome field contains an unsupported value kind or is missing its required flag.");
+                return new CommandOutcomeField(field.FieldId, kind, field.Required.Value);
             }).ToArray();
 
             var arguments = wire.Arguments.Select(argument =>
@@ -361,5 +362,5 @@ public static class CommandAiTextCodec
     private sealed record ArgumentWire(ulong ParameterId, ValueWire Value);
     private sealed record PreconditionWire(string GrammarVersion, string Expression);
     private sealed record OutcomeWire(ulong OutcomeId, IReadOnlyList<OutcomeFieldWire> Fields);
-    private sealed record OutcomeFieldWire(ulong FieldId, string ValueKind, bool Required);
+    private sealed record OutcomeFieldWire(ulong FieldId, string ValueKind, bool? Required);
 }
