@@ -172,7 +172,7 @@ The enriched /1 contract now represents command identity, target/scope, grammar-
 2. Why is a positive action ID insufficient to authorize an operation?
 3. Construct a literal containing a newline, a tab, a quote, and a backslash. Predict its encoded form, then round-trip it through the codec.
 4. Build a proposal that is below the aggregate in-memory literal limit but above the encoded envelope limit. Which operation should succeed, and which should fail?
-5. Identify which layer must own a replay key, a target resource, and the actual execution result. Explain why those concerns do not belong to this minimal proposal representation.
+5. Identify which layer carries a command idempotency identity, which layer enforces replay/deduplication, where target meaning comes from, and which layer records the actual execution result. Explain why carrying a field does not transfer semantic or runtime ownership.
 
 For an implementation exercise, add a test for a malformed token or a boundary condition before changing the codec. State the invariant the test protects and the exact CI revision that verifies it.
 
