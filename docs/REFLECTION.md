@@ -58,7 +58,7 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 
 - The latest source/domain head before this reflection refresh was `10ef4c60bc572fa66d8f50997c39244acf978c61`; this reflection refresh is committed at `ceecb39c12e3340dd4d315f778b9fcd0c1185dc9`. The follow-up commits are `4141b2776a79133c998ce2b4e94d6f69c199dcd4` (remove duplicate null-command guard), `b4e1608cf3cdbf78e02b63bd959666b308dea1dc` (add CRLF decoding and command-order regression coverage), and `10ef4c60bc572fa66d8f50997c39244acf978c61` (document the distinct model and wire size limits). They retain CommandAi/1 and package version `0.1.0-alpha.2`.
 - The CRLF regression verifies that decoding accepts CRLF input and preserves command order and typed values. The domain matrix now explicitly states that the in-memory aggregate literal allowance (1,048,576 UTF-16 characters) exceeds the encoded envelope limit (262,144 UTF-16 characters); a model can therefore be constructible but not encodable. Issue #3 owns the decision whether those independent bounds should remain distinct or be aligned.
-- Exact-head CI for `b4e1608...` and `10ef4c6...` was not available through the current connector status query at this refresh. Do not infer success from the earlier passing baseline or from the observer run for `4141b277...`. The latest development head remains unverified until exact-head workflow evidence is recorded.
+- At the time of this initial follow-up note, exact-head CI for `b4e1608...` and `10ef4c6...` had not yet been recorded. Subsequent exact-head runs verified `b4e1608...` (run 41724874994) and `10ef4c60...` (run 41724949255); the latest documentation-only heads were verified separately below.
 - The observer's first automatic run `41721956351` completed successfully after PR #5 merged. Its only observed candidate was `4141b2776a79133c998ce2b4e94d6f69c199dcd4`; it does not certify the later CRLF test or documentation commits.
 - No extra branches remain. No merge, ref reconciliation, release, deployment, master alteration, or NuGet publication is authorized by this work.
 
@@ -66,3 +66,14 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
 <p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
+
+
+## Latest exact-head verification (2026-11-04)
+
+- Current `development` head: `cda1a11b26bd9269baf5325b431122a42eb3e73d` (`docs: avoid stale ahead-count snapshot`).
+- Exact matching `CommandAi CI` run [41743918823](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41743918823) completed successfully on that exact SHA.
+- Verified steps: Workshop Markdown branding, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, NuGet package pack, packed-artifact audit, and packed-package consumer compilation. The `publish_nuget` job was skipped.
+- CI artifacts were produced for the package and coverage only. Artifact production is not publication or release authorization.
+- This confirms the latest documentation head and the preceding domain/source follow-ups are CI-green; it does not resolve the open resource-limit design question in issue #3 or certify cross-repository runtime behavior.
+- CiAi PR #50 remains draft/open and pins CommandAi at `339f404b0c7ad0170ca1549da1161938047c1ca8`, not this newer head. The PR's two workflows passed on its exact PR head `6499e3a301dfeeeeafaff793ee392120efadedae`; updating that pin to the latest CommandAi head is a separate downstream synchronization task and remains owner-controlled at merge time.
+- No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
