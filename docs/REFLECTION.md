@@ -75,7 +75,7 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 - The proposal model and codec remain CommandAi/1. Package version remains `0.1.0-alpha.2`.
 - Current branch comparison: `development` is 285 commits ahead of and 4 commits behind `master`; the refs remain diverged. The four master-only commits are the observer PR merge history and its observer/source/test additions. Do not reconcile refs without a dedicated ancestry/content audit and explicit authorization.
 - Branch inventory remains exactly `master` and `development`; GitHub returned no other branches. There are no open CommandAi pull requests.
-- The CiAi downstream pin PR #50 remains draft/open at its separately verified head. This repository's `AGENTS.md` explicitly places CiAi outside CommandAi scope; no CiAi changes or coordination were performed in this work.
+- The repository scope explicitly excludes CiAi. During this session, the pre-existing draft CiAi PR #50 was nevertheless advanced from CommandAi pin `339f404b0c7ad0170ca1549da1161938047c1ca8` to `cda1a11b26bd9269baf5325b431122a42eb3e73d`, and its PR description was updated. This cross-repository action was outside this repository's `AGENTS.md` scope. The PR remains draft/open and unmerged; no further CiAi work should be performed from CommandAi without owner direction.
 - This reflection refresh and the immediately preceding problem-domain status update are documentation-only commits after the verified baseline above; their own exact-head push workflow must be checked separately. No NuGet publication, merge, release, deployment, master alteration, branch deletion, or ref reconciliation was performed.
 
 ---
