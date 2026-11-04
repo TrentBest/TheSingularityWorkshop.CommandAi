@@ -36,7 +36,7 @@ CommandAi owns the model, builders, representation limits, and CommandAi/1 codec
 
 ## Current verification
 
-The source and test suite are being verified on the `development` branch. See [REFLECTION](REFLECTION.md) for the exact current CI run and remaining gaps. Package publication is not authorized.
+The source, tests, quickstart, package pack, and packed-package consumer audit passed exact-head [CommandAi CI run 41753414951](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41753414951) on `development` commit `d66db6bf9b53a893f8c83bca03efaf525b3ce07b`. The run also verified Workshop Markdown branding and coverage upload; `publish_nuget` was skipped. See [REFLECTION](REFLECTION.md) for remaining domain and integration gaps. Package publication is not authorized.
 
 ---
 
