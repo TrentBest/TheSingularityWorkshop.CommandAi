@@ -57,7 +57,7 @@ The builder API is convenience, not a second semantic model. A consuming domain 
 
 ## 5. Wire representation and parsing
 
-The encoder emits LF line separators on every platform. The decoder accepts LF and CRLF. It trims surrounding whitespace from each line and ignores blank or whitespace-only lines; the opening and closing markers must still bound the first and last non-empty entries. Non-empty unknown entries, nested envelopes, duplicate protocol declarations, duplicate parameter IDs, unsupported versions, malformed identifiers, malformed JSON literals, and oversized input are rejected.
+The encoder emits LF line separators on every platform. The decoder accepts LF and CRLF. It removes empty lines and trims surrounding whitespace from each remaining line. Whitespace-only lines become empty entries and are ignored semantically, but still count toward the parser's maximum-line guard. The opening and closing markers must still bound the first and last non-empty entries. Non-empty unknown entries, nested envelopes, duplicate protocol declarations, duplicate parameter IDs, unsupported versions, malformed identifiers, malformed JSON literals, and oversized input are rejected.
 
 The wire shape is:
 
