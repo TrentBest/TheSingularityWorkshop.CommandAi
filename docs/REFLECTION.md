@@ -80,8 +80,7 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 
 ---
 
-<!-- THE SINGULARITY WORKSHOP FOOTER -->
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
+
 
 
 ## Domain review verification refresh (2026-11-04)
@@ -93,3 +92,8 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 - CommandAi branch inventory remains exactly `master` and `development`; there are no open CommandAi PRs. The refs remain diverged and must not be reconciled without a separate ancestry/content audit and explicit authorization.
 - The model aggregate literal bound (1,048,576 UTF-16 characters) remains distinct from the codec envelope bound (262,144 UTF-16 characters). This allows a constructible in-memory proposal that is not encodable; the theory chapter now explains the distinction. Issue #3 remains open for a deliberate owner/domain disposition; no limit or protocol change was made speculatively.
 - Package version remains `0.1.0-alpha.2`. No NuGet publication, merge, release, deployment, master alteration, or branch deletion was performed.
+
+---
+
+<!-- THE SINGULARITY WORKSHOP FOOTER -->
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
