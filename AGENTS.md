@@ -6,35 +6,36 @@
 ## Before changing code
 
 1. Read the [shared Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md).
-2. Read [CommandAi's problem domain](docs/PROBLEM_DOMAIN.md), [architecture](docs/ARCHITECTURE.md), [theory](docs/THEORY.md), and [status/open questions](docs/REFLECTION.md).
-3. Check the current branch head and CI before making assumptions about the state of the work.
+2. Read CommandAi's problem domain, architecture, theory, and status/open questions.
+3. Check the current branch head and CI before making assumptions.
 4. Read source and tests before changing public contracts.
+5. Keep source-implemented behavior, planned work, and verified CI evidence clearly separated.
 
 ## Branch and release policy
 
-The permanent branch model is exactly:
-- development — active work and the next release candidate.
-- master — the previously released baseline until the owner-authorized release operation replaces it.
+The permanent branch model is exactly `development` and `master`. Work directly on `development`; the owner handles deletion of branches when explicitly identified as ready. Never delete a branch on the owner's behalf.
 
-Work directly on development. Do not create persistent feature or handoff branches. Do not publish to NuGet unless the owner explicitly authorizes that specific release. Keep publication disabled by default in CI.
+Do not modify `master`, merge pull requests, publish to NuGet, deploy, or release without explicit authorization for that specific operation. Keep publication disabled by default in CI.
 
 ## Domain boundaries
 
-- ProtocolAi owns vocabulary and symbol identity.
-- GrammarAi owns grammar structure and composition.
-- CommandAi owns versioned command-proposal representation and its codec.
-- HeadlessAi owns configured endpoint request/response communication.
-- The host owns trust decisions, policy, authorization, approval, and execution.
+- ProtocolAi owns shared vocabulary identity and broader causal/event/outcome provenance.
+- GrammarAi owns grammar definitions and grammar-specific structural validation.
+- CommandAi owns generic proposal/exchange representations, descriptors, typed values, structural bounds, and local request/response correlation.
+- HeadlessAi owns configured endpoint communication.
+- CiAi and consuming applications own domain-specific definitions and mappings.
+- AppAi may later own application-program composition and response planning.
+- FSM_Foundry / host owns live-state resolution, policy, authorization, approval, lifecycle, dispatch, and execution.
 
-Do not make a lower-level package depend on an adjacent package merely because the concepts compose. Verify the actual public contracts before adding dependencies or claiming interoperability. CommandAi must not execute commands or grant authority.
+CommandAi must not depend on GrammarAi or execute commands. Address IDs are contract identifiers, never pointers. Grammar metadata is opaque to CommandAi. A structurally valid response is still untrusted intent.
+
+## Version policy
+
+The `CommandAi/1` protocol identity may evolve in place by owner direction. It is distinct from the NuGet package version. Do not invent a /2 migration or increment a version merely because an internal contract expands. Coordinate consuming repositories and package publication through the owner's release workflow.
 
 ## Documentation claims
 
-Separate source-implemented behavior, source-checked examples, verified CI behavior, conceptual diagrams, and future work. Never call a local example tested unless a recorded run supports that claim. Do not add unverified badges or claim a package is release-ready based only on a successful build.
-
-## Scope
-
-CiAi is outside this repository's scope. Do not edit or coordinate changes in CiAi as part of CommandAi work.
+Never call an example tested unless a recorded run supports that claim. Do not claim wire support for an object model until a codec and tests exist. Do not add unverified badges or claim release readiness based only on a successful build.
 
 ---
 

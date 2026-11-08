@@ -6,31 +6,26 @@
 [![Build](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml/badge.svg?branch=development)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/LICENSE.txt)
 
-<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.CommandAi/development/docs/images/command-ai-boundary.svg" alt="CommandAi represents a command proposal; a trusted host resolves, validates, authorizes, and executes separately." width="100%"></p>
-<p align="center"><em>A well-formed proposal is still only a proposal.</em></p>
+<p align="center"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.CommandAi/development/docs/images/command-ai-boundary.svg" alt="CommandAi represents untrusted proposals and correlated application address-space exchanges; the host retains authority and execution." width="100%"></p>
+<p align="center"><em>A well-formed response is still only intent.</em></p>
 
 ## 01 What is CommandAi?
 
-**CommandAi defines a provider-neutral, immutable representation for proposed atomic actions.** The approved CommandAi/1 model contains an ordered proposal, action identities, and ordered typed arguments. Each value is either a positive integer identifier or bounded literal text.
+**CommandAi defines provider-neutral, immutable representations for application/AI exchanges.** Its compact proposal model carries ordered atomic actions and typed arguments. Its address-space model describes declared input/context slots and writable response slots, with local request/response correlation.
 
-CommandAi represents intent. It does not resolve application meaning, validate live state, authorize, or execute commands.
+The protocol identity remains `CommandAi/1`. That identity is not the NuGet package version; internal contract evolution does not automatically require a version increment.
 
 ## 02 Why does it exist?
 
-AI-generated and agent-generated content is untrusted. A host needs a small, bounded interchange contract instead of relying on ad-hoc prose or application-specific parsing. CommandAi provides that shared representation while leaving domain meaning and authority with the consuming application.
+Applications need a bounded contract for exposing only the context and response shape they choose. CommandAi describes that boundary without owning application memory, operation meaning, policy, or execution.
 
 ## 03 How does it work?
 
-The line-oriented CommandAi/1 envelope:
+An application declares descriptors with positive IDs, names, read/write access, value kinds, required-slot rules, and optional opaque GrammarAi definition metadata. It creates a `CommandExchange` with values for readable addresses. A model-facing layer can then produce a `CommandResponse` for writable addresses using the same exchange ID.
 
-~~~text
-[CommandAi]
-Protocol=CommandAi/1
-Command=100 200=300 201="diagnostic stream"
-[/CommandAi]
-~~~
+CommandAi rejects undeclared or duplicate addresses, invalid direction, missing required slots, mismatched value kinds, and response correlation mismatch. GrammarAi remains an independent owner of grammar validation; CommandAi has no GrammarAi dependency.
 
-The first token is a positive action identifier. Each following token is a positive parameter identifier and a typed value. Integer identifiers remain opaque; literal strings are JSON-quoted. A proposal preserves command order but is not a transaction or workflow.
+The existing compact text codec continues to encode/decode `CommandProposal`. **The new address-space object model does not yet have its own canonical wire codec**, so do not treat it as serialized interchange until that work lands.
 
 ## 04 See it in a minute
 
@@ -38,7 +33,7 @@ The first token is a positive action identifier. Each following token is a posit
 dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
 ~~~
 
-The quickstart builds a proposal with the generic fluent builder, encodes it, and decodes it. Its sample identifiers are illustrative; a consuming host owns the trusted vocabulary and named operations.
+The quickstart demonstrates the compact proposal API. Address-space examples and a bounded exchange wire codec will be added as that surface is completed.
 
 ## 05 Documentation and theory
 
@@ -58,18 +53,19 @@ The quickstart builds a proposal with the generic fluent builder, encodes it, an
 
 | Package | Responsibility |
 |---|---|
-| ProtocolAi | Protocol vocabulary, identity meaning, correlated events and actual outcomes |
+| ProtocolAi | Shared vocabulary identity and broader correlated event/outcome provenance |
 | GrammarAi | Grammar definitions and structural validation |
-| CommandAi | Immutable action/argument proposals, bounds, builders, CommandAi/1 codec |
+| CommandAi | Immutable proposals, address descriptors, typed exchange values, correlation, bounds |
 | HeadlessAi | Configured endpoint communication |
-| CiAi | CI evidence and verdicts |
+| CiAi | CI evidence, verdicts, and domain-specific mappings |
+| AppAi (future) | Application-program composition and response planning |
 | FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
 
-CommandAi has no runtime dependency on sibling packages. Presentation, accessibility, narration, haptics, and pedagogy belong to observer/application layers.
+CommandAi has no runtime dependency on sibling packages. It does not dereference addresses, interpret application semantics, authorize, or execute.
 
 ## Verification and release status
 
-The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. Package version remains `0.1.0-alpha.2`. Internal consumers adapt to the approved /1 contract; no version bump is required for this coordination. **NuGet publication is not authorized unless explicitly approved by the owner.**
+The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. Package version remains `0.1.0-alpha.2`. NuGet publication remains disabled and requires explicit owner authorization.
 
 ---
 

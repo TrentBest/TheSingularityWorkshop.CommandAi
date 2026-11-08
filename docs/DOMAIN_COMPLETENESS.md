@@ -1,59 +1,56 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-# Command domain completeness and ownership
+# CommandAi domain completeness and ownership
 
-> Status: this inventory describes the approved CommandAi/1 source contract. Candidate features are not treated as implemented merely because they appeared in an earlier design.
+> Status: this document distinguishes implemented in-memory models from wire-format work still outstanding. The protocol identity remains CommandAi/1; internal evolution does not itself require a protocol or NuGet version increment.
 
-## 1. What a command is
+## 1. Domain definition
 
-A command is a bounded declaration of an intended atomic action: an action identity plus ordered, typed parameters. A proposal is a non-empty ordered collection of such commands.
+CommandAi represents an exchange between an application and an AI-facing consumer. The application defines an address space: named, typed, direction-constrained slots through which it supplies context and receives proposed values. A local exchange identifier correlates request and response.
 
-A command is not authorization, proof of live-state truth, an execution result, a transaction, a workflow, a retry policy, or a user-interface instruction. A proposal is untrusted input.
+The application retains ownership of actual memory, persistence, calculations, operation semantics, and execution. An address is a contract identifier, never a pointer or a direct memory capability.
 
-## 2. Semantic neutrality
+The existing atomic proposal model remains available for compact action/argument interchange. It is not the limit of the domain.
 
-The same action meaning can be presented through different application experiences: visual, textual, narrated, haptic, simplified, or expert-oriented. Those are observer-layer projections. CommandAi must not prescribe age, reading level, modality, teaching strategy, screen, profile, or accessibility behavior. It has no UI or presentation dependencies.
+## 2. Implemented exchange guarantees
 
-## 3. Source-backed ownership matrix
+| Concern | Current implementation |
+|---|---|
+| Address identity | Positive application-defined integer ID |
+| Address metadata | Name, optional description, access direction, declared value kind |
+| Direction | Read, write, or read/write; request values require read access and response values require write access |
+| Required slots | Required input and required output flags enforced independently |
+| Typed values | Existing integer-identifier and literal-text kinds; value kind must match descriptor |
+| Grammar binding | Optional positive GrammarAi definition ID + schema version pair; metadata is opaque here |
+| Request/response correlation | Non-empty GUID; response validation requires matching GUID and same address-space instance |
+| Duplicate/unknown slots | Rejected |
+| Immutability | Descriptor and value objects are immutable; collections are defensive read-only snapshots |
+| Resource bounds | At most 1,024 descriptors and 1,024 values per exchange/response; existing literal text bound remains 16,384 UTF-16 characters |
 
-| Concern | Current /1 evidence | Owner and disposition |
-|---|---|---|
-| Protocol identity | `CommandProposal.CurrentProtocolVersion` is `CommandAi/1`; decoder rejects unsupported versions | CommandAi — implemented |
-| Proposal structure | Non-empty ordered collection of instructions | CommandAi — implemented |
-| Action identity | Positive opaque integer | CommandAi — implemented |
-| Parameter identity | Positive opaque integer; duplicate parameter IDs rejected within a command | CommandAi — implemented |
-| Parameter value | Integer identifier or literal text | CommandAi — implemented |
-| Parameter schema, optionality, defaults, constraints | Not represented in /1 | Gap — add only with concrete generic consumer need |
-| Target and scope | Not represented in /1 | Explicitly excluded from the owner-approved /1 contract; consuming domain/host must carry and validate target context outside the generic model |
-| Command/proposal GUID, causal/correlation identity | Not represented in /1 | Protocol/runtime coordination gap; do not mistake proposal order or action IDs for correlation identity |
-| Preconditions | Not represented in /1 | Explicitly excluded from /1; GrammarAi/host may validate domain conditions supplied through an owning layer, but /1 has no structured precondition field |
-| Idempotency and replay | Not represented in /1 | Explicitly excluded from /1; deduplication and replay safety remain host/protocol responsibilities, not guarantees of the proposal model |
-| Expected outcome contract | Not represented in /1 | Explicitly excluded from /1; ProtocolAi/runtime owns correlated outcome contracts and actual outcomes |
-| Actual result and errors | Not represented in /1 | ProtocolAi and runtime |
-| Ordering | Proposal preserves insertion order | CommandAi — representation only; no dependency semantics |
-| Transaction, branching, workflow, retry, cancellation, compensation | Not represented or executed | Orchestrator / host |
-| Resource bounds | Envelope (262,144 UTF-16 characters), command (256), per-command arguments (64), per-literal text (16,384 UTF-16 characters), and aggregate in-memory literal text (1,048,576 UTF-16 characters) are source-defined | CommandAi — implemented representation safeguards; the model's aggregate in-memory allowance is intentionally larger than the codec envelope, so a proposal can be constructible but not encodable. This is a documented boundary, not a guarantee that every model instance has a wire representation. Issue #3 should decide whether these independent limits are desirable or should be aligned. |
-| Encoding and decoding | Line-oriented /1 envelope; encoder emits LF separators; decoder accepts LF/CRLF, removes empty lines, and trims remaining lines; whitespace-only lines are ignored as entries but count toward the maximum-line guard | CommandAi — implemented; non-empty unexpected entries and malformed markers remain rejected |
-| Canonical bytes, signatures, hashes | No canonical signing/digest contract | Not implemented |
-| Unknown extensions | No extension bag; malformed/unknown entries rejected | Strict /1 contract |
-| Secret classification and redaction | No secret metadata or redaction API | Host/security layer; opaque does not mean secret-safe |
-| Authorization and execution | No policy, credential, dispatch, or execution API | Foundry / host — intentionally excluded |
-| Presentation, narration, haptics, pedagogy | No presentation model | Application/observer layers — intentionally excluded |
+## 3. Explicit ownership
 
-## 4. Implemented guarantees
+- **CommandAi:** generic descriptors, direction, type-shape agreement, required-slot checks, local exchange correlation, and bounded in-memory collections.
+- **GrammarAi:** grammar definition registry and structural validation of grammar-governed bodies.
+- **ProtocolAi:** shared vocabulary identity and broader causal/event/outcome provenance.
+- **CiAi / consuming application:** domain-specific command/action definitions and mappings to grammar definitions and protocol categories.
+- **HeadlessAi:** configured model endpoint communication.
+- **AppAi (future):** composition of application programs, chaining, branching, and execution-plan representation.
+- **FSM_Foundry / host:** resolve address meaning against trusted capabilities and live state; policy, authorization, approval, scheduling, dispatch, execution, lifecycle, persistence.
 
-The model and tests establish positive identifiers, typed values, ordered arguments and commands, non-empty proposals, immutable snapshots from builders, and configured resource bounds. The codec rejects malformed envelopes, unsupported versions, duplicate protocol declarations, duplicate parameters, invalid values, and oversized input.
+## 4. Deliberate exclusions
 
-These are representation guarantees. They do not establish that an ID exists in a host vocabulary, that a command is semantically correct, or that execution is safe or authorized.
+CommandAi does not dereference application addresses, read/write live memory, evaluate business semantics, resolve capability names, authorize, execute, persist, transport to endpoints, orchestrate workflows, or guarantee retries, cancellation, idempotency, atomicity, or exactly-once delivery.
 
-## 5. Composition boundary
+A grammar-valid payload remains untrusted intent. GrammarAi validation is not host authorization.
 
-Several ordered commands may be transported together, but order alone does not imply dependency, conditional execution, atomic commit, rollback, or success propagation. A higher-level workflow system owns those semantics. The host validates and authorizes each action against trusted definitions and live state.
+## 5. Wire-format status and scale
 
-## 6. Extension policy
+The existing compact proposal text codec remains intact. A canonical bounded serialization format for the new exchange and response objects is not yet implemented; consumers must not assume the object model is already wire-ready. Before accepting high-volume or 10,000-command scenarios, define framing, maximum encoded bytes, streaming/chunking, ordering, cancellation, idempotency, and partial-failure semantics.
 
-Retain CommandAi/1 for internal Workshop coordination. Do not add /2-only fields or increment package/protocol versions merely to align internal consumers. Before adding schema metadata, correlation identity, extensions, or other cross-cutting fields, identify the semantic owner, validation rules, resource bounds, compatibility behavior, and source-backed tests. No publication or release is implied.
+## 6. Version policy
+
+CommandAi/1 is the protocol identity used for internal Workshop coordination and may evolve in place by owner direction. The NuGet package version is a separate release label. No package version bump, publication, merge, release, or deployment is implied by these source changes.
 
 ---
 
