@@ -189,7 +189,7 @@ public sealed class CommandResponse
         ArgumentNullException.ThrowIfNull(exchange);
         if (ExchangeId != exchange.ExchangeId)
             throw new ArgumentException("Response exchange ID does not match the request.", nameof(exchange));
-        if (!ReferenceEquals(AddressSpace, exchange.AddressSpace))
-            throw new ArgumentException("Response must use the originating exchange address space.", nameof(exchange));
+        if (!AddressSpace.Addresses.SequenceEqual(exchange.AddressSpace.Addresses))
+            throw new ArgumentException("Response address-space descriptors do not match the originating exchange.", nameof(exchange));
     }
 }
