@@ -3,16 +3,18 @@
 
 # CommandAi architecture
 
-## Exchange model
+## Exchange model and wire representation
 
-CommandAi now has two related representation surfaces within the same `CommandAi/1` protocol identity:
+CommandAi has two representation surfaces within the same `CommandAi/1` protocol identity:
 
 - The existing compact `CommandProposal` remains an ordered list of atomic action proposals.
 - The address-space exchange model describes application-defined input/context slots and output slots, correlated by an exchange GUID.
 
-An address descriptor declares a positive local ID, a name, access direction, value kind, optional description, required-input/output constraints, and optional GrammarAi definition identity plus schema version. Grammar metadata is an opaque pair: CommandAi checks that both values are present and positive, but does not load GrammarAi, resolve definitions, or validate grammar payloads.
+`CommandExchangeTextCodec` serializes exchanges and responses as deterministic compact JSON. The envelope declares the protocol, message kind, exchange ID, complete address descriptors, and the corresponding input or output values. Property order is fixed by the encoder; decoders reject duplicate or unknown properties, unsupported enum names, malformed identifiers, invalid descriptor/value shapes, and over-limit collections or envelopes. The compact proposal codec remains unchanged and line-oriented.
 
-`CommandExchange` accepts values only for readable addresses and enforces required inputs. `CommandResponse` accepts values only for writable addresses and enforces required outputs. Both reject unknown or duplicate addresses and mismatched value kinds. `ValidateFor` verifies correlation and that the response uses the originating address-space instance.
+An address descriptor declares a positive local ID, name, access direction, value kind, optional description, required-input/output constraints, and optional GrammarAi definition identity plus schema version. Grammar metadata is opaque: CommandAi checks that both values are present and positive, but does not load GrammarAi, resolve definitions, or validate grammar payloads.
+
+`CommandExchange` accepts values only for readable addresses and enforces required inputs. `CommandResponse` accepts values only for writable addresses and enforces required outputs. Both reject unknown or duplicate addresses and mismatched value kinds. `ValidateFor` verifies correlation and equivalent address-space descriptor snapshots.
 
 ## Responsibility boundaries
 
@@ -48,13 +50,9 @@ A writable address may identify a grammar-governed body through its GrammarAi de
 
 Exchange GUIDs correlate one local request and response; they are not a replacement for ProtocolAi's broader event/provenance model. CommandAi does not define workflows, branching, retries, cancellation, idempotent execution, or batch guarantees.
 
-## Existing compact proposal wire format
-
-The existing line-oriented proposal codec remains supported and unchanged. It is not yet an encoder for the new address-space exchange types. The exchange object model is therefore available to consumers, while a bounded canonical exchange wire codec remains a follow-on implementation task. Do not mistake in-memory model validation for wire-format validation.
-
 ## Resource and trust boundaries
 
-Address spaces and value collections are capped at 1,024 entries. Individual literal values retain the existing 16,384 UTF-16-character limit. These are structural bounds, not authorization limits or guarantees of safe execution. Large multi-command plans require a separate framing/streaming contract before any 10,000-command scale claim.
+Address spaces and value collections are capped at 1,024 entries. Individual literal values retain the existing 16,384 UTF-16-character limit; encoded exchange/response envelopes are capped at 262,144 characters. These are structural bounds, not authorization limits or guarantees of safe execution. Large multi-command plans require a separate framing/streaming contract before any 10,000-command scale claim.
 
 ---
 
