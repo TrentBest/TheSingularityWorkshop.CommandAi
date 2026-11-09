@@ -104,8 +104,9 @@ public static class CommandExchangeTextCodec
 
     private static JsonDocument Parse(string text)
     {
-        if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("CommandAi exchange text cannot be empty.", nameof(text));
+        if (text is null) throw new ArgumentNullException(nameof(text));
         if (text.Length > MaxEnvelopeCharacters) throw new FormatException($"CommandAi exchange envelope exceeds {MaxEnvelopeCharacters} characters.");
+        if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("CommandAi exchange text cannot be empty.", nameof(text));
         try
         {
             var document = JsonDocument.Parse(text, new JsonDocumentOptions { MaxDepth = 16, CommentHandling = JsonCommentHandling.Disallow, AllowTrailingCommas = false });
