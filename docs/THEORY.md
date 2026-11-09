@@ -20,7 +20,7 @@ This distinction matters whenever a model, agent, service, or application propos
 - **Proposal:** an immutable, non-empty ordered collection of command instructions.
 - **Protocol version:** the explicit representation contract. The approved and only supported version is `CommandAi/1`.
 
-An identifier is not a name. The integer `1001` has no universal meaning; the host maps it to a trusted action definition. Likewise, the order of arguments is preserved, but the generic package does not know whether a parameter is a resource, a mode, a path, or a diagnostic selector.
+An identifier is not a name. The integer `1001` has no universal meaning; the host maps it to a trusted action definition. Likewise, the order of arguments is preserved, but the generic package does not know whether the parameter is a resource, a mode, a path, or a diagnostic selector.
 
 A proposal is not a transaction, workflow, authorization token, result, or UI instruction.
 
@@ -157,6 +157,7 @@ For an implementation exercise, add a test for a malformed token or a boundary c
 - [Architecture](ARCHITECTURE.md) — component and trust boundaries.
 - [Usage](USAGE.md) — API examples, failures, and verification commands.
 - [Domain completeness matrix](DOMAIN_COMPLETENESS.md) — concept ownership and explicit exclusions.
+- [Governed command lifecycle](GOVERNED_COMMAND_LIFECYCLE.md) — policy, authority, deferred approval, disclosure, capabilities, and host ownership.
 - [Builder integration](BUILDER_INTEGRATION.md) — host-owned named operations.
 - [CommandAiTextCodec UML](UML/CommandAiTextCodecUML.md) — parser neighborhood and use cases.
 - [Source and tests](../CommandAiTextCodec.cs) — implementation details.
