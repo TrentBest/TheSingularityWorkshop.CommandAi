@@ -11,6 +11,7 @@ CommandAi/1 is the approved provider-neutral representation for immutable, order
 |---|---|
 | Understand the problem and boundaries | [README](README.md) · [Problem domain](docs/PROBLEM_DOMAIN.md) · [Domain completeness](docs/DOMAIN_COMPLETENESS.md) |
 | Understand command theory and atomicity | [Theory](docs/THEORY.md) |
+| Understand policy, authority, approval, disclosure, and execution ownership | [Governed command lifecycle](docs/GOVERNED_COMMAND_LIFECYCLE.md) |
 | Use the current API and wire format | [Usage guide](docs/USAGE.md) |
 | Understand package responsibilities | [Architecture](docs/ARCHITECTURE.md) · [AI series](docs/AI_SERIES.md) |
 | Extend the generic builder | [Builder integration](docs/BUILDER_INTEGRATION.md) |
