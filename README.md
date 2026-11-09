@@ -25,7 +25,7 @@ An application declares descriptors with positive IDs, names, read/write access,
 
 CommandAi rejects undeclared or duplicate addresses, invalid direction, missing required slots, mismatched value kinds, and response correlation mismatch. GrammarAi remains an independent owner of grammar validation; CommandAi has no GrammarAi dependency.
 
-The existing compact text codec continues to encode/decode `CommandProposal`. **The new address-space object model does not yet have its own canonical wire codec**, so do not treat it as serialized interchange until that work lands.
+The compact proposal text codec continues to encode/decode `CommandProposal`. The address-space exchange model also has a canonical, deterministic JSON wire codec: `CommandExchangeTextCodec` encodes and decodes both exchanges and responses under `CommandAi/1`, with strict structural validation and bounded envelopes. The codec does not authorize or execute a response.
 
 ## 04 See it in a minute
 
@@ -33,7 +33,7 @@ The existing compact text codec continues to encode/decode `CommandProposal`. **
 dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
 ~~~
 
-The quickstart demonstrates the compact proposal API. Address-space examples and a bounded exchange wire codec will be added as that surface is completed.
+The quickstart demonstrates the compact proposal API. The exchange and response model, including its JSON codec, is available as a separate API surface.
 
 ## 05 Documentation and theory
 
