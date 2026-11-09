@@ -32,8 +32,8 @@ public static class CommandExchangeTextCodec
         RequireString(root, "protocol", Protocol);
         RequireString(root, "kind", "exchange");
         var id = ReadGuid(root, "exchangeId");
-        var space = ReadAddressSpace(root.GetProperty("addresses"));
-        var values = ReadValues(root.GetProperty("inputs"));
+        var space = ReadAddressSpace(root["addresses"]);
+        var values = ReadValues(root["inputs"]);
         try { return new CommandExchange(id, space, values); }
         catch (ArgumentException ex) { throw new FormatException("The exchange contains invalid address values.", ex); }
     }
@@ -45,8 +45,8 @@ public static class CommandExchangeTextCodec
         RequireString(root, "protocol", Protocol);
         RequireString(root, "kind", "response");
         var id = ReadGuid(root, "exchangeId");
-        var space = ReadAddressSpace(root.GetProperty("addresses"));
-        var values = ReadValues(root.GetProperty("outputs"));
+        var space = ReadAddressSpace(root["addresses"]);
+        var values = ReadValues(root["outputs"]);
         try { return new CommandResponse(id, space, values); }
         catch (ArgumentException ex) { throw new FormatException("The response contains invalid address values.", ex); }
     }
