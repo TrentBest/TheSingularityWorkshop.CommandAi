@@ -35,15 +35,39 @@ Command=100 200=42 201="diagnostic stream"
 
 Each command line starts with a positive action ID, followed by zero or more ordered parameter/value pairs. Values are positive integer identifiers or JSON-quoted literal strings.
 
+## Enriched atomic commands
+
+The original compact constructor and `Command=` wire entry remain available. When a consumer needs a generic atomic-command declaration, use the enriched builder overload:
+
+~~~csharp
+var proposal = new CommandProposalBuilder()
+    .AddCommand(
+        commandId: Guid.NewGuid(),
+        actionId: 1001,
+        target: CommandValue.FromText("repository-id"),
+        scope: CommandValue.FromText("isolated-feature-branch"),
+        idempotencyKey: "stable-operation-key",
+        outcomeContract: new CommandOutcomeContract(700, [
+            new CommandOutcomeField(701, CommandValueKind.LiteralText)
+        ]),
+        configure: command => command
+            .WithText(parameterId: 2001, value: "src/file.cs")
+            .WithPrecondition("GrammarAi/1", "candidate.sha == expected.sha"))
+    .Build();
+~~~
+
+The codec writes enriched commands as `AtomicCommand=` JSON entries under the same `CommandAi/1` envelope. New readers accept compact, enriched, and mixed proposals in order. Older compact-only readers reject enriched entries and must be upgraded before consuming them.
+
 ## Model and ownership
 
 - `CommandProposal` is a non-empty ordered collection; it is not a transaction.
-- `CommandInstruction` contains a positive action ID and ordered arguments.
+- `CommandInstruction` represents either the original compact action/argument shape or a complete enriched atomic-command declaration.
 - `CommandArgument` pairs a positive parameter ID with a typed `CommandValue`.
-- `CommandValue` distinguishes integer identifiers from literal text.
-- The host owns vocabulary meaning, semantic validation, live-state checks, policy, authorization, approval, execution, and actual outcomes.
+- `CommandPrecondition` carries an opaque expression and GrammarAi grammar version; CommandAi does not parse or evaluate it.
+- `CommandOutcomeContract` declares expected outcome shape, not an actual result.
+- The host owns domain meaning, live-state evaluation, replay/deduplication enforcement, policy, authorization, approval, execution, and actual outcomes.
 
-Successful decoding proves only that the input is structurally valid and within limits. It does not authorize any action.
+Successful decoding proves only that the input is structurally valid and within limits. It does not authorize any action. Specialized or domain-specific fields belong in consuming-domain extensions when they are not broadly applicable to the generic contract.
 
 ## Host-owned named operations
 
