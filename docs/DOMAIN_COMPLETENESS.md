@@ -3,7 +3,7 @@
 
 # CommandAi domain completeness and ownership
 
-> Status: the compact proposal codec and address-space exchange/response JSON codec are implemented. The protocol identity remains CommandAi/1; internal evolution does not itself require a protocol or NuGet version increment.
+ > Status: compact and enriched atomic proposal forms plus the address-space exchange/response JSON codec are represented under CommandAi/1. The protocol identity remains CommandAi/1; internal evolution does not itself require a protocol or NuGet version increment.
 
 ## 1. Domain definition
 

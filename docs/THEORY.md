@@ -13,7 +13,12 @@ This distinction matters whenever a model, agent, service, or application propos
 
 ## 2. Concepts and vocabulary
 
+- **Command identity:** a non-empty GUID identifying one proposed command, distinct from action identity and idempotency identity.
 - **Action identity:** a positive opaque integer identifying an action in a vocabulary owned by the consuming application.
+- **Target and scope:** typed opaque values identifying the intended resource and boundary.
+- **Precondition:** a bounded opaque expression paired with its GrammarAi grammar version.
+- **Idempotency identity:** a bounded caller-supplied key; host enforcement is separate.
+- **Expected-outcome contract:** a declaration of expected fields, not an actual result.
 - **Parameter identity:** a positive opaque integer identifying a parameter in that same application-owned vocabulary.
 - **Argument value:** either another positive integer identifier or literal text.
 - **Command instruction:** one atomic declaration of intended action, with an action identity and ordered arguments.
@@ -31,10 +36,12 @@ The public model is deliberately small:
 | Type | Responsibility | Important invariant |
 |---|---|---|
 | `CommandProposal` | Proposal envelope | At least one command; at most the configured command limit; immutable collection snapshot |
-| `CommandInstruction` | One action declaration | Positive action ID; ordered immutable arguments; bounded argument count |
+| `CommandInstruction` | Compact or enriched command declaration | Positive action ID and ordered immutable arguments; enriched form requires command ID, target, scope, idempotency identity, outcome contract, and bounded optional preconditions |
 | `CommandArgument` | One named parameter value | Positive parameter ID and non-null typed value |
 | `CommandValue` | Typed argument representation | Positive integer identifier or non-empty bounded literal text |
-| `CommandLimits` | Resource safeguards | Bounds for wire characters, commands, arguments, and literal text |
+| `CommandPrecondition` | Grammar-versioned opaque condition | Required bounded grammar version and expression; no parsing/evaluation in CommandAi |
+| `CommandOutcomeContract` / `CommandOutcomeField` | Expected outcome shape | Positive unique identities and bounded field count; not actual results |
+| `CommandLimits` | Resource safeguards | Bounds for wire characters, commands, arguments, preconditions, outcome fields, identities, and literal text |
 | `CommandAiTextCodec` | Text serialization boundary | Validates the /1 envelope; does not resolve meaning or grant authority |
 
 Within one instruction, parameter IDs are unique. Proposal order and argument order are preserved. Builders are mutable authoring helpers; `Build()` creates immutable model snapshots. The builders are not thread-safe and do not perform application-specific semantic validation.
@@ -46,7 +53,9 @@ The proposal's ordering is only a representation guarantee. It does not imply th
 The implementation is dependency-free and remains separate from adjacent Workshop packages.
 
 - [`CommandProposal.cs`](../CommandProposal.cs) owns the non-empty bounded collection and protocol identity.
-- [`CommandInstruction.cs`](../CommandInstruction.cs) owns action identity and ordered arguments.
+- [`CommandInstruction.cs`](../CommandInstruction.cs) owns action/command identity, target, scope, idempotency identity, expected-outcome contract, preconditions, and ordered arguments.
+- [`CommandPrecondition.cs`](../CommandPrecondition.cs) carries opaque grammar-versioned condition data.
+- [`CommandOutcomeContract.cs`](../CommandOutcomeContract.cs) and [`CommandOutcomeField.cs`](../CommandOutcomeField.cs) declare expected outcome shape.
 - [`CommandArgument.cs`](../CommandArgument.cs) pairs parameter identity with a value.
 - [`CommandValue.cs`](../CommandValue.cs) distinguishes integer identifiers from literal text.
 - [`CommandLimits.cs`](../CommandLimits.cs) centralizes representation bounds.
@@ -59,7 +68,7 @@ The builder API is convenience, not a second semantic model. A consuming domain 
 
 The encoder emits LF line separators on every platform. The decoder accepts LF and CRLF. It removes empty lines and trims surrounding whitespace from each remaining line. Whitespace-only lines become empty entries and are ignored semantically, but still count toward the parser's maximum-line guard. The opening and closing markers must still bound the first and last non-empty entries. Non-empty unknown entries, nested envelopes, duplicate protocol declarations, duplicate parameter IDs, unsupported versions, malformed identifiers, malformed JSON literals, and oversized input are rejected.
 
-The wire shape is:
+The original compact wire shape remains:
 
 ~~~text
 [CommandAi]
@@ -69,7 +78,9 @@ Command=1002 2003="Diagnostics"
 [/CommandAi]
 ~~~
 
-A command line begins with a positive action identifier. Each subsequent token is a positive parameter identifier, an equals sign, and either a positive integer identifier or a JSON-quoted string. JSON quoting preserves spaces, quotes, backslashes, and escaped control characters inside literal values.
+An enriched command uses an explicit `AtomicCommand=` JSON entry within the same `CommandAi/1` envelope. New readers accept compact, enriched, and mixed entries in proposal order; older compact-only readers reject enriched entries and must be upgraded. Enriched JSON rejects unknown and duplicate properties, invalid field combinations, and nesting deeper than 16.
+
+A compact command line begins with a positive action identifier. Each subsequent token is a positive parameter identifier, an equals sign, and either a positive integer identifier or a JSON-quoted string. JSON quoting preserves spaces, quotes, backslashes, and escaped control characters inside literal values.
 
 LF output makes line endings deterministic, but this does not establish canonical bytes, canonical JSON rules beyond the current serializer behavior, signatures, hashes, or a digest contract. Those must not be inferred from deterministic line separators.
 

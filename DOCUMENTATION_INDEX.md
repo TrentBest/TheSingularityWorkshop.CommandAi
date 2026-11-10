@@ -3,7 +3,7 @@
 
 # CommandAi — documentation index
 
-CommandAi/1 is the approved provider-neutral representation for immutable, ordered proposals of atomic actions with typed arguments. The host owns meaning, policy, authorization, and execution.
+CommandAi/1 is the provider-neutral representation for immutable, ordered atomic-action proposals and application address-space exchanges. Proposals support the original compact form and an enriched atomic-command form; the host owns meaning, policy, authorization, and execution.
 
 ## Start here
 
@@ -25,7 +25,7 @@ CommandAi/1 is the approved provider-neutral representation for immutable, order
 
 The approved /1 model is centered on `CommandProposal`, `CommandInstruction`, `CommandArgument`, `CommandValue`, `CommandValueKind`, `CommandLimits`, `CommandAiTextCodec`, `CommandProposalBuilder`, and `CommandInstructionBuilder`.
 
-The prior /2 candidate introduced `CommandPrecondition`, `CommandOutcomeContract`, and `CommandOutcomeField`. Those types and their type guides are not present in the current source tree and are not part of the approved /1 contract; historical context is recorded in [Legacy compatibility](docs/LEGACY_COMPATIBILITY.md).
+The enriched atomic-command form adds `CommandPrecondition`, `CommandOutcomeContract`, and `CommandOutcomeField`; compact commands leave enriched metadata absent rather than inferring defaults. The separate address-space surface includes `CommandAddressDescriptor`, `CommandAddressSpace`, `CommandAddressValue`, `CommandExchange`, `CommandResponse`, and `CommandExchangeTextCodec`.
 
 All Markdown pages must retain the animated moniker at the top and canonical Workshop PNG footer. CI validates those branding requirements. No NuGet publication is authorized.
 
