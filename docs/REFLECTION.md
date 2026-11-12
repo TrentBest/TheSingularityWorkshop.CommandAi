@@ -7,10 +7,10 @@
 
 - Pull request: [#8 — enriched atomic CommandAi/1 integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/pull/8)
 - Candidate branch: `work/commandai-enriched-v1-integration`
-- Current PR head: `f5256f7693bc8bcf010be4acba9e4686813bc238`
+- Current PR head: `0b8f29cf4b36a4bb525c98218f1de79d86b43e1f`
 - The preceding documented exact-head CI run [43163337018](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43163337018) passed on `a10722ae3013f2fa0526c4d275f77dd0bf9a13b8`: `build-and-test` succeeded and `publish_nuget` was skipped.
-- The current head adds the explicit ordered-address-space response contract documentation and regression test. No workflow run has yet been returned for the current exact head; therefore this head is **not yet CI-verified**.
-- The latest Codecov comment reports **81.23077% patch coverage** with 61 changed lines missing coverage. The report is a test-quality signal, not a failed build/test gate; refresh it against the current head before treating it as final.
+- Subsequent commits add the ordered-address-space response contract documentation and regression test, followed by focused atomic-model, builder, and codec guard tests (`d159b521` and `0b8f29c`). The latest exact-head workflow lookup returned no PR workflow run for `0b8f29cf4b36a4bb525c98218f1de79d86b43e1f`; therefore this head is **not yet CI-verified**.
+- The latest Codecov comment reports **81.23077% patch coverage** with 61 changed lines missing coverage, but it predates the latest test commits. Treat it as historical only; refresh coverage against the current head before drawing conclusions.
 
 Every exact-head verification claim applies only to the SHA named beside its run. A later source or documentation commit requires its own evidence.
 
@@ -36,7 +36,7 @@ A representative sample measured 45 characters for a compact command and 740 cha
 
 ## Focused verification
 
-The suite covers compact byte-for-byte compatibility, mixed compact/enriched ordering, unknown/duplicate JSON properties, required fields, the required outcome-field flag, typed targets/scopes, identity uniqueness, and bounded collections. Follow-up tests cover null nested JSON entries, invalid typed-value combinations, exact collection boundaries, and rejection of reordered response descriptors.
+The suite covers compact byte-for-byte compatibility, mixed compact/enriched ordering, unknown/duplicate JSON properties, required fields, the required outcome-field flag, typed targets/scopes, identity uniqueness, and bounded collections. Follow-up tests cover null nested JSON entries, invalid typed-value combinations, exact collection boundaries, and rejection of reordered response descriptors. The latest test-only commits add constructor/builder guard cases, duplicate and capacity checks, malformed-envelope handling, compact argument overflow, non-object JSON, and invalid atomic model cases; these additions still require exact-head CI and refreshed coverage.
 
 The exchange contract is structural only. Address IDs are identifiers, not pointers or memory capabilities. A well-formed response remains untrusted intent.
 
