@@ -49,7 +49,8 @@ These are representation guarantees. They do not establish that an ID exists in 
 | Required slots | Required input and required output flags enforced independently |
 | Typed values | Existing integer-identifier and literal-text kinds; value kind must match descriptor |
 | Grammar binding | Optional positive GrammarAi definition ID + schema version pair; metadata is opaque here |
-| Request/response correlation | Non-empty GUID; response validation requires matching GUID and equivalent address-space descriptors |
+| Request/response correlation | Non-empty GUID; response validation requires matching GUID and an exact ordered match of address descriptors |
+| Descriptor ordering | Preserved in the JSON envelope and significant for response validation; producers must retain the originating descriptor order |
 | Duplicate/unknown slots | Rejected |
 | Immutability | Descriptor and value objects are immutable; collections are defensive read-only snapshots |
 | Resource bounds | At most 1,024 descriptors and values; literals at most 16,384 UTF-16 characters; encoded exchange/response envelope at most 262,144 characters |
