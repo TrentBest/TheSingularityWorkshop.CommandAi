@@ -215,4 +215,53 @@ public sealed class CommandAiAtomicCommandTests
             preconditions);
         Assert.Throws<ArgumentException>(() => new CommandProposal([command]));
     }
+
+
+    [Fact]
+    public void AtomicCommandJson_RejectsNullNestedEntries()
+    {
+        const string prefix = "[CommandAi]\nProtocol=CommandAi/1\nAtomicCommand=";
+        const string suffix = "\n[/CommandAi]";
+        const string start = "{\"commandId\":\"11111111-2222-3333-4444-555555555555\",\"actionId\":7,\"target\":{\"kind\":\"LiteralText\",\"identifier\":null,\"text\":\"repo\"},\"scope\":{\"kind\":\"LiteralText\",\"identifier\":null,\"text\":\"branch\"},\"idempotencyKey\":\"key\",\"outcomeContract\":{\"outcomeId\":1,\"fields\":";
+        const string end = "},\"arguments\":[],\"preconditions\":[]}";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + start + "[null]" + end + suffix));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + start + "[]" + end.Replace("\"arguments\":[]", "\"arguments\":[null]") + suffix));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + start + "[]" + end.Replace("\"preconditions\":[]", "\"preconditions\":[null]") + suffix));
+    }
+
+    [Fact]
+    public void AtomicCommandJson_RejectsInvalidTypedValueFieldCombinations()
+    {
+        const string prefix = "[CommandAi]\nProtocol=CommandAi/1\nAtomicCommand=";
+        const string suffix = "\n[/CommandAi]";
+        const string invalid = "{\"commandId\":\"11111111-2222-3333-4444-555555555555\",\"actionId\":7,\"target\":{\"kind\":\"IntegerIdentifier\",\"identifier\":0,\"text\":\"unexpected\"},\"scope\":{\"kind\":\"LiteralText\",\"identifier\":null,\"text\":\"branch\"},\"idempotencyKey\":\"key\",\"outcomeContract\":{\"outcomeId\":1,\"fields\":[]},\"arguments\":[],\"preconditions\":[]}";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + invalid + suffix));
+    }
+
+    [Fact]
+    public void EnrichedAtomicCommand_AcceptsExactCollectionBoundaries()
+    {
+        var arguments = Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand)
+            .Select(i => new CommandArgument((ulong)i, CommandValue.FromIdentifier((ulong)i)));
+        var fields = Enumerable.Range(1, CommandLimits.MaxOutcomeFields)
+            .Select(i => new CommandOutcomeField((ulong)i, CommandValueKind.IntegerIdentifier));
+        var preconditions = Enumerable.Range(1, CommandLimits.MaxPreconditionsPerCommand)
+            .Select(i => new CommandPrecondition("G", $"condition-{i}"));
+        var command = new CommandInstruction(
+            Guid.NewGuid(),
+            1001,
+            CommandValue.FromIdentifier(3001),
+            CommandValue.FromIdentifier(3002),
+            "boundary-key",
+            new CommandOutcomeContract(700, fields),
+            arguments,
+            preconditions);
+
+        var decoded = Assert.Single(CommandAiTextCodec.Decode(
+            CommandAiTextCodec.Encode(new CommandProposal([command]))).Commands);
+        Assert.Equal(CommandLimits.MaxArgumentsPerCommand, decoded.Arguments.Count);
+        Assert.Equal(CommandLimits.MaxOutcomeFields, decoded.OutcomeContract!.Fields.Count);
+        Assert.Equal(CommandLimits.MaxPreconditionsPerCommand, decoded.Preconditions.Count);
+    }
+
 }
