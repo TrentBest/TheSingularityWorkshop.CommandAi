@@ -264,4 +264,82 @@ public sealed class CommandAiAtomicCommandTests
         Assert.Equal(CommandLimits.MaxPreconditionsPerCommand, decoded.Preconditions.Count);
     }
 
+
+    [Fact]
+    public void AtomicModel_ConstructorsRejectInvalidIdentitiesAndNullItems()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandInstruction(0));
+        Assert.Throws<ArgumentException>(() => new CommandInstruction(Guid.Empty, 1,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "key",
+            new CommandOutcomeContract(1)));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandInstruction(Guid.NewGuid(), 0,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "key",
+            new CommandOutcomeContract(1)));
+        Assert.Throws<ArgumentNullException>(() => new CommandInstruction(Guid.NewGuid(), 1,
+            null!, CommandValue.FromIdentifier(2), "key", new CommandOutcomeContract(1)));
+        Assert.Throws<ArgumentNullException>(() => new CommandInstruction(Guid.NewGuid(), 1,
+            CommandValue.FromIdentifier(1), null!, "key", new CommandOutcomeContract(1)));
+        Assert.Throws<ArgumentException>(() => new CommandInstruction(Guid.NewGuid(), 1,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), " ",
+            new CommandOutcomeContract(1)));
+        Assert.Throws<ArgumentNullException>(() => new CommandInstruction(Guid.NewGuid(), 1,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "key", null!));
+        Assert.Throws<ArgumentException>(() => new CommandInstruction(1,
+            new CommandArgument[] { null! }));
+        Assert.Throws<ArgumentException>(() => new CommandInstruction(Guid.NewGuid(), 1,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "key",
+            new CommandOutcomeContract(1), preconditions: new CommandPrecondition[] { null! }));
+    }
+
+    [Fact]
+    public void AtomicBuilders_EnforceArgumentAndPreconditionLimits()
+    {
+        var builder = new CommandInstructionBuilder(1);
+        Assert.Throws<ArgumentNullException>(() => builder.WithValue(1, null!));
+        builder.WithIdentifier(1, 1);
+        Assert.Throws<ArgumentException>(() => builder.WithIdentifier(1, 2));
+
+        var enriched = new CommandInstructionBuilder(Guid.NewGuid(), 1,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "key",
+            new CommandOutcomeContract(1));
+        for (var i = 0; i < CommandLimits.MaxPreconditionsPerCommand; i++)
+            enriched.WithPrecondition("G", $"condition-{i}");
+        Assert.Throws<InvalidOperationException>(() => enriched.WithPrecondition("G", "overflow"));
+
+        var full = new CommandInstructionBuilder(2);
+        for (var i = 1; i <= CommandLimits.MaxArgumentsPerCommand; i++)
+            full.WithIdentifier((ulong)i, (ulong)i);
+        Assert.Throws<InvalidOperationException>(() => full.WithIdentifier(999, 999));
+    }
+
+    [Fact]
+    public void OutcomeModels_RejectInvalidAndDuplicateFields()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandOutcomeContract(0));
+        Assert.Throws<ArgumentException>(() => new CommandOutcomeContract(1,
+            new CommandOutcomeField[] { null! }));
+        Assert.Throws<ArgumentException>(() => new CommandOutcomeContract(1, [
+            new CommandOutcomeField(7, CommandValueKind.LiteralText),
+            new CommandOutcomeField(7, CommandValueKind.IntegerIdentifier)
+        ]));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandOutcomeField(0, CommandValueKind.LiteralText));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandOutcomeField(1, (CommandValueKind)999));
+    }
+
+    [Fact]
+    public void Preconditions_RejectBlankAndOversizedValues()
+    {
+        Assert.Throws<ArgumentException>(() => new CommandPrecondition(" ", "expression"));
+        Assert.Throws<ArgumentException>(() => new CommandPrecondition("G", " "));
+    }
+
+    [Fact]
+    public void ProposalBuilder_RejectsCommandBeyondConfiguredCapacity()
+    {
+        var builder = new CommandProposalBuilder();
+        for (var i = 1; i <= CommandLimits.MaxCommands; i++)
+            builder.AddCommand((ulong)i);
+        Assert.Throws<InvalidOperationException>(() => builder.AddCommand(999));
+    }
+
 }
