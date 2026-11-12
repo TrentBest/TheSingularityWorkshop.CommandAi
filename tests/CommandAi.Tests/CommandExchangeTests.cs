@@ -127,6 +127,22 @@ public sealed class CommandExchangeTests
     }
 
     [Fact]
+    public void Response_RejectsEquivalentDescriptorsInDifferentOrder()
+    {
+        var requestSpace = Space();
+        var responseSpace = new CommandAddressSpace(requestSpace.Addresses.Reverse());
+        var id = Guid.NewGuid();
+        var request = new CommandExchange(id, requestSpace, [
+            new CommandAddressValue(1, CommandValue.FromText("context"))
+        ]);
+        var response = new CommandResponse(id, responseSpace, [
+            new CommandAddressValue(2, CommandValue.FromIdentifier(10))
+        ]);
+
+        Assert.Throws<ArgumentException>(() => response.ValidateFor(request));
+    }
+
+    [Fact]
     public void ExchangeAndResponse_TakeImmutableSnapshots()
     {
         var space = Space();
