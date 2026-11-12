@@ -14,7 +14,7 @@ CommandAi has two representation surfaces within the same `CommandAi/1` protocol
 
 An address descriptor declares a positive local ID, name, access direction, value kind, optional description, required-input/output constraints, and optional GrammarAi definition identity plus schema version. Grammar metadata is opaque: CommandAi checks that both values are present and positive, but does not load GrammarAi, resolve definitions, or validate grammar payloads.
 
-`CommandExchange` accepts values only for readable addresses and enforces required inputs. `CommandResponse` accepts values only for writable addresses and enforces required outputs. Both reject unknown or duplicate addresses and mismatched value kinds. `ValidateFor` verifies correlation and equivalent address-space descriptor snapshots.
+`CommandExchange` accepts values only for readable addresses and enforces required inputs. `CommandResponse` accepts values only for writable addresses and enforces required outputs. Both reject unknown or duplicate addresses and mismatched value kinds. `ValidateFor` verifies correlation and exact ordered equality of the address-descriptor snapshot: descriptor order is part of the exchange contract, not merely a presentation choice. Producers must preserve the originating descriptor order when constructing a response.
 
 ## Atomic proposal contract
 
