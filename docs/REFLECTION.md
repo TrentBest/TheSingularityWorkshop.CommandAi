@@ -51,3 +51,14 @@ The follow-up commit adds focused regression coverage for null nested JSON entri
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
 <p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
+
+
+## Latest exact-head verification and repository audit (2026-11-12)
+
+- The integrated enriched atomic proposal candidate is tracked by [PR #8](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/pull/8) on `work/commandai-enriched-v1-integration`.
+- Exact candidate head `a7af66ffe72835aaa915bd3d85c01b6bfa05aa45` passed [CommandAi CI run 43160802749](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43160802749). The `build-and-test` job completed successfully, including Workshop Markdown branding, restore/build, tests with coverage, Codecov upload, coverage artifact upload, quickstart, package pack, packed-artifact audit, packed-package consumer compilation, and package artifact upload. The `publish_nuget` job was skipped.
+- The latest PR #8 review audit found no submitted reviews and no inline review threads. The PR remains unmerged; CI success is not merge or release authorization.
+- GitHub currently lists four branches: `master`, `development`, `work/commandai-enriched-v1-integration`, and `work/enriched-atomic-command-v1`. The two work branches are distinct. Keep both until their unique changes and PR dependencies have been audited; no branch is marked safe to delete.
+- The current `master` versus `development` comparison is diverged: `development` is 313 commits ahead and 4 behind. This is not a simple fast-forward release alignment. Do not reset, force-push, merge, or reconcile these refs without a separate ancestry/content audit and explicit authorization.
+- The current `development` README and domain-completeness page still describe the compact proposal surface, while PR #8 carries the enriched atomic model and the reconciled domain-completeness documentation. That difference is expected while PR #8 remains open; do not describe the enriched contract as already present on `development` or `master`.
+- Package version remains `0.1.0-alpha.2`. No package was published. No merge, master write, release, deployment, or branch deletion was performed.
