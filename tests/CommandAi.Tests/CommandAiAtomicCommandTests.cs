@@ -342,4 +342,58 @@ public sealed class CommandAiAtomicCommandTests
         Assert.Throws<InvalidOperationException>(() => builder.AddCommand(999));
     }
 
+
+    [Fact]
+    public void AtomicModel_RejectsTooManyPreconditionsAtConstruction()
+    {
+        var preconditions = Enumerable.Range(1, CommandLimits.MaxPreconditionsPerCommand + 1)
+            .Select(i => new CommandPrecondition("G", $"condition-{i}"));
+        Assert.Throws<ArgumentException>(() => new CommandInstruction(
+            Guid.NewGuid(), 1, CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2),
+            "key", new CommandOutcomeContract(1), preconditions: preconditions));
+    }
+
+    [Fact]
+    public void AtomicBuilders_RejectInvalidConstructorArguments()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandInstructionBuilder(0));
+        Assert.Throws<ArgumentException>(() => new CommandInstructionBuilder(Guid.Empty, 1,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "key",
+            new CommandOutcomeContract(1)));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandInstructionBuilder(Guid.NewGuid(), 0,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "key",
+            new CommandOutcomeContract(1)));
+    }
+
+    [Fact]
+    public void AtomicCodec_RejectsMalformedEnvelopeAndCompactArgumentOverflow()
+    {
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode("Protocol=CommandAi/1"));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode("preamble\n[CommandAi]\nProtocol=CommandAi/1\nCommand=1\n[/CommandAi]"));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode("[CommandAi]\nProtocol=CommandAi/1"));
+        var arguments = string.Join(" ", Enumerable.Range(1, CommandLimits.MaxArgumentsPerCommand + 1)
+            .Select(i => $"{i}=1"));
+        var tooManyArguments = $"[CommandAi]\nProtocol=CommandAi/1\nCommand=1 {arguments}\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(tooManyArguments));
+    }
+
+    [Fact]
+    public void AtomicCodec_RejectsNonObjectJsonAndModelInvalidAtomicCommand()
+    {
+        var prefix = "[CommandAi]\nProtocol=CommandAi/1\nAtomicCommand=";
+        var suffix = "\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + "[]" + suffix));
+
+        var valid = CommandAiTextCodec.Encode(new CommandProposal([Enriched()]));
+        var invalidIdentity = valid.Replace(
+            "11111111-2222-3333-4444-555555555555",
+            "00000000-0000-0000-0000-000000000000");
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(invalidIdentity));
+
+        var nullArgumentValue = valid.Replace(
+            "\"arguments\":[{\"parameterId\":2001,\"value\":{\"kind\":\"IntegerIdentifier\",\"identifier\":3001,\"text\":null}}",
+            "\"arguments\":[{\"parameterId\":2001,\"value\":null}");
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(nullArgumentValue));
+    }
+
 }
