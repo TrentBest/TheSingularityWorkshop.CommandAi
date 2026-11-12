@@ -3,19 +3,27 @@
 
 # CommandInstruction
 
-An immutable atomic action declaration consisting of a positive action identity and an ordered collection of typed arguments.
+An immutable command proposal with an action identity and ordered typed arguments. It can use either the original compact /1 shape or the enriched atomic-command shape.
 
-## Contract
+## Compact contract
 
-- `ActionId` is a positive unsigned integer.
-- `Arguments` preserves insertion order.
-- Parameter identities are positive and unique within the instruction.
-- Argument count and literal values are bounded by CommandLimits.
+The legacy constructor accepts a positive ActionId and optional ordered arguments. CommandId, Target, Scope, IdempotencyKey, and OutcomeContract remain absent. Preconditions is empty. HasAtomicContract is false. The model does not invent defaults for fields that were not present in a legacy proposal.
 
-The instruction does not carry command GUID, target/scope, preconditions, idempotency, or expected-outcome metadata in the approved CommandAi/1 model.
+## Enriched atomic-command contract
 
-Source: [CommandInstruction.cs](../../CommandInstruction.cs). Related: CommandArgument, CommandValue, CommandProposal.
+The enriched constructor additionally requires:
 
+- CommandId: non-empty GUID identifying this proposed command, distinct from action identity.
+- ActionId: positive application-owned action identity.
+- Target and Scope: non-null typed opaque values.
+- IdempotencyKey: non-empty bounded caller-supplied identity; it is not a replay guarantee.
+- OutcomeContract: a non-null declaration of the expected outcome shape.
+- Arguments: ordered typed values with unique positive parameter identities.
+- Preconditions: optional bounded expressions paired with grammar-version identifiers.
+
+HasAtomicContract is true only for a command created with the complete enriched constructor. A proposal may contain compact and enriched instructions together.
+
+Source: [CommandInstruction.cs](../../CommandInstruction.cs). Related: CommandArgument, CommandValue, CommandPrecondition, CommandOutcomeContract, CommandProposal.
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->

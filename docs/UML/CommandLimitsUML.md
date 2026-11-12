@@ -5,24 +5,35 @@
 
 ## Class neighborhood
 
-```mermaid
+~~~mermaid
 classDiagram
-    class CommandLimits {
-      <<static>>
-      +const resource limits
-    }
-```
+ class CommandLimits {
+  <<static>>
+  +MaxEnvelopeCharacters = 262144
+  +MaxCommands = 256
+  +MaxArgumentsPerCommand = 64
+  +MaxPreconditionsPerCommand = 32
+  +MaxOutcomeFields = 64
+  +MaxLiteralCharacters = 16384
+  +MaxGrammarVersionCharacters = 128
+  +MaxPreconditionCharacters = 16384
+  +MaxIdempotencyKeyCharacters = 256
+  +MaxTotalLiteralCharacters = 1048576
+ }
+~~~
 
 ## Use case
 
-1. Construct a definition or payload through the public API.
-2. The owning type checks collection and text limits before retaining the input.
-3. The caller receives a clear argument or invalid-operation error when a bound is exceeded.
+1. Construct a compact or enriched command through the public API.
+2. The owning type checks collection and text limits before retaining input.
+3. The codec checks the serialized envelope and enriched JSON nesting depth.
+4. The caller receives an argument or format error when a bound is exceeded.
 
 ## Boundary
 
-The limits bound representation size. They do not validate application meaning, provider behavior, permissions, or downstream execution.
+The limits bound representation size. They do not validate application meaning, evaluate preconditions, enforce idempotency, grant permissions, or authorize downstream execution. The aggregate in-memory literal bound is independent of the smaller encoded-envelope bound.
 
+Source: [CommandLimits.cs](../../CommandLimits.cs).
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->

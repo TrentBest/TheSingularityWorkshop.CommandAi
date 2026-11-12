@@ -3,20 +3,21 @@
 
 # CommandInstructionBuilder
 
-Fluent construction API for one immutable `CommandInstruction`.
+Fluent construction API for one immutable compact or enriched CommandInstruction.
 
-## Contract
+## Compact mode
 
-- The builder is initialized with a positive action identity.
-- `WithIdentifier(parameterId, valueId)` adds a positive integer identifier value.
-- `WithText(parameterId, value)` adds bounded literal text.
-- `WithValue(parameterId, value)` adds a typed CommandValue.
-- `Build()` validates and snapshots the ordered arguments.
+The legacy constructor accepts a positive action identity. WithIdentifier, WithText, and WithValue append ordered typed arguments. Build returns a compact instruction without inventing enriched metadata.
 
-The builder does not accept command GUID, target/scope, preconditions, idempotency, or expected-outcome metadata in CommandAi/1.
+## Enriched mode
 
-Source: [CommandInstructionBuilder.cs](../../CommandInstructionBuilder.cs). Related: CommandInstruction, CommandArgument, CommandValue.
+The enriched constructor requires command GUID, positive action identity, target, scope, idempotency identity, and expected-outcome contract. It supports the same typed argument methods plus WithPrecondition(grammarVersion, expression).
 
+WithPrecondition is available only in enriched mode. The builder validates bounds and duplicate parameter identities; it does not resolve meanings, parse or evaluate grammar, authorize, or execute.
+
+The builder is mutable, not thread-safe, and Build creates an immutable snapshot.
+
+Source: [CommandInstructionBuilder.cs](../../CommandInstructionBuilder.cs). Related: CommandInstruction, CommandPrecondition, CommandOutcomeContract.
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
