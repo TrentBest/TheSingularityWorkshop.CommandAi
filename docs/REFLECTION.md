@@ -7,9 +7,9 @@
 
 - Pull request: [#8 — enriched atomic CommandAi/1 integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/pull/8)
 - Candidate branch: `work/commandai-enriched-v1-integration`
-- Current PR head: `0b8f29cf4b36a4bb525c98218f1de79d86b43e1f`
+- Current PR head: `eb0d6533149c5690518fdded97881d062da6f7b5`
 - The preceding documented exact-head CI run [43163337018](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43163337018) passed on `a10722ae3013f2fa0526c4d275f77dd0bf9a13b8`: `build-and-test` succeeded and `publish_nuget` was skipped.
-- Subsequent commits add the ordered-address-space response contract documentation and regression test, followed by focused atomic-model, builder, and codec guard tests (`d159b521` and `0b8f29c`). The latest exact-head workflow lookup returned no PR workflow run for `0b8f29cf4b36a4bb525c98218f1de79d86b43e1f`; therefore this head is **not yet CI-verified**.
+- Subsequent commits add the ordered-address-space response contract documentation and regression test, followed by focused atomic-model, builder, and codec guard tests (`d159b521` and `0b8f29c`). The latest exact-head workflow lookup returned no PR workflow run for test head `0b8f29cf4b36a4bb525c98218f1de79d86b43e1f`. This documentation refresh advances the branch to `eb0d6533149c5690518fdded97881d062da6f7b5`; neither the test head nor this latest documentation head is yet CI-verified.
 - The latest Codecov comment reports **81.23077% patch coverage** with 61 changed lines missing coverage, but it predates the latest test commits. Treat it as historical only; refresh coverage against the current head before drawing conclusions.
 
 Every exact-head verification claim applies only to the SHA named beside its run. A later source or documentation commit requires its own evidence.
