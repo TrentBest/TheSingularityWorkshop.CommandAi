@@ -12,6 +12,7 @@ public sealed class CommandInstructionBuilder
     private readonly CommandOutcomeContract? _outcomeContract;
     private readonly List<CommandArgument> _arguments = [];
     private readonly List<CommandPrecondition> _preconditions = [];
+    private CommandGrammarBody? _grammarBody;
 
     /// <summary>Creates a compact CommandAi/1 instruction builder.</summary>
     public CommandInstructionBuilder(ulong actionId)
@@ -73,6 +74,15 @@ public sealed class CommandInstructionBuilder
         return this;
     }
 
+    /// <summary>Attaches an opaque, bounded GrammarAi wire body to an enriched command.</summary>
+    public CommandInstructionBuilder WithGrammarBody(CommandGrammarBody body)
+    {
+        if (!_commandId.HasValue)
+            throw new InvalidOperationException("Grammar bodies require the enriched atomic-command contract.");
+        _grammarBody = body ?? throw new ArgumentNullException(nameof(body));
+        return this;
+    }
+
     /// <summary>Creates an immutable compact or enriched command snapshot.</summary>
     public CommandInstruction Build() => _commandId is Guid commandId
         ? new CommandInstruction(
@@ -83,6 +93,7 @@ public sealed class CommandInstructionBuilder
             _idempotencyKey!,
             _outcomeContract!,
             _arguments,
-            _preconditions)
+            _preconditions,
+            _grammarBody)
         : new CommandInstruction(_actionId, _arguments);
 }
