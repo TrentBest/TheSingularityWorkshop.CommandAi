@@ -30,6 +30,8 @@ The enriched atomic-command form uses an explicit AtomicCommand= JSON entry unde
 
 A new decoder accepts compact and enriched entries, including mixed proposals. Older compact-only readers reject the unknown AtomicCommand= entry; they must be upgraded before consuming enriched commands. Retaining the /1 identifier does not imply that old readers understand new entry types.
 
+Enriched atomic commands may include an optional `body` object containing a positive `grammarWireVersion` and canonical Base64 payload. The Base64 value transports exact opaque GrammarAi wire bytes; it is not a second grammar representation. CommandAi enforces a non-empty payload, 32 KiB decoded bytes per command, and 128 KiB decoded bytes per proposal, but deliberately does not reject unknown positive GrammarAi wire versions or inspect the payload. The trusted consumer resolves the action to its exact GrammarAi definition/schema version and delegates structural validation to GrammarAi. Older enriched readers that do not recognize this optional member may reject body-bearing records and must be upgraded before consuming them.
+
 ## Ownership
 
 CommandAi validates bounded representation only. GrammarAi owns precondition grammar structure; the host evaluates conditions against current state. ProtocolAi owns correlated message/event outcomes. The host owns authorization, approval, replay/delivery, and execution. Neither a parsed command nor a declared idempotency key grants authority or guarantees execution semantics.
