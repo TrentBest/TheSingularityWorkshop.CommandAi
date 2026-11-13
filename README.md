@@ -42,6 +42,7 @@ The quickstart demonstrates the compact proposal API. The exchange and response 
 - [Domain completeness and ownership](docs/DOMAIN_COMPLETENESS.md)
 - [Theory and wire contract](docs/THEORY.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [SingularityBot integration concept](docs/SINGULARITYBOT_INTEGRATION.md)
 - [Usage guide](docs/USAGE.md)
 - [Builder integration](docs/BUILDER_INTEGRATION.md)
 - [Type guides](docs/types/)
