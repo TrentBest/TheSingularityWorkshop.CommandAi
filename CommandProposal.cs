@@ -32,6 +32,10 @@ public sealed record CommandProposal
         if (totalLiteralCharacters > CommandLimits.MaxTotalLiteralCharacters)
             throw new ArgumentException($"A proposal cannot contain more than {CommandLimits.MaxTotalLiteralCharacters} aggregate literal characters.", nameof(commands));
 
+        var totalGrammarBodyBytes = items.Sum(command => (long)(command.GrammarBody?.Payload.Length ?? 0));
+        if (totalGrammarBodyBytes > CommandLimits.MaxGrammarBodyBytesPerProposal)
+            throw new ArgumentException($"A proposal cannot contain more than {CommandLimits.MaxGrammarBodyBytesPerProposal} aggregate GrammarAi body bytes.", nameof(commands));
+
         var enriched = items.Where(command => command.HasAtomicContract).ToArray();
         if (enriched.Select(command => command.CommandId).Distinct().Count() != enriched.Length)
             throw new ArgumentException("A proposal cannot repeat an enriched command identity.", nameof(commands));
