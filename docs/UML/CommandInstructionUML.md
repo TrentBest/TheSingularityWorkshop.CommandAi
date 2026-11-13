@@ -13,6 +13,7 @@ classDiagram
     +string? IdempotencyKey
     +IReadOnlyList~CommandArgument~ Arguments
     +IReadOnlyList~CommandPrecondition~ Preconditions
+    +CommandGrammarBody? GrammarBody
     +CommandOutcomeContract? OutcomeContract
     +bool HasAtomicContract
   }
@@ -29,12 +30,18 @@ classDiagram
     +string GrammarVersion
     +string Expression
   }
+  class CommandGrammarBody {
+    +int GrammarWireVersion
+    +ReadOnlyMemory~byte~ Payload
+    +string PayloadBase64
+  }
   class CommandOutcomeContract {
     +ulong OutcomeId
     +IReadOnlyList~CommandOutcomeField~ Fields
   }
   CommandInstruction --> CommandArgument : ordered parameters
   CommandInstruction --> CommandPrecondition : opaque conditions
+  CommandInstruction --> CommandGrammarBody : opaque grammar bytes
   CommandInstruction --> CommandOutcomeContract : expected shape
   CommandArgument --> CommandValue : typed value
 ~~~
@@ -42,7 +49,7 @@ classDiagram
 ## Source-supported relationships
 
 - Target source: [CommandInstruction.cs](../../CommandInstruction.cs).
-- Related source: CommandArgument.cs, CommandValue.cs, CommandPrecondition.cs, CommandOutcomeContract.cs, CommandProposal.cs.
+- Related source: CommandArgument.cs, CommandValue.cs, CommandPrecondition.cs, CommandGrammarBody.cs, CommandOutcomeContract.cs, CommandProposal.cs.
 - Codec: CommandAiTextCodec.cs encodes compact and enriched CommandAi/1 entries.
 - Invariant: action and parameter identities are positive; parameter identities are unique within a command. Enriched metadata is all-or-nothing; compact instructions retain absent metadata and HasAtomicContract is false.
 
