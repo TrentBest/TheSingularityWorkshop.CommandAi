@@ -49,7 +49,7 @@ This is an ownership map, not a claim that every package is wired into one turnk
 
 The original compact Command= entry remains supported with byte-for-byte stable encoding. The enriched atomic-command form adds an explicit AtomicCommand= JSON entry under the same CommandAi/1 protocol identifier. New readers accept compact, enriched, and mixed proposals.
 
-The enriched form carries command identity distinct from action identity, typed target and scope, bounded idempotency identity, expected-outcome shape, ordered typed arguments, and optional grammar-versioned preconditions. Compact entries retain enriched metadata as absent; no defaults are inferred.
+The enriched form carries command identity distinct from action identity, typed target and scope, bounded idempotency identity, expected-outcome shape, ordered typed arguments, and optional grammar-versioned preconditions. A precondition pins the exact grammar definition identity and schema version using `DefinitionId@SchemaVersion`; the observer schema is `TheSingularityWorkshop.GrammarAi.Observer@1`. Consumers must resolve that exact pair without aliases or fallback. Compact entries retain enriched metadata as absent; no defaults are inferred.
 
 **Compatibility is directional:** older compact-only readers reject the new AtomicCommand= entry and must be upgraded before consuming enriched proposals. The unchanged /1 label does not make old readers forward-compatible.
 
