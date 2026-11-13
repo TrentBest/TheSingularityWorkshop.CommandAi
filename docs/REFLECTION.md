@@ -7,10 +7,12 @@
 
 - Pull request: [#8 — enriched atomic CommandAi/1 integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/pull/8)
 - Candidate branch: `work/commandai-enriched-v1-integration`
-- Current PR head: `eb0d6533149c5690518fdded97881d062da6f7b5`
-- The preceding documented exact-head CI run [43163337018](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43163337018) passed on `a10722ae3013f2fa0526c4d275f77dd0bf9a13b8`: `build-and-test` succeeded and `publish_nuget` was skipped.
-- Subsequent commits add the ordered-address-space response contract documentation and regression test, followed by focused atomic-model, builder, and codec guard tests (`d159b521` and `0b8f29c`). The latest exact-head workflow lookup returned no PR workflow run for test head `0b8f29cf4b36a4bb525c98218f1de79d86b43e1f`. This documentation refresh advances the branch to `eb0d6533149c5690518fdded97881d062da6f7b5`; neither the test head nor this latest documentation head is yet CI-verified.
-- The latest Codecov comment reports **81.23077% patch coverage** with 61 changed lines missing coverage, but it predates the latest test commits. Treat it as historical only; refresh coverage against the current head before drawing conclusions.
+- Current PR head: `5fbf4bf7303966b6413fc2ba70d7d5aaf74c14f5`
+- Exact-head CI: [CommandAi CI run 43508426972](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43508426972) ran on this exact SHA and completed successfully. The `build-and-test` job succeeded; `publish_nuget` was skipped.
+- The successful run covered branding verification, restore, build, tests with coverage, Codecov upload, coverage artifact upload, quickstart validation, package packing, audit/compile of the quickstart against the packed package, and package artifact upload. This is validation evidence only; no package was published.
+- The run's Cobertura artifact reports **96.77% overall line coverage (751/776)** and **85.30% branch coverage (418/490)**. These are repository-wide totals, not patch coverage. The artifact also reports 100% line coverage for `CommandGrammarBody.cs` and `CommandInstructionBuilder.cs`, 98.20% for `CommandAiTextCodec.cs`, 91.11% for `CommandExchange.cs`, 90.80% for `CommandExchangeTextCodec.cs`, and 96.97% for `CommandProposal.cs`.
+- The exact-head workflow evidence supersedes earlier notes that the later atomic guard tests had no verification. The run is tied to the SHA above; any subsequent source or documentation commit requires its own exact-head verification.
+- PR #8 remains open and draft, targeting `development`. At the latest branch comparison, it is 42 commits ahead and 5 behind `development`; synchronize deliberately and rerun exact-head CI after any update.
 
 Every exact-head verification claim applies only to the SHA named beside its run. A later source or documentation commit requires its own evidence.
 
@@ -36,15 +38,19 @@ A representative sample measured 45 characters for a compact command and 740 cha
 
 ## Focused verification
 
-The suite covers compact byte-for-byte compatibility, mixed compact/enriched ordering, unknown/duplicate JSON properties, required fields, the required outcome-field flag, typed targets/scopes, identity uniqueness, and bounded collections. Follow-up tests cover null nested JSON entries, invalid typed-value combinations, exact collection boundaries, and rejection of reordered response descriptors. The latest test-only commits add constructor/builder guard cases, duplicate and capacity checks, malformed-envelope handling, compact argument overflow, non-object JSON, and invalid atomic model cases; these additions still require exact-head CI and refreshed coverage.
+The suite covers compact byte-for-byte compatibility, mixed compact/enriched ordering, unknown/duplicate JSON properties, required fields, the required outcome-field flag, typed targets/scopes, identity uniqueness, and bounded collections. Follow-up tests cover null nested JSON entries, invalid typed-value combinations, exact collection boundaries, and rejection of reordered response descriptors. The latest focused guard tests cover constructor/builder preconditions, duplicate and capacity checks, malformed-envelope handling, compact argument overflow, non-object JSON, and invalid atomic model cases. These tests are included in the exact-head CI run cited above.
 
 The exchange contract is structural only. Address IDs are identifiers, not pointers or memory capabilities. A well-formed response remains untrusted intent.
 
+## Reconciliation and downstream integration gates
+
+- PR #6 remains open and unmerged on `work/enriched-atomic-command-v1`. Its history is divergent from PR #8; do not merge it wholesale. A content-level documentation audit is in progress. Sampled architecture, README, UML/type guidance, and agent instructions have been compared, but the full document-by-document audit is not yet complete. PR #6 is not declared safe to delete.
+- GrammarAi [issue #14](https://github.com/TrentBest/TheSingularityWorkshop.GrammarAi/issues/14) has its grammar-owned acceptance criteria complete, but its real consumer/host-adapter proof remains unchecked. The required proof must use the exact pinned GrammarAi revision and real ProtocolAi/CommandAi/host adapters, and distinguish True, False, Unknown, Incomplete, failed events, and mismatched scope. CommandAi's own opaque-preservation tests do not satisfy this downstream proof.
+- PR #8 and PR #6 histories are substantially divergent. Reconcile unique content and plan synchronization with `development` explicitly; do not use a blind merge/rebase as a substitute for the audit.
+
 ## Repository and release safety
 
-- PR #8 remains open and draft, unmerged.
-- PR #6 remains open and unmerged on `work/enriched-atomic-command-v1`; it has not been marked safe to delete. Its distinct history and any unique remaining documentation must be reconciled before branch cleanup.
-- The long-term branch target remains exactly `master` and `development`; no work branch is ready to delete based on this audit.
+- The long-term branch target remains exactly `master` and `development`. The current repository has those two canonical branches plus the two active PR work branches; neither work branch is ready to delete based on this audit.
 - Package version remains `0.1.0-alpha.2`.
 - NuGet publication is not authorized. No package was published.
 - No merge, write to `master`, release, deployment, or branch deletion is authorized or performed by this work.
