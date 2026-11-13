@@ -58,6 +58,8 @@ var proposal = new CommandProposalBuilder()
 
 The codec writes enriched commands as `AtomicCommand=` JSON entries under the same `CommandAi/1` envelope. New readers accept compact, enriched, and mixed proposals in order. Older compact-only readers reject enriched entries and must be upgraded before consuming them.
 
+An enriched atomic command may also carry an optional opaque GrammarAi body. Attach it with `CommandInstructionBuilder.WithGrammarBody(new CommandGrammarBody(grammarWireVersion, payloadBytes))`. The wire member is `body: { grammarWireVersion, payloadBase64 }`; Base64 preserves the exact GrammarAi wire bytes and is only a JSON transport encoding. CommandAi requires a positive version, canonical Base64, a non-empty payload, at most 32 KiB decoded bytes per command, and at most 128 KiB decoded bytes across a proposal. It deliberately accepts unknown positive GrammarAi wire versions and does not decode or validate the body. The trusted consumer maps the action to the exact GrammarAi definition/schema version and delegates structural validation to GrammarAi. Hosts still own live-state checks, capability, policy, authorization, and execution. Older enriched readers that do not recognize `body` may reject body-bearing records; upgrade readers before sending them.
+
 ## Model and ownership
 
 - `CommandProposal` is a non-empty ordered collection; it is not a transaction.
