@@ -389,7 +389,6 @@ CommandAi contributes one deliberately narrow but valuable piece: a common way t
 - [Domain completeness and ownership](DOMAIN_COMPLETENESS.md)
 - [Workshop AI package series](AI_SERIES.md)
 - [SingularityBot repository](https://github.com/TrentBest/TheSingularityWorkshop.SingularityBot)
-- [ExampleBot reference](https://github.com/TrentBest/ExampleBot)
 
 ---
 
