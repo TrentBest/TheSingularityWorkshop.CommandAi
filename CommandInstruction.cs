@@ -31,7 +31,8 @@ public sealed record CommandInstruction
         string idempotencyKey,
         CommandOutcomeContract outcomeContract,
         IEnumerable<CommandArgument>? arguments = null,
-        IEnumerable<CommandPrecondition>? preconditions = null)
+        IEnumerable<CommandPrecondition>? preconditions = null,
+        CommandGrammarBody? grammarBody = null)
     {
         if (commandId == Guid.Empty)
             throw new ArgumentException("A command identity is required.", nameof(commandId));
@@ -50,6 +51,7 @@ public sealed record CommandInstruction
         OutcomeContract = outcomeContract ?? throw new ArgumentNullException(nameof(outcomeContract));
         Arguments = SnapshotArguments(arguments);
         Preconditions = SnapshotPreconditions(preconditions);
+        GrammarBody = grammarBody;
     }
 
     /// <summary>Whether this instruction carries the complete generic atomic-command contract.</summary>
@@ -75,6 +77,9 @@ public sealed record CommandInstruction
 
     /// <summary>Opaque grammar-versioned conditions; evaluation belongs to GrammarAi and the host.</summary>
     public IReadOnlyList<CommandPrecondition> Preconditions { get; }
+
+    /// <summary>Opaque GrammarAi wire payload; structure is not interpreted by CommandAi.</summary>
+    public CommandGrammarBody? GrammarBody { get; }
 
     /// <summary>Expected outcome shape, not an actual execution outcome.</summary>
     public CommandOutcomeContract? OutcomeContract { get; }
