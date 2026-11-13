@@ -433,4 +433,53 @@ public sealed class CommandAiAtomicCommandTests
         Assert.Throws<ArgumentException>(() => new CommandProposal(commands));
     }
 
+
+    [Fact]
+    public void GrammarBodyBuilder_RequiresEnrichedCommandAndNonNullBody()
+    {
+        var body = new CommandGrammarBody(1, new byte[] { 1, 2, 3 });
+        Assert.Throws<InvalidOperationException>(() =>
+            new CommandInstructionBuilder(100).WithGrammarBody(body));
+
+        var builder = new CommandInstructionBuilder(
+            Guid.NewGuid(), 100, CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2),
+            "grammar-body-builder", new CommandOutcomeContract(1));
+        Assert.Throws<ArgumentNullException>(() => builder.WithGrammarBody(null!));
+
+        var command = builder.WithGrammarBody(body).Build();
+        Assert.Same(body, command.GrammarBody);
+    }
+
+    [Fact]
+    public void GrammarBodyDecoder_RejectsEmptyMalformedAndInvalidVersionFields()
+    {
+        const string prefix = "[CommandAi]\\nProtocol=CommandAi/1\\nAtomicCommand=";
+        const string suffix = "\\n[/CommandAi]";
+        const string json = """{"commandId":"11111111-2222-3333-4444-555555555555","actionId":7,"target":{"kind":"LiteralText","identifier":null,"text":"repo"},"scope":{"kind":"LiteralText","identifier":null,"text":"branch"},"idempotencyKey":"key","outcomeContract":{"outcomeId":1,"fields":[]},"arguments":[],"preconditions":[],"body":{"grammarWireVersion":1,"payloadBase64":"AQ=="}}""";
+
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + json.Replace("\\"payloadBase64\\":\\"AQ==\\"", "\\"payloadBase64\\":\\"\\"") + suffix));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + json.Replace("AQ==", "!") + suffix));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + json.Replace("\\"grammarWireVersion\\":1", "\\"grammarWireVersion\\":0") + suffix));
+    }
+
+    [Fact]
+    public void AtomicCodec_RejectsNestedEnvelopeAndExcessiveEntryCount()
+    {
+        var nested = "[CommandAi]\\n[CommandAi]\\nProtocol=CommandAi/1\\nCommand=1\\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(nested));
+
+        var excessive = string.Join("\\n",
+            new[] { "[CommandAi]", "Protocol=CommandAi/1" }
+                .Concat(Enumerable.Repeat("Unexpected=entry", CommandLimits.MaxCommands + 1))
+                .Append("[/CommandAi]"));
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(excessive));
+    }
+
+    [Fact]
+    public void AtomicCodec_RejectsNullTypedArgumentValue()
+    {
+        const string json = """{"commandId":"11111111-2222-3333-4444-555555555555","actionId":7,"target":{"kind":"LiteralText","identifier":null,"text":"repo"},"scope":{"kind":"LiteralText","identifier":null,"text":"branch"},"idempotencyKey":"key","outcomeContract":{"outcomeId":1,"fields":[]},"arguments":[{"parameterId":1,"value":null}],"preconditions":[]}""";
+        var input = "[CommandAi]\\nProtocol=CommandAi/1\\nAtomicCommand=" + json + "\\n[/CommandAi]";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(input));
+    }
 }
