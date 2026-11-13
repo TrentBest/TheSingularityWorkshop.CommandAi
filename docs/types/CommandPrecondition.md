@@ -3,13 +3,13 @@
 
 # CommandPrecondition
 
-An immutable, bounded opaque precondition expression paired with the grammar-version identifier needed to interpret it.
+An immutable, bounded opaque precondition expression paired with the exact grammar definition identity and schema version needed to interpret it.
 
 ## Contract
 
-- GrammarVersion is required and bounded to 128 UTF-16 characters.
+- GrammarVersion is required and bounded to 128 UTF-16 characters. Consumers should use the exact `DefinitionId@SchemaVersion` form (for the observer contract: `TheSingularityWorkshop.GrammarAi.Observer@1`).
 - Expression is required and bounded to 16,384 UTF-16 characters.
-- CommandAi preserves both values but does not parse, validate, or evaluate the expression.
+- CommandAi preserves both values but does not parse, validate, or evaluate the expression. Consumers must resolve the exact identity/version; aliases and silent schema substitution are not allowed.
 - GrammarAi owns the grammar and structural validation.
 - The host evaluates a validated condition against trusted current state.
 
