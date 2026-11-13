@@ -31,6 +31,12 @@ public static class CommandLimits
     /// <summary>Maximum opaque precondition expression length.</summary>
     public const int MaxPreconditionCharacters = 16_384;
 
+    /// <summary>Maximum decoded GrammarAi body bytes on one command.</summary>
+    public const int MaxGrammarBodyBytesPerCommand = 32 * 1024;
+
+    /// <summary>Maximum aggregate decoded GrammarAi body bytes in one proposal.</summary>
+    public const int MaxGrammarBodyBytesPerProposal = 128 * 1024;
+
     /// <summary>Maximum idempotency identity length.</summary>
     public const int MaxIdempotencyKeyCharacters = 256;
 }
