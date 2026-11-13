@@ -364,7 +364,7 @@ public static class CommandAiTextCodec
         OutcomeWire OutcomeContract,
         IReadOnlyList<ArgumentWire> Arguments,
         IReadOnlyList<PreconditionWire> Preconditions,
-        GrammarBodyWire? Body = null);
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] GrammarBodyWire? Body = null);
 
     private sealed record ValueWire(string Kind, ulong? Identifier, string? Text);
     private sealed record ArgumentWire(ulong ParameterId, ValueWire Value);
