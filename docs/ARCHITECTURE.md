@@ -18,9 +18,9 @@ An address descriptor declares a positive local ID, name, access direction, valu
 
 ## Atomic proposal contract
 
-An enriched `CommandInstruction` requires a non-empty command GUID, positive action ID, typed opaque target and scope, bounded idempotency key, and expected-outcome contract. It may include bounded preconditions carrying a GrammarAi grammar version and opaque expression, plus ordered typed arguments. Compact legacy instructions retain absent enriched metadata; no defaults are inferred.
+An enriched `CommandInstruction` requires a non-empty command GUID, positive action ID, typed opaque target and scope, bounded idempotency key, and expected-outcome contract. It may include bounded preconditions carrying an exact grammar definition identity/schema-version token (conventionally `DefinitionId@SchemaVersion`) and opaque expression, plus ordered typed arguments. Compact legacy instructions retain absent enriched metadata; no defaults are inferred.
 
-CommandAi validates representation and resource bounds only. GrammarAi owns precondition grammar; the host evaluates conditions against live state, enforces replay/deduplication using the supplied idempotency identity, resolves target/scope meaning, and owns authorization and execution. An expected-outcome contract declares shape only; it is not an actual result, success signal, CI verdict, or proof. Proposal order does not define dependencies, transactionality, or workflow semantics.
+CommandAi validates representation and resource bounds only. GrammarAi owns precondition grammar; consumers pin the exact definition identity/schema version (the observer contract is `TheSingularityWorkshop.GrammarAi.Observer@1`) without alias or fallback; the host evaluates conditions against live state, enforces replay/deduplication using the supplied idempotency identity, resolves target/scope meaning, and owns authorization and execution. An expected-outcome contract declares shape only; it is not an actual result, success signal, CI verdict, or proof. Proposal order does not define dependencies, transactionality, or workflow semantics.
 
 ## Responsibility boundaries
 
