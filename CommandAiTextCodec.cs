@@ -43,7 +43,9 @@ public static class CommandAiTextCodec
                     command.Arguments.Select(argument =>
                         new ArgumentWire(argument.ParameterId, ToWire(argument.Value))).ToArray(),
                     command.Preconditions.Select(precondition =>
-                        new PreconditionWire(precondition.GrammarVersion, precondition.Expression)).ToArray());
+                        new PreconditionWire(precondition.GrammarVersion, precondition.Expression)).ToArray(),
+                    command.GrammarBody is null ? null : new GrammarBodyWire(
+                        command.GrammarBody.GrammarWireVersion, command.GrammarBody.PayloadBase64));
 
                 lines.Add("AtomicCommand=" + JsonSerializer.Serialize(wire, JsonOptions));
                 continue;
@@ -251,6 +253,10 @@ public static class CommandAiTextCodec
                 return new CommandPrecondition(precondition.GrammarVersion, precondition.Expression);
             }).ToArray();
 
+            var grammarBody = wire.Body is null
+                ? null
+                : CommandGrammarBody.FromBase64(wire.Body.GrammarWireVersion, wire.Body.PayloadBase64);
+
             return new CommandInstruction(
                 wire.CommandId,
                 wire.ActionId,
@@ -259,7 +265,8 @@ public static class CommandAiTextCodec
                 wire.IdempotencyKey,
                 new CommandOutcomeContract(wire.OutcomeContract.OutcomeId, fields),
                 arguments,
-                preconditions);
+                preconditions,
+                grammarBody);
         }
         catch (ArgumentException ex)
         {
@@ -356,11 +363,13 @@ public static class CommandAiTextCodec
         string IdempotencyKey,
         OutcomeWire OutcomeContract,
         IReadOnlyList<ArgumentWire> Arguments,
-        IReadOnlyList<PreconditionWire> Preconditions);
+        IReadOnlyList<PreconditionWire> Preconditions,
+        GrammarBodyWire? Body = null);
 
     private sealed record ValueWire(string Kind, ulong? Identifier, string? Text);
     private sealed record ArgumentWire(ulong ParameterId, ValueWire Value);
     private sealed record PreconditionWire(string GrammarVersion, string Expression);
+    private sealed record GrammarBodyWire(int GrammarWireVersion, string PayloadBase64);
     private sealed record OutcomeWire(ulong OutcomeId, IReadOnlyList<OutcomeFieldWire> Fields);
     private sealed record OutcomeFieldWire(ulong FieldId, string ValueKind, bool? Required);
 }
