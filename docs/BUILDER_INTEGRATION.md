@@ -43,11 +43,11 @@ var enriched = new CommandProposalBuilder()
         ]),
         command => command
             .WithIdentifier(200, 42)
-            .WithPrecondition("GrammarAi/Observer/1", "candidate.sha == expected.sha"))
+            .WithPrecondition("TheSingularityWorkshop.GrammarAi.Observer@1", "candidate.sha == expected.sha"))
     .Build();
 ~~~
 
-The generic model treats these values as opaque. The application owns the action vocabulary and meanings of target, scope, parameter, and outcome identities. GrammarAi owns precondition grammar and structural validation. The host evaluates preconditions against current trusted state.
+The generic model treats these values as opaque. The application owns the action vocabulary and meanings of target, scope, parameter, and outcome identities. Precondition grammar tokens pin a fully qualified GrammarAi definition identity and schema version using `DefinitionId@SchemaVersion`; for the observer contract use `TheSingularityWorkshop.GrammarAi.Observer@1`. The consumer resolves that exact pair without aliases or fallback. GrammarAi owns structural validation. The host evaluates preconditions against current trusted state.
 
 ## Extension boundary
 
