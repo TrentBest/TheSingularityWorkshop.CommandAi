@@ -13,6 +13,8 @@
 
 CommandAi should not become a StarCraft bot. It should be a stable boundary between a decision-maker and the system allowed to cause effects.
 
+There is an important distinction in this integration: **the most natural first role for CommandAi is to represent high-level orders or goal requests that are resolved into SingularityBot's existing goal/FSM model.** It should not automatically sit in the innermost per-frame unit-control loop. The bot already collects intents, arbitrates them, validates them against current observations and game data, and translates accepted intents into SC2 actions. That deterministic pipeline remains authoritative.
+
 SingularityBot should remain free to evolve its strategies, state machines, unit behaviors, and learning systems without making the generic command contract understand Terran build orders, Protoss abilities, Zerg inject cycles, or StarCraft's action API. CommandAi should not need to know what a Marine is.
 
 That separation makes the same platform useful for a single experimental bot, a tournament ladder, a multi-team match, or a community of independently developed bots.
@@ -23,9 +25,10 @@ That separation makes the same platform useful for a single experimental bot, a 
 |---|---|---|
 | ExampleBot / SC2 adapter | Connect to StarCraft II, join games, collect observations, submit game actions, handle API details | Owning all strategy and tournament policy |
 | FSM_API | Provide the state-machine heartbeat and lifecycle foundation | Knowing StarCraft-specific strategy |
-| SingularityBot / FSM_Bot | Own match strategy, economy, army behavior, unit-level decisions, and adaptation | Bypassing host authorization |
-| CommandAi | Represent bounded, ordered, typed action proposals | Interpreting StarCraft semantics or executing actions |
-| Trusted bot host / FSM_Foundry integration | Resolve proposal identities, inspect live state, enforce policy, authorize, schedule, dispatch, and record execution | Secretly changing the bot's strategy |
+| SingularityBot / FSM_Bot | Own match strategy, goal resolution, economy, army behavior, unit-level decisions, and adaptation | Bypassing the validated action pipeline |
+| CommandAi | Represent bounded, ordered, typed high-level orders or goal proposals | Owning StarCraft semantics, tactical FSM execution, or SC2 actions |
+| Current SingularityBot action pipeline | Collect and arbitrate FSM intents, validate against current observations/game data, translate and submit SC2 actions | Accepting unvalidated or stale intent |
+| FSM_Foundry (planned integration) | Become the shared composed-workload executor when integrated | Being described as already wired into the current bot |
 | GrammarAi (where adopted) | Define and validate grammar-governed structures | Granting permission to act in the live game |
 | Match supervisor / observer host | Provision and supervise independent player instances, enforce match rules, collect evidence and results | Sharing one player's authority with another |
 | CiAi | Build, test, and evaluate integration evidence | Treating a successful build as proof of safe live execution |
@@ -51,13 +54,16 @@ Some components may initially run in one process. A tournament deployment may is
        SingularityBot            SingularityBot
        strategic FSMs             strategic FSMs
              |                       |
-       behavior intent            behavior intent
+       high-level order           high-level order
              |                       |
         CommandAi proposal         CommandAi proposal
              |                       |
-       trusted host boundary     trusted host boundary
-       resolve + validate        resolve + validate
-       authorize + schedule      authorize + schedule
+       bot goal resolver          bot goal resolver
+             |                       |
+       strategic/FSM goals        strategic/FSM goals
+             |                       |
+       FSM intent pipeline        FSM intent pipeline
+       arbitrate + validate       arbitrate + validate
              |                       |
        SC2 action adapter         SC2 action adapter
              |                       |
@@ -72,7 +78,7 @@ Some components may initially run in one process. A tournament deployment may is
                   next FSM tick
 ~~~
 
-The supervisor coordinates the match, but each participant has its own runtime, command channel, and authority boundary.
+The supervisor coordinates the match, but each participant has its own runtime, command channel, and authority boundary. The CommandAi lane shown here is an optional high-level order ingress; the bot's ordinary internal FSM decisions can continue without it.
 
 ### 3.1 Startup and identity
 
@@ -110,13 +116,17 @@ SingularityBot consumes observations through its FSM_API-driven state hierarchy.
 
 This is an example, not a mandated tree. Other developers should be able to use different state machines, behavior trees, planners, search algorithms, learned policies, or hybrids.
 
-The decision layer produces intent. For example: "Move this Marine group toward the rally point, but do not cross the threat boundary; if an enemy enters weapon range, attack while preserving spacing."
+The decision layer produces goals and tactical intent. For example: "Defend the natural expansion while the economy completes the next production milestone" or "Move this Marine group toward the rally point, but do not cross the threat boundary."
 
-The integration layer decomposes that intent into atomic, host-resolvable actions. CommandAi does not need to understand the strategic sentence.
+The first CommandAi integration should express a high-level order or bounded goal request. SingularityBot resolves that request into its own strategy descriptors, advisor goals, Task Master assignments, and FSM contexts. The existing FSMs then emit tactical intents for the current observation cycle. Those intents pass through SingularityBot's existing arbitration and validation pipeline before SC2 translation. CommandAi does not need to understand the strategic sentence, and it should not replace the bot's deterministic tactical controllers.
 
 ### 3.4 Proposal through CommandAi
 
 The current CommandAi/1 proposal model is generic: an immutable ordered collection of commands, each with an opaque positive action ID and typed arguments. Integer identifiers and literal text are values; their meanings come from the consuming application's trusted vocabulary.
+
+For SingularityBot, the preferred initial vocabulary should describe orders and goal-level requests rather than raw SC2 ability calls. Examples might include a strategic posture request, an expansion objective, a scouting assignment, a force-assembly goal, or a production/composition objective. The bot's trusted resolver maps those requests into its own strategy and goal model. The resulting FSM execution still flows through the current intent arbitration, live-state validation, and SC2 action translation path.
+
+This preserves a useful separation: CommandAi can provide a common external order interface for different bot implementations, while SingularityBot retains its internal strategy and tactical behavior. A future consumer may also use CommandAi for lower-level atomic actions, but that is a separate adapter contract and should not bypass the same validation boundary.
 
 A bot-specific adapter could map intents into actions such as:
 
@@ -159,7 +169,7 @@ The host may normalize explicitly documented details, such as quantizing a coord
 
 ### 3.6 Dispatch through the SC2 adapter
 
-Only after validation and authorization does the host dispatch accepted actions to the ExampleBot/SC2 adapter.
+Only after validation does the current SingularityBot action pipeline translate accepted tactical intents to the ExampleBot/SC2 adapter. In the proposed high-level CommandAi integration, the goal resolver is not itself an SC2 dispatcher: it creates or updates bot-owned goals, and the existing action pipeline remains responsible for live-state validation and submission.
 
 Game-specific details belong here: mapping domain actions to SC2 abilities, translating unit and target references, converting positions, batching compatible actions for a frame, handling API errors, and respecting per-frame and per-unit constraints.
 
@@ -296,6 +306,8 @@ Those concepts have different owners:
 
 The current CommandAi/1 contract is intentionally small and provider-neutral. A consuming domain can define a typed vocabulary and adapter without teaching the generic package what a Marine or a Nexus is.
 
+SingularityBot already has a more specific internal domain model: strategy/advisor assessments, Task Master assignments, persistent entity contexts, FSM goals, tactical intents, and an SC2 action pipeline. CommandAi should bridge into the appropriate goal/order boundary, not duplicate those models inside a second command engine.
+
 GrammarAi can be used where a structured grammar is genuinely needed, but grammar validation is not authorization. The current CommandAi/1 proposal model should not be described as already carrying a StarCraft-specific grammar payload.
 
 ## 10. Staged implementation path
@@ -357,7 +369,7 @@ This guide does not claim that:
 - the multiplayer supervisor, ladder, team coordination, or external developer onboarding is complete;
 - proposal order guarantees atomic execution or all-or-nothing game effects.
 
-The current CommandAi/1 model provides a generic representation boundary. The StarCraft-specific mapping, trusted host, execution adapter, feedback records, and match supervision must be implemented and verified in their owning repositories.
+The current CommandAi/1 model provides a generic representation boundary. A SingularityBot goal/order vocabulary and resolver, any shared host integration, multi-player supervisor, and cross-player isolation tests must be implemented and verified in their owning repositories. SingularityBot's existing tactical intent validation and SC2 action pipeline remain the live execution authority. FSM_Foundry is an intended shared executor but is not yet referenced by the current SingularityBot project; documentation must not imply otherwise.
 
 ## 12. The architectural payoff
 
