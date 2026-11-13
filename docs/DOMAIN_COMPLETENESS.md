@@ -25,12 +25,13 @@ The application retains ownership of actual memory, persistence, calculations, o
 | Target and scope | Required typed opaque values for enriched commands; absent for compact commands | CommandAi bounds representation; consuming host defines meaning and validates current state |
 | Parameter identity/value | Positive parameter ID paired with integer identifier or bounded literal text; duplicate parameter IDs rejected per command | CommandAi |
 | Preconditions | Optional bounded expression paired with a grammar-version identifier | CommandAi carries opaque data; GrammarAi owns grammar/structural validation; host evaluates live state |
+| Opaque GrammarAi body | Optional immutable byte payload paired with a positive grammar wire version; canonical Base64 on the text wire | CommandAi validates framing, canonical encoding, and byte bounds only; GrammarAi owns decoding and structural validation |
 | Idempotency identity | Required bounded string for enriched commands; unique among enriched commands in a proposal | CommandAi carries identity only; host owns replay/deduplication; no exactly-once guarantee |
 | Expected outcome | Required outcome identity and bounded unique field declarations for enriched commands | CommandAi declares shape only; ProtocolAi/runtime carries actual correlated outcomes |
 | Actual result and errors | Not represented as command intent | ProtocolAi and runtime/host |
 | Ordering | Proposal preserves insertion order | Representation only; no dependency semantics |
 | Workflow/transaction/retry/cancellation/compensation | Not represented or executed | Orchestrator / host |
-| Resource bounds | Envelope 262,144; commands 256; arguments/command 64; preconditions/command 32; outcome fields 64; literal 16,384; grammar version 128; precondition expression 16,384; idempotency identity 256; aggregate in-memory literal data 1,048,576; enriched JSON depth 16 | CommandAi representation safeguards |
+| Resource bounds | Envelope 262,144 characters; commands 256; arguments/command 64; preconditions/command 32; outcome fields 64; literal 16,384 characters; grammar version 128 characters; precondition expression 16,384 characters; idempotency identity 256 characters; opaque GrammarAi body 32 KiB/command and 128 KiB/proposal (decoded bytes); aggregate in-memory literal data 1,048,576 characters; enriched JSON depth 16 | CommandAi representation safeguards |
 | Encoding and decoding | Legacy Command line unchanged; enriched AtomicCommand JSON line; mixed proposals supported; strict duplicate/unknown JSON-property rejection | CommandAi codec |
 | Older-reader compatibility | Older compact-only /1 readers reject AtomicCommand entries | Consumer upgrade required before enriched forms are emitted/accepted; not universal forward compatibility |
 | Canonical bytes, signatures, hashes | No canonical signing/digest contract | Not implemented |
