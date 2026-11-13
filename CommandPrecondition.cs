@@ -2,7 +2,10 @@ namespace TheSingularityWorkshop.CommandAi;
 
 /// <summary>An opaque precondition expression attached to a proposed atomic command.</summary>
 /// <remarks>
-/// CommandAi preserves the grammar version and expression without parsing or evaluating it.
+/// CommandAi preserves the grammar identity/version token and expression without parsing or evaluating them.
+/// Consumers should pin a fully qualified definition identity and schema version as
+/// DefinitionId@SchemaVersion (for example, TheSingularityWorkshop.GrammarAi.Observer@1).
+/// The consumer must resolve that exact identity/version without aliases or schema substitution.
 /// GrammarAi owns the expression grammar; the host owns evaluation against live state.
 /// </remarks>
 public sealed record CommandPrecondition
@@ -22,7 +25,7 @@ public sealed record CommandPrecondition
         Expression = expression;
     }
 
-    /// <summary>The GrammarAi grammar version needed to interpret the expression.</summary>
+    /// <summary>Exact grammar definition identity and schema version, conventionally DefinitionId@SchemaVersion.</summary>
     public string GrammarVersion { get; }
 
     /// <summary>Opaque grammar expression; never evaluated by CommandAi.</summary>
