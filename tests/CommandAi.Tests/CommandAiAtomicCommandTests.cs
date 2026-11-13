@@ -22,7 +22,7 @@ public sealed class CommandAiAtomicCommandTests
                 new CommandArgument(2001, CommandValue.FromIdentifier(3001)),
                 new CommandArgument(2002, CommandValue.FromText("bounded payload"))
             ],
-            preconditions ?? [new CommandPrecondition("GrammarAi/Observer/1", "candidate.sha == expected.sha")]);
+            preconditions ?? [new CommandPrecondition("TheSingularityWorkshop.GrammarAi.Observer@1", "candidate.sha == expected.sha")]);
 
     [Fact]
     public void EnrichedAtomicCommand_RoundTripsAllGenericFieldsWithinCommandAi1()
@@ -48,7 +48,7 @@ public sealed class CommandAiAtomicCommandTests
         Assert.True(decoded.OutcomeContract.Fields[0].Required);
         Assert.False(decoded.OutcomeContract.Fields[1].Required);
         Assert.Equal("bounded payload", decoded.Arguments[1].Value.Text);
-        Assert.Equal("GrammarAi/Observer/1", decoded.Preconditions[0].GrammarVersion);
+        Assert.Equal("TheSingularityWorkshop.GrammarAi.Observer@1", decoded.Preconditions[0].GrammarVersion);
         Assert.Equal("candidate.sha == expected.sha", decoded.Preconditions[0].Expression);
     }
 
@@ -153,7 +153,7 @@ public sealed class CommandAiAtomicCommandTests
         Assert.Throws<ArgumentException>(() => new CommandPrecondition(
             new string('g', CommandLimits.MaxGrammarVersionCharacters + 1), "condition"));
         Assert.Throws<ArgumentException>(() => new CommandPrecondition(
-            "GrammarAi/1", new string('x', CommandLimits.MaxPreconditionCharacters + 1)));
+            "TheSingularityWorkshop.GrammarAi.Observer@1", new string('x', CommandLimits.MaxPreconditionCharacters + 1)));
         Assert.Throws<ArgumentException>(() => new CommandOutcomeContract(
             1, Enumerable.Range(1, CommandLimits.MaxOutcomeFields + 1)
                 .Select(i => new CommandOutcomeField((ulong)i, CommandValueKind.LiteralText))));
@@ -172,13 +172,13 @@ public sealed class CommandAiAtomicCommandTests
                 new CommandOutcomeContract(700, [new CommandOutcomeField(701, CommandValueKind.LiteralText)]),
                 builder => builder
                     .WithText(2001, "file/path")
-                    .WithPrecondition("GrammarAi/1", "file.sha == expected.sha"))
+                    .WithPrecondition("TheSingularityWorkshop.GrammarAi.Observer@1", "file.sha == expected.sha"))
             .Build();
 
         var command = Assert.Single(proposal.Commands);
         Assert.True(command.HasAtomicContract);
         Assert.Equal("file/path", command.Arguments[0].Value.Text);
-        Assert.Equal("GrammarAi/1", command.Preconditions[0].GrammarVersion);
+        Assert.Equal("TheSingularityWorkshop.GrammarAi.Observer@1", command.Preconditions[0].GrammarVersion);
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public sealed class CommandAiAtomicCommandTests
         Assert.Null(command.OutcomeContract);
         Assert.Empty(command.Preconditions);
         Assert.Throws<InvalidOperationException>(() =>
-            new CommandInstructionBuilder(100).WithPrecondition("GrammarAi/1", "true"));
+            new CommandInstructionBuilder(100).WithPrecondition("TheSingularityWorkshop.GrammarAi.Observer@1", "true"));
     }
 
     [Fact]
