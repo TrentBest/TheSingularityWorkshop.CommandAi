@@ -396,4 +396,41 @@ public sealed class CommandAiAtomicCommandTests
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(nullArgumentValue));
     }
 
+    [Fact]
+    public void GrammarBody_RoundTripsOpaqueBytesAndUnknownPositiveWireVersion()
+    {
+        var bytes = new byte[] { 0, 1, 2, 127, 128, 255 };
+        var command = new CommandInstruction(Guid.NewGuid(), 1001,
+            CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2), "grammar-body-roundtrip",
+            new CommandOutcomeContract(700), grammarBody: new CommandGrammarBody(987, bytes));
+        var decoded = Assert.Single(CommandAiTextCodec.Decode(
+            CommandAiTextCodec.Encode(new CommandProposal([command]))).Commands);
+        Assert.Equal(987, decoded.GrammarBody!.GrammarWireVersion);
+        Assert.Equal(bytes, decoded.GrammarBody.Payload.ToArray());
+    }
+
+    [Fact]
+    public void GrammarBody_RejectsInvalidVersionsEmptyAndOversizedPayloads()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new CommandGrammarBody(0, new byte[] { 1 }));
+        Assert.Throws<ArgumentException>(() => new CommandGrammarBody(1, ReadOnlySpan<byte>.Empty));
+        Assert.Throws<ArgumentException>(() => new CommandGrammarBody(1,
+            new byte[CommandLimits.MaxGrammarBodyBytesPerCommand + 1]));
+    }
+
+    [Fact]
+    public void GrammarBody_RejectsNonCanonicalBase64AndProposalAggregateOverflow()
+    {
+        const string prefix = "[CommandAi]\\nProtocol=CommandAi/1\\nAtomicCommand=";
+        const string suffix = "\\n[/CommandAi]";
+        const string json = "{\\"commandId\\":\\"11111111-2222-3333-4444-555555555555\\",\\"actionId\\":7,\\"target\\":{\\"kind\\":\\"LiteralText\\",\\"identifier\\":null,\\"text\\":\\"repo\\"},\\"scope\\":{\\"kind\\":\\"LiteralText\\",\\"identifier\\":null,\\"text\\":\\"branch\\"},\\"idempotencyKey\\":\\"key\\",\\"outcomeContract\\":{\\"outcomeId\\":1,\\"fields\\":[]},\\"arguments\\":[],\\"preconditions\\":[],\\"body\\":{\\"grammarWireVersion\\":1,\\"payloadBase64\\":\\"AQ==\\"}}";
+        Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + json.Replace("AQ==", "AR==") + suffix));
+
+        var commands = Enumerable.Range(0, 5).Select(i => new CommandInstruction(
+            Guid.NewGuid(), (ulong)(100 + i), CommandValue.FromIdentifier(1), CommandValue.FromIdentifier(2),
+            "aggregate-" + i, new CommandOutcomeContract(700),
+            grammarBody: new CommandGrammarBody(1, new byte[CommandLimits.MaxGrammarBodyBytesPerCommand])));
+        Assert.Throws<ArgumentException>(() => new CommandProposal(commands));
+    }
+
 }
