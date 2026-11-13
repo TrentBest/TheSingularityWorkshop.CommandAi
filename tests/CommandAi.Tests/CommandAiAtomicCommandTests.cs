@@ -421,9 +421,9 @@ public sealed class CommandAiAtomicCommandTests
     [Fact]
     public void GrammarBody_RejectsNonCanonicalBase64AndProposalAggregateOverflow()
     {
-        const string prefix = "[CommandAi]\\nProtocol=CommandAi/1\\nAtomicCommand=";
-        const string suffix = "\\n[/CommandAi]";
-        const string json = "{\\"commandId\\":\\"11111111-2222-3333-4444-555555555555\\",\\"actionId\\":7,\\"target\\":{\\"kind\\":\\"LiteralText\\",\\"identifier\\":null,\\"text\\":\\"repo\\"},\\"scope\\":{\\"kind\\":\\"LiteralText\\",\\"identifier\\":null,\\"text\\":\\"branch\\"},\\"idempotencyKey\\":\\"key\\",\\"outcomeContract\\":{\\"outcomeId\\":1,\\"fields\\":[]},\\"arguments\\":[],\\"preconditions\\":[],\\"body\\":{\\"grammarWireVersion\\":1,\\"payloadBase64\\":\\"AQ==\\"}}";
+        const string prefix = "[CommandAi]\nProtocol=CommandAi/1\nAtomicCommand=";
+        const string suffix = "\n[/CommandAi]";
+        const string json = """{"commandId":"11111111-2222-3333-4444-555555555555","actionId":7,"target":{"kind":"LiteralText","identifier":null,"text":"repo"},"scope":{"kind":"LiteralText","identifier":null,"text":"branch"},"idempotencyKey":"key","outcomeContract":{"outcomeId":1,"fields":[]},"arguments":[],"preconditions":[],"body":{"grammarWireVersion":1,"payloadBase64":"AQ=="}}""";
         Assert.Throws<FormatException>(() => CommandAiTextCodec.Decode(prefix + json.Replace("AQ==", "AR==") + suffix));
 
         var commands = Enumerable.Range(0, 5).Select(i => new CommandInstruction(
