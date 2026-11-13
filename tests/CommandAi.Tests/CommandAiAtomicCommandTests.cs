@@ -413,7 +413,7 @@ public sealed class CommandAiAtomicCommandTests
     public void GrammarBody_RejectsInvalidVersionsEmptyAndOversizedPayloads()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new CommandGrammarBody(0, new byte[] { 1 }));
-        Assert.Throws<ArgumentException>(() => new CommandGrammarBody(1, ReadOnlySpan<byte>.Empty));
+        Assert.Throws<ArgumentException>(() => new CommandGrammarBody(1, Array.Empty<byte>()));
         Assert.Throws<ArgumentException>(() => new CommandGrammarBody(1,
             new byte[CommandLimits.MaxGrammarBodyBytesPerCommand + 1]));
     }
