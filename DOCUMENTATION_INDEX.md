@@ -14,6 +14,7 @@ CommandAi/1 is the approved provider-neutral representation for immutable, order
 | Understand policy, authority, approval, disclosure, and execution ownership | [Governed command lifecycle](docs/GOVERNED_COMMAND_LIFECYCLE.md) |
 | Use the current API and wire format | [Usage guide](docs/USAGE.md) |
 | Understand package responsibilities | [Architecture](docs/ARCHITECTURE.md) · [AI series](docs/AI_SERIES.md) |
+| Understand the StarCraft II / SingularityBot integration concept | [SingularityBot integration](docs/SINGULARITYBOT_INTEGRATION.md) |
 | Extend the generic builder | [Builder integration](docs/BUILDER_INTEGRATION.md) |
 | Review historical compatibility notes | [Legacy reference](docs/LEGACY_COMPATIBILITY.md) |
 | Review current maturity and evidence | [Status](docs/REFLECTION.md) |
