@@ -3,62 +3,65 @@
 
 # CommandProposal — UML neighborhood and use cases
 
-> Relationships are authored from the approved source model; this is not a runtime trace or generated UML.
+> Relationships are authored from the source model; this is not a runtime trace or generated UML.
 
 ## Neighborhood
 
 ~~~mermaid
 classDiagram
-  class CommandProposal {
-    +string ProtocolVersion
-    +IReadOnlyList~CommandInstruction~ Commands
-    +CurrentProtocolVersion = CommandAi/1
-  }
-  class CommandInstruction {
-    +ulong ActionId
-    +IReadOnlyList~CommandArgument~ Arguments
-  }
-  class CommandArgument {
-    +ulong ParameterId
-    +CommandValue Value
-  }
-  class CommandValue {
-    +CommandValueKind Kind
-    +ulong? Identifier
-    +string? Text
-  }
-  CommandProposal --> CommandInstruction : ordered commands
-  CommandInstruction --> CommandArgument : ordered parameters
-  CommandArgument --> CommandValue : typed value
+ class CommandProposal {
+  +string ProtocolVersion
+  +IReadOnlyList~CommandInstruction~ Commands
+  +CurrentProtocolVersion = CommandAi/1
+ }
+ class CommandInstruction {
+  +Guid? CommandId
+  +ulong ActionId
+  +CommandValue? Target
+  +CommandValue? Scope
+  +string? IdempotencyKey
+  +IReadOnlyList~CommandArgument~ Arguments
+  +IReadOnlyList~CommandPrecondition~ Preconditions
+  +CommandOutcomeContract? OutcomeContract
+ }
+ class CommandPrecondition {
+  +string GrammarVersion
+  +string Expression
+ }
+ class CommandOutcomeContract {
+  +ulong OutcomeId
+  +IReadOnlyList~CommandOutcomeField~ Fields
+ }
+ CommandProposal --> CommandInstruction : ordered compact/enriched commands
+ CommandInstruction --> CommandPrecondition : opaque conditions
+ CommandInstruction --> CommandOutcomeContract : expected shape
 ~~~
 
 ## Source-supported relationships
 
-- **Target source:** [CommandProposal.cs](../../CommandProposal.cs).
-- **Related source:** [CommandInstruction.cs](../../CommandInstruction.cs), [CommandArgument.cs](../../CommandArgument.cs), [CommandValue.cs](../../CommandValue.cs), and [CommandLimits.cs](../../CommandLimits.cs).
-- **Codec:** [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs) reads and writes the line-oriented CommandAi/1 envelope.
-- **Invariants:** proposals are non-empty, ordered, bounded; action and parameter identities are positive; duplicate parameter identities are rejected within a command.
+- Target source: [CommandProposal.cs](../../CommandProposal.cs).
+- Related source: [CommandInstruction.cs](../../CommandInstruction.cs), [CommandArgument.cs](../../CommandArgument.cs), [CommandValue.cs](../../CommandValue.cs), [CommandPrecondition.cs](../../CommandPrecondition.cs), [CommandOutcomeContract.cs](../../CommandOutcomeContract.cs), and [CommandLimits.cs](../../CommandLimits.cs).
+- Codec: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs) reads and writes compact and enriched CommandAi/1 entries.
+- Invariants: proposals are non-empty, ordered, and bounded; enriched command IDs and idempotency identities are unique; compact instructions do not receive invented metadata.
 
 ## Use cases
 
 ### UC-1 — Decode a proposed batch
-- **Actor:** consuming host.
-- **Trigger:** receive a candidate CommandAi/1 envelope.
-- **Outcome:** a structurally valid proposal is available for host-owned semantic validation.
-- **Failure:** malformed content, unsupported protocol, invalid identifiers, duplicates, or resource-limit violations are rejected.
+- Actor: consuming host.
+- Trigger: receive a candidate CommandAi/1 envelope.
+- Outcome: a structurally valid proposal is available for host-owned semantic validation.
+- Failure: malformed content, unsupported protocol, invalid identities, duplicates, or resource-limit violations are rejected.
 
 ### UC-2 — Compose atomic actions
-- **Actor:** application or host.
-- **Goal:** represent several ordered action proposals.
-- **Outcome:** the host receives an ordered list. The list does not imply transaction, dependency, retry, or rollback semantics.
+- Actor: application or host.
+- Goal: represent several ordered action proposals.
+- Outcome: the host receives an ordered list. The list does not imply transaction, dependency, retry, replay, or rollback semantics.
 
 ## Related pages
 
 - [Type page](../types/CommandProposal.md)
 - [Theory](../THEORY.md)
 - [Problem domain](../PROBLEM_DOMAIN.md)
-
-
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->

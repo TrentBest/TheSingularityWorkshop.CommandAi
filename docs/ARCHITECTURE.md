@@ -7,14 +7,20 @@
 
 CommandAi has two representation surfaces within the same `CommandAi/1` protocol identity:
 
-- The existing compact `CommandProposal` remains an ordered list of atomic action proposals.
+- `CommandProposal` represents ordered atomic action proposals in the original compact form or an enriched form with explicit command identity, target, scope, preconditions, idempotency identity, and expected-outcome shape.
 - The address-space exchange model describes application-defined input/context slots and output slots, correlated by an exchange GUID.
 
-`CommandExchangeTextCodec` serializes exchanges and responses as deterministic compact JSON. The envelope declares the protocol, message kind, exchange ID, complete address descriptors, and the corresponding input or output values. Property order is fixed by the encoder; decoders reject duplicate or unknown properties, unsupported enum names, malformed identifiers, invalid descriptor/value shapes, and over-limit collections or envelopes. The compact proposal codec remains unchanged and line-oriented.
+`CommandExchangeTextCodec` serializes exchanges and responses as deterministic compact JSON. The envelope declares the protocol, message kind, exchange ID, complete address descriptors, and the corresponding input or output values. Property order is fixed by the encoder; decoders reject duplicate or unknown properties, unsupported enum names, malformed identifiers, invalid descriptor/value shapes, and over-limit collections or envelopes. The proposal codec is line-oriented: legacy compact `Command=` entries retain their representation, while enriched commands use bounded `AtomicCommand=` JSON entries. The enriched reader rejects unknown and duplicate JSON properties and enforces JSON depth 16. Older compact-only readers must be upgraded before consuming enriched entries.
 
 An address descriptor declares a positive local ID, name, access direction, value kind, optional description, required-input/output constraints, and optional GrammarAi definition identity plus schema version. Grammar metadata is opaque: CommandAi checks that both values are present and positive, but does not load GrammarAi, resolve definitions, or validate grammar payloads.
 
-`CommandExchange` accepts values only for readable addresses and enforces required inputs. `CommandResponse` accepts values only for writable addresses and enforces required outputs. Both reject unknown or duplicate addresses and mismatched value kinds. `ValidateFor` verifies correlation and equivalent address-space descriptor snapshots.
+`CommandExchange` accepts values only for readable addresses and enforces required inputs. `CommandResponse` accepts values only for writable addresses and enforces required outputs. Both reject unknown or duplicate addresses and mismatched value kinds. `ValidateFor` verifies correlation and exact ordered equality of the address-descriptor snapshot: descriptor order is part of the exchange contract, not merely a presentation choice. Producers must preserve the originating descriptor order when constructing a response.
+
+## Atomic proposal contract
+
+An enriched `CommandInstruction` requires a non-empty command GUID, positive action ID, typed opaque target and scope, bounded idempotency key, and expected-outcome contract. It may include bounded preconditions carrying an exact grammar definition identity/schema-version token (conventionally `DefinitionId@SchemaVersion`) and opaque expression, plus ordered typed arguments. Compact legacy instructions retain absent enriched metadata; no defaults are inferred.
+
+CommandAi validates representation and resource bounds only. GrammarAi owns precondition grammar; consumers pin the exact definition identity/schema version (the observer contract is `TheSingularityWorkshop.GrammarAi.Observer@1`) without alias or fallback; the host evaluates conditions against live state, enforces replay/deduplication using the supplied idempotency identity, resolves target/scope meaning, and owns authorization and execution. An expected-outcome contract declares shape only; it is not an actual result, success signal, CI verdict, or proof. Proposal order does not define dependencies, transactionality, or workflow semantics.
 
 ## Responsibility boundaries
 

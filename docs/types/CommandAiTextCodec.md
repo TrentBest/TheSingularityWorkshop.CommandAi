@@ -3,22 +3,24 @@
 
 # CommandAiTextCodec
 
-Encoder and decoder for the line-oriented CommandAi/1 envelope.
+Encoder and decoder for compact and enriched entries within the CommandAi/1 envelope.
 
 ## Contract
 
-- `Encode(proposal)` serializes the protocol header and ordered command lines.
-- `Decode(text)` validates the envelope and reconstructs typed immutable data.
+- Encode(proposal) preserves proposal order and writes the CommandAi/1 header.
+- Compact instructions use the original `Command=` action/argument line unchanged.
+- Enriched atomic commands use `AtomicCommand=` followed by a JSON object.
+- Decode(text) reads compact, enriched, or mixed proposals.
 - Encoding emits LF line endings; decoding accepts LF or CRLF.
-- Decoding removes empty lines and trims remaining lines. Whitespace-only lines are ignored as entries but still count toward the maximum-line guard; the opening and closing markers must be the first and last non-empty entries.
-- Integer values are positive decimal identifiers.
-- Literal values are JSON-quoted strings.
-- Malformed input, unsupported versions, duplicate protocol declarations, duplicate parameters, invalid identifiers, and resource-limit violations are rejected.
+- Enriched JSON is limited to depth 16, rejects unknown members, and rejects duplicate properties.
+- Unknown envelope entries, malformed values, unsupported versions, duplicate protocol declarations, duplicate parameter identities, duplicate enriched command identities/idempotency identities, and resource-limit violations are rejected.
+- The decoder does not reinterpret missing legacy fields as defaults.
 
-Empty caller input is an argument error. Malformed non-empty wire input is a format error. Parsing does not authorize or execute.
+Older compact-only readers reject the new `AtomicCommand=` entry. Consumers must upgrade before accepting enriched proposals; retaining the protocol identifier at /1 does not promise universal forward compatibility.
 
-Source: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs). Tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs).
+Empty caller input is an argument error. Malformed non-empty wire input is a format error. Parsing does not authorize, evaluate, or execute.
 
+Source: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs). Tests: [CommandAiAtomicCommandTests.cs](../../tests/CommandAi.Tests/CommandAiAtomicCommandTests.cs) and [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs).
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->

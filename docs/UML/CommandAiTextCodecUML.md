@@ -5,25 +5,26 @@
 
 ~~~mermaid
 flowchart TD
-  I[Untrusted CommandAi/1 envelope] --> C[CommandAiTextCodec]
-  C --> P[CommandProposal]
-  P --> A[Ordered CommandInstruction records]
-  A --> M[Action identity and typed arguments]
-  P -.-> H[Host validation and authorization remain external]
+ I[Untrusted CommandAi/1 envelope] --> C[CommandAiTextCodec]
+ C --> P[CommandProposal]
+ P --> L[Compact Command entry]
+ P --> A[Enriched AtomicCommand JSON entry]
+ L --> M[Action identity and ordered typed arguments]
+ A --> X[Command identity, target, scope, preconditions, idempotency, outcome contract]
+ P -.-> H[Host validation and authorization remain external]
+ X -.-> G[GrammarAi validates precondition structure]
+ G -.-> H
 ~~~
 
 ## Contract
 
-The codec reads and writes the line-oriented CommandAi/1 envelope. Encoding uses LF line separators on every platform; decoding accepts LF and CRLF input, removes empty lines and trims remaining lines; whitespace-only lines are ignored as entries but still count toward the maximum-line guard. A command line contains a positive action identifier followed by ordered parameter/value pairs. Values are positive integer identifiers or JSON-quoted literal strings.
+The codec reads and writes compact and enriched entries within the same CommandAi/1 envelope. Compact `Command=` entries preserve their original serialized form. Enriched `AtomicCommand=` entries use bounded JSON with depth 16, strict unknown-member rejection, and duplicate-property rejection. Proposals may mix both forms while preserving command order.
 
-## Use cases
+Encoding uses LF line separators. Decoding accepts LF and CRLF, removes empty lines, and trims remaining lines. Whitespace-only lines are ignored as entries but still count toward the maximum-line guard.
 
-- Decode an untrusted envelope into bounded immutable data for host validation.
-- Encode a constructed proposal for transport or inspection.
-- Reject malformed envelopes, unsupported versions, duplicate declarations/parameters, invalid identifiers, and resource-limit violations.
+Older compact-only readers reject `AtomicCommand=` as an unknown envelope entry. Consumers must upgrade before accepting enriched proposals. Parsing does not authorize, evaluate preconditions, guarantee replay, or execute.
 
-Source: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs). Tests: [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs). Parsing does not authorize or execute.
-
+Source: [CommandAiTextCodec.cs](../../CommandAiTextCodec.cs). Tests: [CommandAiAtomicCommandTests.cs](../../tests/CommandAi.Tests/CommandAiAtomicCommandTests.cs) and [CommandAiTextCodecTests.cs](../../tests/CommandAi.Tests/CommandAiTextCodecTests.cs).
 ---
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
