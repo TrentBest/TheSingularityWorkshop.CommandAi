@@ -18,7 +18,7 @@ public sealed class CommandGrammarBody
 
     private readonly byte[] _payload;
     public int GrammarWireVersion { get; }
-    public ReadOnlyMemory<byte> Payload => _payload;
+    public ReadOnlyMemory<byte> Payload => new(_payload.ToArray());
     public string PayloadBase64 => Convert.ToBase64String(_payload);
 
     internal static CommandGrammarBody FromBase64(int version, string payloadBase64)
