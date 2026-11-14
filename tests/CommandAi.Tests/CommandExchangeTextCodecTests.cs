@@ -159,3 +159,4 @@ public sealed class CommandExchangeTextCodecTests
             StringComparison.Ordinal);
         Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(json));
     }
+}
