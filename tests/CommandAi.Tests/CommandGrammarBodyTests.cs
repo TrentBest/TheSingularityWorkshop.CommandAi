@@ -92,7 +92,7 @@ public sealed class CommandGrammarBodyTests
     public void GrammarBody_RejectsZeroWireVersionAndEmptyPayload()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new CommandGrammarBody(0, [1]));
-        Assert.Throws<ArgumentException>(() => new CommandGrammarBody(1, ReadOnlySpan<byte>.Empty));
+        Assert.Throws<ArgumentException>(() => new CommandGrammarBody(1, Array.Empty<byte>()));
     }
 
     [Fact]
