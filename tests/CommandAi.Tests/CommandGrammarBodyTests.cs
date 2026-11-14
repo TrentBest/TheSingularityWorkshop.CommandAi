@@ -81,6 +81,19 @@ public sealed class CommandGrammarBodyTests
     }
 
     [Fact]
+    public void GrammarBody_PayloadIsDefensivelyCopiedOnInputAndRead()
+    {
+        byte[] source = [1, 2, 3];
+        var body = new CommandGrammarBody(1, source);
+        source[0] = 99;
+
+        Assert.True(System.Runtime.InteropServices.MemoryMarshal.TryGetArray(body.Payload, out var exposed));
+        exposed.Array![exposed.Offset] = 88;
+
+        Assert.Equal(new byte[] { 1, 2, 3 }, body.Payload.ToArray());
+    }
+
+    [Fact]
     public void GrammarBody_RejectsPayloadAbovePerCommandByteLimit()
     {
         var payload = new byte[CommandLimits.MaxGrammarBodyBytesPerCommand + 1];
