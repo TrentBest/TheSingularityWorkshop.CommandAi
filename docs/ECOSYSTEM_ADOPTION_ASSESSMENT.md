@@ -11,7 +11,7 @@
 
 The strongest adoption finding is **SingularityBot already consumes CommandAi**. Its development branch contains `docs/commandai-integration-v1.md`, a bot-owned vocabulary (`SingularityBot.Commands/1`), and a validator that accepts real CommandAi `CommandProposal` objects. This is a verified integration, not a future proposal. The remaining work is to connect validated proposals to existing goal/job contracts and prove the first end-to-end production-target use case without creating a second scheduler or allowing model output to dispatch SC2 actions.
 
-The second candidate is **The (The Architect)**. Its README describes a terminal for understanding, composing, and eventually operating the software ecosystem through context. A bounded CommandAi proposal surface could be useful when the Architect turns an approved operator request into a sequence of typed, atomic domain actions. This is conditional: no inspected evidence yet establishes a current command-proposal implementation, action registry, or execution adapter. The first step should be an architecture issue and a narrow consumer proof, not an immediate package dependency.
+The second major finding is **The (The Architect) is already an active CommandAi consumer/migration target**, not a hypothetical candidate. Its current `Architect.csproj` references `dependencies/CommandAi/TheSingularityWorkshop.CommandAi.csproj`, and its Windows CI workflow checks out the CommandAi `development` branch into that path. Existing [issue #19](https://github.com/TrentBest/The/issues/19) tracks convergence of the Architect command boundary with the shared packages. The key remaining integration risks are exact API alignment with enriched CommandAi/1, pinning the dependency source SHA in CI rather than following a moving branch, and proving host-side authorization and execution-boundary revalidation against the actual shared contract.
 
 **FSM_Foundry, ServerApp, and AnyApp are not recommended as direct CommandAi dependencies today.** Foundry and ServerApp currently expose only minimal placeholder READMEs in their inspected default-branch trees, with no source architecture to validate. Foundry may eventually host an application-specific CommandAi adapter, but the generic Foundry core should not own application command meaning or become an authorization shortcut. AnyApp currently documents a different semantic-intent boundary (ProtocolAi + GrammarAi + FSM_UserIO) and host-owned Experience execution; CommandAi should be introduced there only if a concrete bounded atomic-action proposal workflow is identified.
 
@@ -41,26 +41,25 @@ The integration already:
 
 CommandAi remains a dependency-free contract library. The bot owns the action catalog and meaning; the runtime and adapter own semantic validation and execution.
 
-### 2. The (The Architect) — conditional candidate
+### 2. The (The Architect) — active consumer / migration already tracked
 
-**Disposition:** Candidate; issue requested for a concrete first proof.  
-**Evidence:** [The README](https://github.com/TrentBest/The/blob/master/README.md) describes an ecosystem command center intended to understand, compose, and eventually operate the Workshop.
+**Disposition:** Existing consumer; continue the current migration under [The issue #19](https://github.com/TrentBest/The/issues/19).  
+**Evidence:** `Architect/Architect.csproj` on `development` has a project reference to `dependencies/CommandAi/TheSingularityWorkshop.CommandAi.csproj`. The [Architect Windows Tests workflow](https://github.com/TrentBest/The/blob/development/.github/workflows/architect-tests.yml) checks out `TrentBest/TheSingularityWorkshop.CommandAi` from the moving `development` ref into that dependency path. [The's CommandAi ownership map](https://github.com/TrentBest/The/blob/development/docs/COMMAND_AI_OWNERSHIP.md) records the host-specific policy and migration constraints.
 
-**Potential use**
-- Convert an operator-approved request into a bounded proposal of atomic actions such as inspect repository, prepare a documented change, request a build, or open a review.
-- Keep each action typed and explicitly identified; use ordered arguments and stable action IDs owned by The or the domain adapter.
-- Present the proposal for review before any privileged action.
-- Pass approved proposals to a host adapter that resolves action IDs, validates current repository/ref/SHA and policy, then invokes the appropriate GitHub or local workflow service.
-- Correlate results and lifecycle evidence outside CommandAi; do not treat a well-formed proposal or expected outcome as proof that work succeeded.
+**How The should use CommandAi**
+- Use the shared immutable proposal model and codec for the generic atomic command envelope; retain an Architect-owned action vocabulary and adapter for navigation, repository, and surface semantics.
+- Convert model output into pending proposals only. Keep the explicit user approval step, `CommandAiPolicy`, current repository/surface checks, and execution-boundary revalidation inside The.
+- Keep the Architect's UI, action allow-list, context, policy, and execution implementation application-owned. CommandAi must not interpret Architect IDs or grant permission.
+- Keep ProtocolAi vocabulary identity, GrammarAi structural rules, and HeadlessAi endpoint transport as separate optional layers; none is a substitute for CommandAi or host authorization.
 
-**Required proof before adoption**
-- Identify one real Architect interaction that currently produces an action request.
-- Define a small action vocabulary owned by The, not by CommandAi.
-- Demonstrate proposal construction, strict validation, review/approval, host dispatch, and correlated result reporting.
-- Prove default-deny behavior for unknown actions/arguments and stale repository/ref/SHA.
-- Keep long-running workflows, retries, dependencies, and progress state in The/host composition, not inside one atomic proposal.
+**Immediate integration work**
+1. Align The's consumer with the enriched CommandAi/1 API currently under review; do not revive the superseded /2 contract.
+2. Pin the exact CommandAi source SHA used by CI and print it in the workflow summary. A moving `development` checkout is useful for active integration but does not provide reproducible evidence for a given test run.
+3. Add consumer tests for typed target/scope, arguments, optional GrammarAi body handling where used, malformed/unknown action data, and compact/enriched compatibility.
+4. Prove the full path: proposal decode → host validation → pending review → explicit approval → immediate policy/context revalidation → allow-listed dispatch.
+5. Verify rejected, stale, unknown, duplicate, and unauthorized proposals cannot reach dispatch; a successful decode is never an authorization signal.
 
-Do not add CommandAi as a dependency merely to encode existing navigation, semantic intents, or ordinary UI events.
+This is an existing integration track, not a request to create a second issue or add another parallel local command implementation.
 
 ### 3. FSM_Foundry — future adapter boundary, not a core dependency
 
@@ -147,7 +146,7 @@ The connected account returned 100 repositories (including CommandAi). The 99 ot
 | FSM_UnityIntegrationAdvanced | No use identified |
 | FSM_UnityIntegration | No use identified |
 | Diagrams | No use identified |
-| The | Conditional candidate; issue proposed |
+| The | Existing CommandAi consumer; migration tracked in The #19 |
 | FSM_ProjectTemplates | No use identified |
 | GitHackforFun | No use identified |
 | FSM_Helix | No use identified |
