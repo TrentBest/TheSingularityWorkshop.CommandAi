@@ -10,7 +10,7 @@
 
 - Pull request: [#8 — enriched atomic CommandAi/1 integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/pull/8)
 - Candidate branch: `work/commandai-enriched-v1-integration`
-- Current PR head: `5fbf4bf7303966b6413fc2ba70d7d5aaf74c14f5`
+- Latest verified ancestor: `5fbf4bf7303966b6413fc2ba70d7d5aaf74c14f5` (see exact-head evidence above); subsequent candidate commits remain unverified until CI runs on their exact SHA.
 - Exact-head CI: [CommandAi CI run 43508426972](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43508426972) ran on this exact SHA and completed successfully. The `build-and-test` job succeeded; `publish_nuget` was skipped.
 - The successful run covered branding verification, restore, build, tests with coverage, Codecov upload, coverage artifact upload, quickstart validation, package packing, audit/compile of the quickstart against the packed package, and package artifact upload. This is validation evidence only; no package was published.
 - The run's Cobertura artifact reports **96.77% overall line coverage (751/776)** and **85.30% branch coverage (418/490)**. These are repository-wide totals, not patch coverage. The artifact also reports 100% line coverage for `CommandGrammarBody.cs` and `CommandInstructionBuilder.cs`, 98.20% for `CommandAiTextCodec.cs`, 91.11% for `CommandExchange.cs`, 90.80% for `CommandExchangeTextCodec.cs`, and 96.97% for `CommandProposal.cs`.
