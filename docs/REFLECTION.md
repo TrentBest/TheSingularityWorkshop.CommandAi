@@ -5,6 +5,9 @@
 
 ## Current candidate
 
+- **Latest candidate head:** `083d63cbf73a934c035044edc75b51ef037a646d` (2026-11-14). This head includes the approved optional opaque GrammarAi body transport and the expanded domain-completeness ownership matrix. Exact-head workflow/status lookups currently return no runs or checks; this candidate is **not yet CI-verified**.
+- **Latest verified ancestor:** `5fbf4bf7303966b6413fc2ba70d7d5aaf74c14f5`, verified by [CommandAi CI run 43508426972](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43508426972). That successful run is evidence for that SHA only, not for later commits.
+
 - Pull request: [#8 — enriched atomic CommandAi/1 integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/pull/8)
 - Candidate branch: `work/commandai-enriched-v1-integration`
 - Current PR head: `5fbf4bf7303966b6413fc2ba70d7d5aaf74c14f5`
