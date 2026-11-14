@@ -212,6 +212,9 @@ public static class CommandAiTextCodec
             using var document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 16 });
             if (document.RootElement.ValueKind != JsonValueKind.Object)
                 throw new FormatException("An enriched atomic command must be a JSON object.");
+            if (document.RootElement.TryGetProperty("body", out var bodyProperty) &&
+                bodyProperty.ValueKind != JsonValueKind.Object)
+                throw new FormatException("An optional grammar body, when present, must be a JSON object.");
             EnsureNoDuplicateProperties(document.RootElement);
             wire = JsonSerializer.Deserialize<AtomicCommandWire>(json, JsonOptions)
                 ?? throw new FormatException("An enriched atomic command cannot be JSON null.");
