@@ -5,19 +5,15 @@
 
 ## Current candidate
 
-- **Candidate review snapshot:** the approved optional opaque GrammarAi body transport and expanded domain-completeness ownership matrix are included on this PR branch. The PR description records the current exact branch head; exact-head workflow/status checks must be repeated after every subsequent commit.
-- **Latest verified ancestor:** `5fbf4bf7303966b6413fc2ba70d7d5aaf74c14f5`, verified by [CommandAi CI run 43508426972](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43508426972). That successful run is evidence for that SHA only, not for later commits.
-
 - Pull request: [#8 — enriched atomic CommandAi/1 integration](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/pull/8)
 - Candidate branch: `work/commandai-enriched-v1-integration`
-- Latest verified ancestor: `5fbf4bf7303966b6413fc2ba70d7d5aaf74c14f5` (see exact-head evidence above); subsequent candidate commits remain unverified until CI runs on their exact SHA.
-- Exact-head CI: [CommandAi CI run 43508426972](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43508426972) ran on this exact SHA and completed successfully. The `build-and-test` job succeeded; `publish_nuget` was skipped.
-- The successful run covered branding verification, restore, build, tests with coverage, Codecov upload, coverage artifact upload, quickstart validation, package packing, audit/compile of the quickstart against the packed package, and package artifact upload. This is validation evidence only; no package was published.
-- The run's Cobertura artifact reports **96.77% overall line coverage (751/776)** and **85.30% branch coverage (418/490)**. These are repository-wide totals, not patch coverage. The artifact also reports 100% line coverage for `CommandGrammarBody.cs` and `CommandInstructionBuilder.cs`, 98.20% for `CommandAiTextCodec.cs`, 91.11% for `CommandExchange.cs`, 90.80% for `CommandExchangeTextCodec.cs`, and 96.97% for `CommandProposal.cs`.
-- The exact-head workflow evidence supersedes earlier notes that the later atomic guard tests had no verification. The run is tied to the SHA above; any subsequent source or documentation commit requires its own exact-head verification.
-- PR #8 remains open and draft, targeting `development`. At the latest branch comparison, it is 42 commits ahead and 5 behind `development`; synchronize deliberately and rerun exact-head CI after any update.
+- Current verified head at this checkpoint: `c5071022c25a5fe5e5f98f20f8a8e6a5588d4882`.
+- Exact-head CI: [CommandAi CI run 43548894948](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43548894948) completed successfully for that SHA (push event). Restore, Release build, tests with coverage, Codecov upload, coverage artifact upload, quickstart execution, package pack, and packed-package quickstart audit all passed. `publish_nuget` was skipped; no package was published.
+- The exact-head Cobertura artifact reports **96.79% overall line coverage (755/780)** and **85.42% branch coverage (422/494)**. These are repository-wide totals, not patch coverage. `CommandGrammarBody` and `CommandInstructionBuilder` have 100% line coverage. `CommandAiTextCodec` is 98.2% line / 95.8% branch; `CommandExchangeTextCodec` is 90.8% line / 70.0% branch; `CommandAddressDescriptor` is 91.1% line / 65.6% branch; `CommandProposal` is 97.0% line / 95.8% branch.
+- Remaining uncovered paths are concentrated in exchange-codec error/limit branches and descriptor constructor validation, with smaller gaps in the atomic codec and proposal validation. Treat these as a focused adversarial-test audit; do not add tests solely to inflate a percentage.
+- PR #8 remains open and draft, targeting `development`. Its current head must be rechecked after every new commit; this evidence does not automatically verify later commits.
 
-Every exact-head verification claim applies only to the SHA named beside its run. A later source or documentation commit requires its own evidence.
+Every exact-head verification claim applies only to the SHA named beside its run. A later source or documentation commit requires its own exact-head verification.
 
 ## Approved design direction and compatibility
 
