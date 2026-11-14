@@ -75,8 +75,6 @@ public sealed class CommandExchangeTextCodecTests
                 CommandValue.FromText(new string('x', CommandLimits.MaxLiteralCharacters)))));
         Assert.Throws<ArgumentException>(() => CommandExchangeTextCodec.Encode(exchange));
     }
-}
-
 
     private static string ValidExchangeJson() => """
         {
@@ -100,12 +98,12 @@ public sealed class CommandExchangeTextCodecTests
     }
 
     [Theory]
-    [InlineData("\\"kind\\":\\"exchange\\"","\\"kind\\":17")]
-    [InlineData("\\"exchangeId\\":\\"6e54ec9e-7d38-4f40-b2a1-4b1770d15c02\\"","\\"exchangeId\\":\\"not-a-guid\\"")]
-    [InlineData("\\"addresses\\":[","\\"addresses\\":null,\\"unused\\":[")]
-    [InlineData("\\"access\\":\\"read\\"","\\"access\\":\\"execute\\"")]
-    [InlineData("\\"valueKind\\":\\"literalText\\"","\\"valueKind\\":\\"unknown\\"")]
-    [InlineData("\\"addressId\\":1","\\"addressId\\":0")]
+    [InlineData("\"kind\":\"exchange\"","\"kind\":17")]
+    [InlineData("\"exchangeId\":\"6e54ec9e-7d38-4f40-b2a1-4b1770d15c02\"","\"exchangeId\":\"not-a-guid\"")]
+    [InlineData("\"addresses\":[","\"addresses\":null,\"unused\":[")]
+    [InlineData("\"access\":\"read\"","\"access\":\"execute\"")]
+    [InlineData("\"valueKind\":\"literalText\"","\"valueKind\":\"unknown\"")]
+    [InlineData("\"addressId\":1","\"addressId\":0")]
     public void Decode_RejectsInvalidEnvelopeAndDescriptorFields(string original, string replacement)
     {
         var json = ValidExchangeJson().Replace(original, replacement, StringComparison.Ordinal);
@@ -113,10 +111,10 @@ public sealed class CommandExchangeTextCodecTests
     }
 
     [Theory]
-    [InlineData("\\"grammarDefinitionId\\":42","")]
-    [InlineData("\\"grammarSchemaVersion\\":3","")]
-    [InlineData("\\"grammarDefinitionId\\":42","\\"grammarDefinitionId\\":0")]
-    [InlineData("\\"grammarSchemaVersion\\":3","\\"grammarSchemaVersion\\":0")]
+    [InlineData("\"grammarDefinitionId\":42","")]
+    [InlineData("\"grammarSchemaVersion\":3","")]
+    [InlineData("\"grammarDefinitionId\":42","\"grammarDefinitionId\":0")]
+    [InlineData("\"grammarSchemaVersion\":3","\"grammarSchemaVersion\":0")]
     public void Decode_RequiresPositivePairedGrammarIdentity(string original, string replacement)
     {
         var json = ValidExchangeJson().Replace(original, replacement, StringComparison.Ordinal);
@@ -124,10 +122,10 @@ public sealed class CommandExchangeTextCodecTests
     }
 
     [Theory]
-    [InlineData("\\"inputs\\":[{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"}]","\\"inputs\\":[]")]
-    [InlineData("\\"inputs\\":[{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"}]","\\"inputs\\":[{\\"addressId\\":99,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"}]")]
-    [InlineData("\\"inputs\\":[{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"}]","\\"inputs\\":[{\\"addressId\\":1,\\"kind\\":\\"integerIdentifier\\",\\"identifier\\":9}]")]
-    [InlineData("\\"inputs\\":[{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"}]","\\"inputs\\":[{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"},{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"again\\"}]")]
+    [InlineData("\"inputs\":[{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"hello\"}]","\"inputs\":[]")]
+    [InlineData("\"inputs\":[{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"hello\"}]","\"inputs\":[{\"addressId\":99,\"kind\":\"literalText\",\"text\":\"hello\"}]")]
+    [InlineData("\"inputs\":[{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"hello\"}]","\"inputs\":[{\"addressId\":1,\"kind\":\"integerIdentifier\",\"identifier\":9}]")]
+    [InlineData("\"inputs\":[{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"hello\"}]","\"inputs\":[{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"hello\"},{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"again\"}]")]
     public void Decode_RejectsInvalidAddressValueBindings(string original, string replacement)
     {
         var json = ValidExchangeJson().Replace(original, replacement, StringComparison.Ordinal);
@@ -137,7 +135,7 @@ public sealed class CommandExchangeTextCodecTests
     [Fact]
     public void Decode_RejectsAddressDescriptorWithInvalidAccessContract()
     {
-        var json = ValidExchangeJson().Replace("\\"access\\":\\"read\\"","\\"access\\":\\"write\\"",StringComparison.Ordinal);
+        var json = ValidExchangeJson().Replace("\"access\":\"read\"","\"access\":\"write\"",StringComparison.Ordinal);
         Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(json));
     }
 
@@ -145,8 +143,8 @@ public sealed class CommandExchangeTextCodecTests
     public void Decode_RejectsDuplicateAddressIdentifiers()
     {
         var json = ValidExchangeJson().Replace(
-            "{\\"addressId\\":2,\\"name\\":\\"result\\"",
-            "{\\"addressId\\":1,\\"name\\":\\"result\\"",
+            "{\"addressId\":2,\"name\":\"result\"",
+            "{\"addressId\":1,\"name\":\"result\"",
             StringComparison.Ordinal);
         Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(json));
     }
@@ -155,9 +153,9 @@ public sealed class CommandExchangeTextCodecTests
     public void Decode_RejectsValueCountAboveConfiguredLimit()
     {
         var json = ValidExchangeJson().Replace(
-            "\\"inputs\\":[{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"}]",
-            "\\"inputs\\":[" + string.Join(",", Enumerable.Range(0, CommandExchange.MaxValues + 1)
-                .Select(_ => "{\\"addressId\\":1,\\"kind\\":\\"literalText\\",\\"text\\":\\"hello\\"}")) + "]",
+            "\"inputs\":[{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"hello\"}]",
+            "\"inputs\":[" + string.Join(",", Enumerable.Range(0, CommandExchange.MaxValues + 1)
+                .Select(_ => "{\"addressId\":1,\"kind\":\"literalText\",\"text\":\"hello\"}")) + "]",
             StringComparison.Ordinal);
         Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(json));
     }
