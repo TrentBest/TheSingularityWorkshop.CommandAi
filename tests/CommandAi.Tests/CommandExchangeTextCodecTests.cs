@@ -83,7 +83,7 @@ public sealed class CommandExchangeTextCodecTests
           "exchangeId":"6e54ec9e-7d38-4f40-b2a1-4b1770d15c02",
           "addresses":[
             {"addressId":1,"name":"context","access":"read","valueKind":"literalText","requiredInput":true,"requiredOutput":false},
-            {"addressId":2,"name":"result","access":"write","valueKind":"integerIdentifier","requiredInput":false,"requiredOutput":true}
+            {"addressId":2,"name":"result","access":"write","valueKind":"integerIdentifier","requiredInput":false,"requiredOutput":true,"grammarDefinitionId":42,"grammarSchemaVersion":3}
           ],
           "inputs":[{"addressId":1,"kind":"literalText","text":"hello"}]
         }
