@@ -159,4 +159,93 @@ public sealed class CommandExchangeTextCodecTests
             StringComparison.Ordinal);
         Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(json));
     }
+
+
+    [Fact]
+    public void DecodeResponse_TranslatesMissingRequiredOutputIntoFormatException()
+    {
+        const string json = """
+            {
+              "protocol":"CommandAi/1",
+              "kind":"response",
+              "exchangeId":"6e54ec9e-7d38-4f40-b2a1-4b1770d15c02",
+              "addresses":[
+                {"addressId":2,"name":"result","access":"write","valueKind":"integerIdentifier","requiredInput":false,"requiredOutput":true}
+              ],
+              "outputs":[]
+            }
+            """;
+        Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeResponse(json));
+    }
+
+    [Fact]
+    public void Decode_RejectsMissingRequiredDescriptorProperty()
+    {
+        var json = ValidExchangeJson().Replace(
+            ",\\"requiredOutput\\":true",
+            string.Empty,
+            StringComparison.Ordinal);
+        Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(json));
+    }
+
+    [Fact]
+    public void Decode_RejectsAddressValueWithMissingOrUnknownProperties()
+    {
+        var missing = ValidExchangeJson().Replace(
+            "\\"text\\":\\"hello\\"",
+            "\\"unexpected\\":\\"hello\\"",
+            StringComparison.Ordinal);
+        Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(missing));
+
+        var unknown = ValidExchangeJson().Replace(
+            "\\"text\\":\\"hello\\"",
+            "\\"text\\":\\"hello\\",\\"extra\\":true",
+            StringComparison.Ordinal);
+        Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(unknown));
+    }
+
+    [Fact]
+    public void Decode_RejectsLiteralAboveConfiguredValueLimit()
+    {
+        var json = ValidExchangeJson().Replace(
+            "\\"text\\":\\"hello\\"",
+            "\\"text\\":\\"" + new string('x', CommandLimits.MaxLiteralCharacters + 1) + "\\"",
+            StringComparison.Ordinal);
+        Assert.Throws<FormatException>(() => CommandExchangeTextCodec.DecodeExchange(json));
+    }
+
+    [Fact]
+    public void Decode_PreservesOptionalNullAndNonNullDescriptions()
+    {
+        var withNull = ValidExchangeJson().Replace(
+            "\\"name\\":\\"context\\"",
+            "\\"name\\":\\"context\\",\\"description\\":null",
+            StringComparison.Ordinal);
+        var nullDescription = CommandExchangeTextCodec.DecodeExchange(withNull);
+        Assert.Null(nullDescription.AddressSpace.Addresses[0].Description);
+
+        var withDescription = ValidExchangeJson().Replace(
+            "\\"name\\":\\"context\\"",
+            "\\"name\\":\\"context\\",\\"description\\":\\"Input context\\"",
+            StringComparison.Ordinal);
+        var description = CommandExchangeTextCodec.DecodeExchange(withDescription);
+        Assert.Equal("Input context", description.AddressSpace.Addresses[0].Description);
+    }
+
+    [Fact]
+    public void ReadWriteAddress_RoundTripsThroughExchangeCodec()
+    {
+        var space = new CommandAddressSpace([
+            new CommandAddressDescriptor(1, "shared", CommandAddressAccess.ReadWrite, CommandValueKind.LiteralText)
+        ]);
+        var exchange = new CommandExchange(Guid.NewGuid(), space, [
+            new CommandAddressValue(1, CommandValue.FromText("shared value"))
+        ]);
+        var encoded = CommandExchangeTextCodec.Encode(exchange);
+        Assert.Contains("\\"access\\":\\"readWrite\\"", encoded);
+
+        var decoded = CommandExchangeTextCodec.DecodeExchange(encoded);
+        Assert.Equal(CommandAddressAccess.ReadWrite, decoded.AddressSpace.Addresses[0].Access);
+    }
+
 }
