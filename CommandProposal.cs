@@ -32,7 +32,7 @@ public sealed record CommandProposal
         if (totalLiteralCharacters > CommandLimits.MaxTotalLiteralCharacters)
             throw new ArgumentException($"A proposal cannot contain more than {CommandLimits.MaxTotalLiteralCharacters} aggregate literal characters.", nameof(commands));
 
-        var totalGrammarBodyBytes = items.Sum(command => (long)(command.GrammarBody?.Payload.Length ?? 0));
+        var totalGrammarBodyBytes = items.Sum(command => (long)(command.GrammarBody?.PayloadLength ?? 0));
         if (totalGrammarBodyBytes > CommandLimits.MaxGrammarBodyBytesPerProposal)
             throw new ArgumentException($"A proposal cannot contain more than {CommandLimits.MaxGrammarBodyBytesPerProposal} aggregate GrammarAi body bytes.", nameof(commands));
 
