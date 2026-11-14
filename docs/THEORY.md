@@ -23,7 +23,8 @@ This distinction matters whenever a model, agent, service, or application propos
 - **Argument value:** either another positive integer identifier or literal text.
 - **Command instruction:** one atomic declaration of intended action, with an action identity and ordered arguments.
 - **Proposal:** an immutable, non-empty ordered collection of command instructions.
-- **Protocol version:** the explicit representation contract. The approved and only supported version is `CommandAi/1`.
+- **Grammar body:** an optional opaque byte payload paired with a positive GrammarAi wire-format version and transported as canonical Base64.
+- **Protocol version:** the explicit representation contract. The approved and only supported version is `CommandAi/1`; compact and enriched forms coexist.
 
 An identifier is not a name. The integer `1001` has no universal meaning; the host maps it to a trusted action definition. Likewise, the order of arguments is preserved, but the generic package does not know whether the parameter is a resource, a mode, a path, or a diagnostic selector.
 
@@ -41,8 +42,9 @@ The public model is deliberately small:
 | `CommandValue` | Typed argument representation | Positive integer identifier or non-empty bounded literal text |
 | `CommandPrecondition` | Grammar-versioned opaque condition | Required bounded grammar version and expression; no parsing/evaluation in CommandAi |
 | `CommandOutcomeContract` / `CommandOutcomeField` | Expected outcome shape | Positive unique identities and bounded field count; not actual results |
-| `CommandLimits` | Resource safeguards | Bounds for wire characters, commands, arguments, preconditions, outcome fields, identities, and literal text |
-| `CommandAiTextCodec` | Text serialization boundary | Validates the /1 envelope; does not resolve meaning or grant authority |
+| `CommandGrammarBody` | Opaque GrammarAi body transport | Positive wire version, canonical Base64, non-empty bytes; 32 KiB per command and 128 KiB per proposal |
+| `CommandLimits` | Resource safeguards | Independent bounds for envelope, literals, collections, preconditions, outcomes, identities, and body bytes |
+| `CommandAiTextCodec` | Text serialization boundary | Compact `Command=` and enriched `AtomicCommand=`; strict /1 validation without authority |
 
 Within one instruction, parameter IDs are unique. Proposal order and argument order are preserved. Builders are mutable authoring helpers; `Build()` creates immutable model snapshots. The builders are not thread-safe and do not perform application-specific semantic validation.
 
@@ -56,11 +58,13 @@ The implementation is dependency-free and remains separate from adjacent Worksho
 - [`CommandInstruction.cs`](../CommandInstruction.cs) owns action/command identity, target, scope, idempotency identity, expected-outcome contract, preconditions, and ordered arguments.
 - [`CommandPrecondition.cs`](../CommandPrecondition.cs) carries opaque grammar-versioned condition data.
 - [`CommandOutcomeContract.cs`](../CommandOutcomeContract.cs) and [`CommandOutcomeField.cs`](../CommandOutcomeField.cs) declare expected outcome shape.
+- [`CommandGrammarBody.cs`](../CommandGrammarBody.cs) preserves the bounded GrammarAi body payload without parsing it.
 - [`CommandArgument.cs`](../CommandArgument.cs) pairs parameter identity with a value.
 - [`CommandValue.cs`](../CommandValue.cs) distinguishes integer identifiers from literal text.
 - [`CommandLimits.cs`](../CommandLimits.cs) centralizes representation bounds.
-- [`CommandAiTextCodec.cs`](../CommandAiTextCodec.cs) encodes and decodes the line-oriented /1 envelope.
-- [`CommandAiTextCodecTests.cs`](../tests/CommandAi.Tests/CommandAiTextCodecTests.cs) exercises round trips, ordering, malformed input, whitespace handling, and resource boundaries.
+- [`CommandAiTextCodec.cs`](../CommandAiTextCodec.cs) encodes and decodes compact and enriched forms in the /1 envelope.
+- [`CommandAiTextCodecTests.cs`](../tests/CommandAi.Tests/CommandAiTextCodecTests.cs) exercises compact round trips, ordering, malformed input, whitespace handling, and resource boundaries.
+- [`CommandGrammarBodyTests.cs`](../tests/CommandAi.Tests/CommandGrammarBodyTests.cs) exercises opaque body round trips, unknown positive wire versions, canonical Base64, exact byte limits, aggregate bounds, and envelope interaction.
 
 The builder API is convenience, not a second semantic model. A consuming domain can wrap it with named operations such as `InspectResource(...)`, but the names, mappings, and validation remain in that consuming domain. CommandAi itself must not accumulate application-specific action catalogs.
 
@@ -81,6 +85,8 @@ Command=1002 2003="Diagnostics"
 An enriched command uses an explicit `AtomicCommand=` JSON entry within the same `CommandAi/1` envelope. New readers accept compact, enriched, and mixed entries in proposal order; older compact-only readers reject enriched entries and must be upgraded. Enriched JSON rejects unknown and duplicate properties, invalid field combinations, and nesting deeper than 16.
 
 A compact command line begins with a positive action identifier. Each subsequent token is a positive parameter identifier, an equals sign, and either a positive integer identifier or a JSON-quoted string. JSON quoting preserves spaces, quotes, backslashes, and escaped control characters inside literal values.
+
+An enriched command may additionally carry an optional `body` object with `grammarWireVersion` and `payloadBase64`. The decoded bytes are preserved opaquely. CommandAi accepts any positive wire version; GrammarAi decides which versions it supports and validates the grammar structure. A missing body preserves the existing enriched record shape. Older enriched readers may reject records containing this new field; compact-only readers may reject all `AtomicCommand=` entries.
 
 LF output makes line endings deterministic, but this does not establish canonical bytes, canonical JSON rules beyond the current serializer behavior, signatures, hashes, or a digest contract. Those must not be inferred from deterministic line separators.
 
@@ -120,8 +126,10 @@ The current limits are measured in UTF-16 characters unless otherwise stated:
 | Arguments per command | 64 |
 | One literal text value | 16,384 |
 | Aggregate in-memory literal text | 1,048,576 |
+| Grammar body bytes per command (decoded) | 32 KiB |
+| Grammar body bytes per proposal (decoded) | 128 KiB |
 
-The model aggregate literal limit is currently independent of the smaller transport envelope limit. The recommendation to retain that separation remains open for owner review in issue #3. A proposal may be valid as in-memory data and still be too large to encode. The model bound limits aggregate literal storage; the codec bound limits the serialized transport representation. This is not a promise that every constructible model has a wire representation.
+Grammar body byte bounds are enforced independently of the serialized envelope and aggregate literal limits. The model aggregate literal limit is independent of the smaller transport envelope limit. A proposal may be valid in memory and still be too large to encode; this is not a guarantee that every constructible model has a wire representation. A proposal may be valid as in-memory data and still be too large to encode. The model bound limits aggregate literal storage; the codec bound limits the serialized transport representation. This is not a promise that every constructible model has a wire representation.
 
 Failure categories are also distinct:
 - Empty caller input is an `ArgumentException`.
@@ -150,7 +158,7 @@ The exact-head [CommandAi CI run 41752954762](https://github.com/TrentBest/TheSi
 
 Subsequent regression tests add explicit coverage for escaped control characters and blank/whitespace-only lines. Their own exact-head CI is tracked in [REFLECTION](REFLECTION.md); do not treat the earlier run as evidence for later commits.
 
-The enriched atomic-command form now carries command identity, target, scope, grammar-versioned opaque preconditions, a caller-supplied idempotency identity, and an expected-outcome shape. These are bounded declarations, not domain interpretation or runtime guarantees: GrammarAi owns grammar structure; the host owns live-state evaluation, replay/deduplication enforcement, authorization, approval, dispatch, and execution. The separate address-space exchange surface carries local request/response correlation and declared input/output slots. Neither surface supplies actual outcomes, canonical signing/digests, workflow semantics, secret classification, authorization, or execution. Keep specialized or domain-specific concerns in consuming-domain extensions rather than adding generic fields without a concrete cross-domain need, semantic owner, validation rule, compatibility policy, resource bound, and source-backed tests.
+The enriched atomic-command form carries command identity, target, scope, grammar-versioned opaque preconditions, a caller-supplied idempotency identity, an expected-outcome shape, and an optional opaque GrammarAi body. CommandAi validates the body wire version as positive, canonical Base64, non-empty payload, and 32 KiB/command plus 128 KiB/proposal bounds; it does not reject unknown positive GrammarAi wire versions or parse the body. GrammarAi owns grammar decoding and structural validation; the host owns live-state evaluation, replay/deduplication enforcement, authorization, approval, dispatch, and execution. The separate address-space exchange surface carries local request/response correlation and declared input/output slots. Neither surface supplies actual outcomes, canonical signing/digests, workflow semantics, secret classification, authorization, or execution. Keep specialized or domain-specific concerns in consuming-domain extensions rather than adding generic fields without a concrete cross-domain need, semantic owner, validation rule, compatibility policy, resource bound, and source-backed tests.
 
 ## 10. Practice and assessment
 
