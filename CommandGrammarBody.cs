@@ -19,6 +19,9 @@ public sealed class CommandGrammarBody
     private readonly byte[] _payload;
     public int GrammarWireVersion { get; }
     public ReadOnlyMemory<byte> Payload => new(_payload.ToArray());
+
+    // Internal accounting avoids allocating a defensive payload copy for every proposal validation.
+    internal int PayloadLength => _payload.Length;
     public string PayloadBase64 => Convert.ToBase64String(_payload);
 
     internal static CommandGrammarBody FromBase64(int version, string payloadBase64)
