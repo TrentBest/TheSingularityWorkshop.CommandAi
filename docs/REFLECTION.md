@@ -3,19 +3,22 @@
 
 ## Owner-selected CommandAi/1 alignment — 2026-11-15
 
-The owner selected the enriched CommandAi/1 contract as the target for the next release. The intended direction is to align the permanent `development` branch with the enriched candidate in draft PR #8 while retaining the compact `Command=` representation and its compatibility behavior alongside enriched `AtomicCommand=` entries.
+The owner selected the enriched CommandAi/1 contract as the next implementation target while retaining the original compact Command= representation. Compact and enriched AtomicCommand entries may coexist in one ordered proposal. Compact-only readers must reject enriched entries and upgrade before consuming them; no silent downgrade or inferred compact defaults are allowed.
 
-This is an implementation target, **not a claim that enriched behavior is already present on `development`**. The current development source remains compact-only until the candidate's models, builders, codec, GrammarAi opaque-body seam, bounds, adversarial tests, and documentation are reconciled against the current development baseline and pass exact-head CI.
+The current development branch has since received the overlapping core model, builders, codec, limits, and expected-outcome contract changes. Those seven source files were verified to have identical blob contents on development and the integration work branch. The remaining integration delta is isolated on work/commandai-enriched-v1-current-development-integration, created from the current development head. It adds the opaque GrammarAi body, precondition and outcome-field types, plus the focused enriched-command and grammar-body test suites.
+
+The integration branch also updates the README, documentation index, theory, usage, and domain-completeness pages to describe the combined contract. Exact-head CI for this complete candidate is still pending; earlier compact-only CI evidence does not certify these changes.
 
 Alignment constraints:
 
-- Keep the protocol identity `CommandAi/1`; do not introduce /2 or infer defaults for compact commands.
-- Keep CommandAi independent of GrammarAi. Grammar metadata/body bytes remain opaque here; GrammarAi owns grammar structure and validation.
-- Keep live-state resolution, policy, authorization, approval, replay enforcement, dispatch, and execution in the trusted host.
-- Preserve the current address-space exchange/response behavior and optional MicroBundle package boundary during reconciliation.
+- Keep the protocol identity CommandAi/1 and preserve the compact Command= representation.
+- Treat AtomicCommand as an explicit additive entry; compact-only readers reject it.
+- Keep CommandAi independent of GrammarAi. Grammar version tokens and body bytes remain opaque; GrammarAi owns grammar interpretation and structural validation.
+- Keep live-state evaluation, policy, authorization, approval, replay/deduplication enforcement, dispatch, and execution in the trusted host.
+- Preserve the address-space exchange/response behavior and optional MicroBundle package boundary.
 - Keep NuGet publication disabled. A passing build or package artifact is not publication authorization.
 
-The reconciliation must be performed against the current `development` head, not by blindly transplanting the older draft branch. PR #6 remains open until its unique material is fully reconciled; PR #8 remains draft. Neither PR is to be merged as part of this work.
+PR #8 remains draft and PR #6 remains untouched. Neither PR is to be merged as part of this integration. No master write, package publication, release, deployment, or branch deletion is authorized by this work.
 
 # CommandAi status and release-readiness evidence
 
