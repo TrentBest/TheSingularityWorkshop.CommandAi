@@ -1,35 +1,28 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-# Internal consumer alignment: retain CommandAi/1
+# CommandAi/1 consumer alignment — no /2 migration
 
-## Owner decision
+## Owner-selected contract
 
-The repository owner has explicitly chosen to retain the existing CommandAi/1 model and wire format. The Workshop owns the current consumers, so internal repositories must adapt together. Do not migrate consumers to /2, do not add /2-only fields, and do not increment the package or protocol version merely for internal coordination.
+The Workshop has selected the enriched **CommandAi/1** contract. This page is retained at its historical path so existing links do not break; it is not a proposal to migrate to CommandAi/2.
 
-This page replaces the former /2 migration proposal. It is retained at its existing path to avoid breaking links; it is not an instruction to migrate to /2.
+## Supported proposal shapes
 
-## Approved model
+- The original compact `Command=` entry remains supported with its original encoding.
+- Enriched `AtomicCommand=` JSON entries add command identity, typed target and scope, idempotency identity, expected-outcome shape, ordered typed arguments, optional GrammarAi-versioned preconditions, and an optional opaque GrammarAi body.
+- Compact and enriched entries may coexist in one proposal, preserving their declared order.
+- Compact instructions retain absent enriched metadata. Consumers must not infer defaults.
 
-The current API uses:
-- `CommandProposalBuilder` to create an immutable proposal;
-- `AddCommand(actionId, configure)` to add an instruction;
-- `CommandInstructionBuilder` to add typed parameters;
-- `WithIdentifier(parameterId, valueId)` for positive integer identifiers;
-- `WithText(parameterId, value)` for literal text;
-- `CommandAiTextCodec` for the line-oriented CommandAi/1 envelope.
+## Compatibility
 
-## Consumer action
+Older compact-only readers reject `AtomicCommand=` entries. Upgrade consumers before sending enriched proposals; the unchanged `CommandAi/1` identifier does not make older readers forward-compatible. Enriched readers must also support the optional `body` member before consuming body-bearing commands.
 
-1. Remove assumptions about command IDs, targets, scopes, idempotency keys, precondition fields, and expected-outcome contracts; those are not fields in the approved /1 model.
-2. Build named operations in the consuming host and translate them into action and parameter identities.
-3. Keep host-owned policy, authorization, execution, and outcome handling outside CommandAi.
-4. Update fixtures and tests to the /1 line-oriented envelope.
-5. Run the consuming repository's restore, build, tests, and integration workflows against the exact CommandAi source revision.
+## Ownership
 
-## Compatibility and release
+CommandAi validates representation and bounds only. GrammarAi owns grammar definitions and structural validation. The trusted host owns live-state evaluation, replay/deduplication enforcement, policy, authorization, approval, dispatch, execution, and actual outcomes.
 
-No external compatibility boundary is being introduced by this internal correction. Preserve package version `0.1.0-alpha.2`. No NuGet publication, master merge, release, or deployment is authorized by this page.
+The NuGet package version remains `0.1.0-alpha.2`. Package publication, master changes, merges, releases, and deployments require explicit owner authorization.
 
 ---
 
