@@ -20,10 +20,10 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../../TheSingularityWorkshop.CommandAi.csproj" Condition="'$(UsePackedCommandAi)' != 'true'" />
+    <ProjectReference Include="../TheSingularityWorkshop.CommandAi.csproj" Condition="'$(UsePackedCommandAi)' != 'true'" />
     <PackageReference Include="TheSingularityWorkshop.CommandAi" Version="$(CommandAiPackageVersion)" Condition="'$(UsePackedCommandAi)' == 'true'" />
     <PackageReference Include="TheSingularityWorkshop.MicroBundleDomain" Version="1.0.1" />
     <None Include="README.md" Pack="true" PackagePath="" />
-    <None Include="../../LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+    <None Include="../LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
   </ItemGroup>
 </Project>
