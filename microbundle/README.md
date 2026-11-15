@@ -27,13 +27,15 @@ A successfully decoded proposal remains untrusted intent. The host still owns do
 ## 04 See it in a minute
 
 ```bash
-dotnet add package TheSingularityWorkshop.CommandAi.MicroBundle
+dotnet add package TheSingularityWorkshop.CommandAi.MicroBundle --version 0.1.0-alpha.1
 ```
 
 ```csharp
+using TheSingularityWorkshop.CommandAi;
 using TheSingularityWorkshop.CommandAi.MicroBundle;
 
 var capability = new CommandAiMicroBundle();
+var proposal = new CommandProposal([new CommandInstruction(1001)]);
 Console.WriteLine(capability.Descriptor.Providers[0].Id);
 
 var decoded = capability.Decode(capability.Encode(proposal));
