@@ -11,7 +11,7 @@
 
 ## 01 What is CommandAi?
 
-**CommandAi defines provider-neutral, immutable representations for application/AI exchanges.** The current development package provides ordered command proposals, atomic instructions, typed arguments, and a bounded CommandAi/1 text codec. It describes intent; it does not authorize or execute it.
+**CommandAi defines provider-neutral, immutable representations for application/AI exchanges.** Its proposal model carries ordered atomic actions and typed arguments in both the original compact form and an enriched atomic-command form. The enriched form adds explicit command identity, target, scope, preconditions, idempotency identity, and an expected-outcome contract. Its address-space model describes declared input/context slots and writable response slots, with local request/response correlation.
 
 The protocol identity remains `CommandAi/1`. That identity is not the NuGet package version; internal contract evolution does not automatically require a version increment.
 
@@ -25,7 +25,7 @@ An application declares descriptors with positive IDs, names, read/write access,
 
 CommandAi rejects undeclared or duplicate addresses, invalid direction, missing required slots, mismatched value kinds, and response correlation mismatch. GrammarAi remains an independent owner of grammar validation; CommandAi has no GrammarAi dependency.
 
-The compact proposal text codec continues to encode/decode `CommandProposal`. The address-space exchange model also has a canonical, deterministic JSON wire codec: `CommandExchangeTextCodec` encodes and decodes both exchanges and responses under `CommandAi/1`, with strict structural validation and bounded envelopes. The codec does not authorize or execute a response.
+The line-oriented proposal codec reads and writes both compact `Command=` entries and enriched `AtomicCommand=` entries within `CommandAi/1`. Compact entries retain their original representation; older compact-only readers must be upgraded before consuming enriched entries. The address-space exchange model also has a canonical, deterministic JSON wire codec: `CommandExchangeTextCodec` encodes and decodes both exchanges and responses under `CommandAi/1`, with strict structural validation and bounded envelopes. The codec does not authorize or execute a response.
 
 ## 04 See it in a minute
 
@@ -33,7 +33,7 @@ The compact proposal text codec continues to encode/decode `CommandProposal`. Th
 dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
 ~~~
 
-The quickstart demonstrates the compact proposal API. The optional MicroBundle quickstart demonstrates the same capability through `IMicroBundle`.
+The quickstart demonstrates the compact proposal API. Enriched atomic proposals and address-space exchanges remain separate API surfaces, each with its own model and codec.
 
 ## 05 Documentation and theory
 
@@ -42,7 +42,6 @@ The quickstart demonstrates the compact proposal API. The optional MicroBundle q
 - [Domain completeness and ownership](docs/DOMAIN_COMPLETENESS.md)
 - [Theory and wire contract](docs/THEORY.md)
 - [Architecture](docs/ARCHITECTURE.md)
-- [SingularityBot integration concept](docs/SINGULARITYBOT_INTEGRATION.md)
 - [Usage guide](docs/USAGE.md)
 - [Builder integration](docs/BUILDER_INTEGRATION.md)
 - [Type guides](docs/types/)
@@ -56,17 +55,17 @@ The quickstart demonstrates the compact proposal API. The optional MicroBundle q
 |---|---|
 | ProtocolAi | Shared vocabulary identity and broader correlated event/outcome provenance |
 | GrammarAi | Grammar definitions and structural validation |
-| CommandAi | Immutable proposals, atomic instructions, typed arguments, /1 codec and bounds |\n| CommandAi.MicroBundle (optional) | Exposes the CommandAi proposal codec as an `IMicroBundle` capability |
+| CommandAi | Compact/enriched atomic proposals, address descriptors, typed exchange values, correlation, representation bounds |
 | HeadlessAi | Configured endpoint communication |
 | CiAi | CI evidence, verdicts, and domain-specific mappings |
 | AppAi (future) | Application-program composition and response planning |
 | FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
 
-The core `TheSingularityWorkshop.CommandAi` package remains dependency-free. Consumers that want MicroBundle composition can install `TheSingularityWorkshop.CommandAi.MicroBundle`; that adapter depends on the neutral `MicroBundleDomain` contract, not FSM_COS. Neither package resolves application semantics, authorizes, dispatches, or executes commands.
+CommandAi has no runtime dependency on sibling packages. It does not dereference addresses, interpret application semantics, authorize, or execute.
 
 ## Verification and release status
 
-The repository workflow restores, builds, tests, runs both quickstarts, packs both packages, and audits each packed artifact with package-only consumers. The core package version remains `0.1.0-alpha.2`; the optional adapter begins at `0.1.0-alpha.1`. NuGet publication remains disabled and requires explicit owner authorization.
+The repository workflow restores, builds, tests, runs the quickstart, packs, and audits the package artifact. Package version remains `0.1.0-alpha.2`. NuGet publication remains disabled and requires explicit owner authorization.
 
 ---
 
