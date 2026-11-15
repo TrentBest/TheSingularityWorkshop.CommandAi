@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: TrentBest/TheSingularityWorkshop.CiAi
-          ref: 49a802fcab60fa7411b01892072d7e2c8a2c72a9
+          ref: 9e01a4be81fb94fa7bb2d4619196646adf3463f4
           path: .ciai
           submodules: recursive
 
