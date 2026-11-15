@@ -52,7 +52,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
       - name: Restore
         run: dotnet restore TheSingularityWorkshop.CommandAi.slnx
       - name: Build
@@ -99,8 +99,8 @@ jobs:
               assert nuspec_name, 'Package nuspec is missing'
               assert any(name.lower() == 'readme.md' for name in names), 'Package README is missing'
               assert any(name.endswith('LICENSE.txt') for name in names), 'Package license is missing'
-              assert any(name.startswith('lib/net8.0/') and name.endswith('.dll') for name in names), 'Package assembly is missing'
-              assert any(name.startswith('lib/net8.0/') and name.endswith('.xml') for name in names), 'Package XML documentation is missing'
+              assert any(name.startswith('lib/net10.0/') and name.endswith('.dll') for name in names), 'Package assembly is missing'
+              assert any(name.startswith('lib/net10.0/') and name.endswith('.xml') for name in names), 'Package XML documentation is missing'
               root = ET.fromstring(package.read(nuspec_name))
               metadata = root.find('.//{*}metadata')
               assert metadata is not None, 'Package metadata is missing'
@@ -139,8 +139,8 @@ jobs:
               assert nuspec_name, 'Adapter nuspec is missing'
               assert any(name.lower() == 'readme.md' for name in names), 'Adapter README is missing'
               assert any(name.endswith('LICENSE.txt') for name in names), 'Adapter license is missing'
-              assert any(name.startswith('lib/net8.0/') and name.endswith('.dll') for name in names), 'Adapter assembly is missing'
-              assert any(name.startswith('lib/net8.0/') and name.endswith('.xml') for name in names), 'Adapter XML documentation is missing'
+              assert any(name.startswith('lib/net10.0/') and name.endswith('.dll') for name in names), 'Adapter assembly is missing'
+              assert any(name.startswith('lib/net10.0/') and name.endswith('.xml') for name in names), 'Adapter XML documentation is missing'
               root = ET.fromstring(package.read(nuspec_name))
               metadata = root.find('.//{*}metadata')
               assert metadata is not None
