@@ -1,64 +1,35 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-## Owner-selected CommandAi/1 alignment — 2026-11-15
-
-The owner selected the enriched CommandAi/1 contract as the target for the next release. The intended direction is to align the permanent `development` branch with the enriched candidate in draft PR #8 while retaining the compact `Command=` representation and its compatibility behavior alongside enriched `AtomicCommand=` entries.
-
-This is an implementation target, **not a claim that enriched behavior is already present on `development`**. The current development source remains compact-only until the candidate's models, builders, codec, GrammarAi opaque-body seam, bounds, adversarial tests, and documentation are reconciled against the current development baseline and pass exact-head CI.
-
-Alignment constraints:
-
-- Keep the protocol identity `CommandAi/1`; do not introduce /2 or infer defaults for compact commands.
-- Keep CommandAi independent of GrammarAi. Grammar metadata/body bytes remain opaque here; GrammarAi owns grammar structure and validation.
-- Keep live-state resolution, policy, authorization, approval, replay enforcement, dispatch, and execution in the trusted host.
-- Preserve the current address-space exchange/response behavior and optional MicroBundle package boundary during reconciliation.
-- Keep NuGet publication disabled. A passing build or package artifact is not publication authorization.
-
-The reconciliation must be performed against the current `development` head, not by blindly transplanting the older draft branch. PR #6 remains open until its unique material is fully reconciled; PR #8 remains draft. Neither PR is to be merged as part of this work.
-
 # CommandAi status and release-readiness evidence
 
-## Current package verification — 2026-11-15
+## Owner-selected CommandAi/1 alignment — 2026-11-15
 
-The current `development` package track now contains two independently packed artifacts:
+The owner selected the enriched CommandAi/1 contract for the next release. The permanent `development` branch is being aligned directly; the implementation retains the original compact `Command=` representation and adds enriched `AtomicCommand=` records without changing the protocol identity.
 
-- **Core:** `TheSingularityWorkshop.CommandAi` `0.1.0-alpha.2`; dependency-free.
-- **Optional adapter:** `TheSingularityWorkshop.CommandAi.MicroBundle` `0.1.0-alpha.1`; depends on the core package and `TheSingularityWorkshop.MicroBundleDomain` `1.0.1`. It has no FSM_COS or MicroBundleRepository dependency.
+The enriched contract includes command identity, typed opaque target and scope, ordered typed arguments, bounded grammar-versioned preconditions, caller-supplied idempotency identity, expected-outcome declarations, and an optional opaque GrammarAi body. CommandAi validates representation and transport bounds only. GrammarAi owns grammar structure; the trusted host owns live-state evaluation, replay/deduplication enforcement, policy, authorization, approval, dispatch, execution, and actual outcomes.
 
-Exact-head [CommandAi CI run 43683852447](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43683852447) passed on `d3b26f14490eac18966e813e4ceb66e4d3c996db`. It verified Workshop Markdown branding, restore, Release build, tests with coverage, the core quickstart, core package packing and packed-package consumer audit, adapter packing against the packed core package, adapter nuspec dependency checks, and a package-only adapter consumer restore/build/run. The `publish_nuget` job was skipped. Package artifacts were uploaded as `command-ai-nuget-package`; no package was published.
+The address-space `CommandExchange` / `CommandResponse` models and their codec remain present. The optional MicroBundle adapter remains separate from the dependency-free core package.
 
-The MicroBundle adapter implements the neutral `IMicroBundle` contract. It declares provider `commandai.proposal`, delegates Encode/Decode to the core codec, and does not authorize, dispatch, or execute proposals. Its `Load` and `Arbitrate` behavior is intentionally stateless and is covered by adapter contract tests.
+## Current implementation and verification
 
-**Important scope boundary:** this verified development package contains the compact proposal model currently present on `development`. Draft PR #8 contains a richer candidate contract and remains separate; its code is not silently treated as part of this package. Before a public release, reconcile the candidate API and all source-backed documentation, then rerun exact-head package/consumer CI. Do not merge PR #8, publish either package, modify `master`, or release without the owner's explicit authorization.
+- `CommandAi/1` remains the protocol identity. Do not invent a /2 migration or change the NuGet version merely because this contract is richer.
+- Compact-only consumers are not forward-compatible with `AtomicCommand=` entries. Upgrade consuming repositories before sending enriched proposals; compact entries retain absent enriched metadata and receive no inferred defaults.
+- The first push after the enriched implementation exposed missing source declarations for `CommandPrecondition`, `CommandOutcomeField`, and `CommandGrammarBody`. Those types have now been added to `development`, together with focused atomic-contract and opaque-body regression suites.
+- Enriched architecture, theory, usage, problem-domain, compatibility, and type-reference documentation has been ported to the active branch. Final docs reconciliation and exact-head CI are still required before release readiness can be claimed.
+- The first failed build is recorded in [CI run 43695659319](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43695659319); its compiler errors identified the missing type declarations above. Follow-up commits add those declarations and the tests.
+- Core package version remains `0.1.0-alpha.2`; optional adapter version remains `0.1.0-alpha.1`. NuGet publication remains disabled and is not authorized.
 
+## Release and repository boundaries
 
-## Approved direction
+- Work directly on `development`; do not modify `master`.
+- Keep CommandAi independent of GrammarAi. Grammar metadata and body bytes remain opaque in this package.
+- Preserve address-space exchange/response behavior and the optional MicroBundle package boundary.
+- Keep publication disabled by default. Passing CI or producing package artifacts is not publication authorization.
+- PR #8 and PR #6 remain open draft/legacy work records pending a full reconciliation audit. Do not merge them as a shortcut; do not delete branches.
+- Consumer migration and exact-SHA integration checks remain required, especially for SingularityBot and The Architect. Structurally valid responses remain untrusted intent.
 
-**Retain CommandAi/1.** The Workshop owns all current consumers, so internal repositories adapt together to the existing /1 model and wire shape. Do not migrate to /2, add /2-only fields, or bump the package/protocol version merely for internal coordination.
-
-Package version remains `0.1.0-alpha.2`. NuGet publication is not authorized.
-
-## Current implementation
-
-- Immutable `CommandProposal` and `CommandInstruction` model.
-- Positive integer action and parameter identities.
-- Ordered typed arguments using integer identifiers or literal text.
-- Generic fluent proposal and instruction builders.
-- Line-oriented CommandAi/1 codec.
-- Bounds for envelope, command count, arguments, individual literal text, and aggregate literal text.
-- Decoder rejects unsupported versions, malformed envelopes, duplicate protocol declarations, duplicate parameters, invalid values, malformed quoted literals, and resource-limit violations.
-- Host owns domain meaning, authorization, approval, execution, and actual outcomes.
-
-## Verification status
-
-- **Latest verified implementation baseline before this reflection refresh:** [run 41711472222](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41711472222) completed successfully for exact head `3563bfcabdae9e4166c6b9f86a65edf959ab5631` on 2026-11-03. The `build-and-test` check succeeded; `publish_nuget` was skipped. The documentation refresh commit itself requires its own exact-head CI result.
-- The immediately preceding source-fix head `14a0828fbce994eddef9f9d229afbbb8e3b16e8a` also passed [run 41594167943](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41594167943).
-- These runs verify the null-command validation-order fix and its regression test. A null command in the proposal input now produces the intended `ArgumentException` (with parameter name `commands`) rather than an accidental `NullReferenceException` during aggregate literal-size inspection.
-- The earlier full workflow passed on exact development head `339f404b0c7ad0170ca1549da1161938047c1ca8`: [run 41592630562](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/41592630562). It completed Workshop Markdown branding validation, .NET restore/build, tests with coverage, Codecov upload, quickstart execution, package pack, packed-artifact audit, and consumer compilation against the packed package.
-- The `publish_nuget` job was skipped. The package artifact was produced but not published.
-- The verified implementation includes adversarial codec tests and deterministic-LF encoding. The encoder emits LF line separators on every platform; the decoder accepts LF and CRLF.
-- The approved package version remains `0.1.0-alpha.2`. No package/protocol version increment or NuGet publication occurred.
+## Historical records (pre-enriched implementation)
 
 ## Latest development activity (2026-11-03)
 
