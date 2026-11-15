@@ -1,3 +1,4 @@
+using TheSingularityWorkshop.CommandAi;
 using TheSingularityWorkshop.CommandAi.MicroBundle;
 using TheSingularityWorkshop.MicroBundleDomain;
 
