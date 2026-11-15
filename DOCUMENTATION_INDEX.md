@@ -33,9 +33,7 @@ The optional adapter depends on the core package and `TheSingularityWorkshop.Mic
 
 ## Current public types
 
-The approved /1 model is centered on `CommandProposal`, `CommandInstruction`, `CommandArgument`, `CommandValue`, `CommandValueKind`, `CommandLimits`, `CommandAiTextCodec`, `CommandProposalBuilder`, and `CommandInstructionBuilder`.
-
-The prior /2 candidate introduced `CommandPrecondition`, `CommandOutcomeContract`, and `CommandOutcomeField`. Those types and their type guides are not present in the current source tree and are not part of the approved /1 contract; historical context is recorded in [Legacy compatibility](docs/LEGACY_COMPATIBILITY.md).
+The enriched CommandAi/1 model includes `CommandProposal`, `CommandInstruction`, `CommandArgument`, `CommandValue`, `CommandPrecondition`, `CommandOutcomeContract`, `CommandOutcomeField`, `CommandGrammarBody`, `CommandLimits`, `CommandAiTextCodec`, `CommandExchange`, `CommandResponse`, `CommandExchangeTextCodec`, and the proposal/instruction builders. Compact `Command=` entries remain supported; enriched `AtomicCommand=` entries add command identity, typed target/scope, idempotency, expected outcome, optional preconditions, and an optional opaque GrammarAi body.
 
 All Markdown pages must retain the animated moniker at the top and canonical Workshop PNG footer. CI validates those branding requirements. No NuGet publication is authorized.
 
