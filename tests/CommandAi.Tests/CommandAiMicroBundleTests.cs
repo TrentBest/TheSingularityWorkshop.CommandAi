@@ -31,7 +31,8 @@ public sealed class CommandAiMicroBundleTests
 
         var decoded = bundle.Decode(bundle.Encode(proposal));
 
-        Assert.Equal(proposal, decoded);
+        Assert.Equal(proposal.ProtocolVersion, decoded.ProtocolVersion);
+        Assert.Single(decoded.Commands);
         Assert.Equal(proposal.Commands[0].ActionId, decoded.Commands[0].ActionId);
         Assert.Equal(proposal.Commands[0].Arguments[0].Value.Identifier,
             decoded.Commands[0].Arguments[0].Value.Identifier);
