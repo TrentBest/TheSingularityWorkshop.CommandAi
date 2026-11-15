@@ -1,6 +1,22 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
+## Owner-selected CommandAi/1 alignment — 2026-11-15
+
+The owner selected the enriched CommandAi/1 contract as the target for the next release. The intended direction is to align the permanent `development` branch with the enriched candidate in draft PR #8 while retaining the compact `Command=` representation and its compatibility behavior alongside enriched `AtomicCommand=` entries.
+
+This is an implementation target, **not a claim that enriched behavior is already present on `development`**. The current development source remains compact-only until the candidate's models, builders, codec, GrammarAi opaque-body seam, bounds, adversarial tests, and documentation are reconciled against the current development baseline and pass exact-head CI.
+
+Alignment constraints:
+
+- Keep the protocol identity `CommandAi/1`; do not introduce /2 or infer defaults for compact commands.
+- Keep CommandAi independent of GrammarAi. Grammar metadata/body bytes remain opaque here; GrammarAi owns grammar structure and validation.
+- Keep live-state resolution, policy, authorization, approval, replay enforcement, dispatch, and execution in the trusted host.
+- Preserve the current address-space exchange/response behavior and optional MicroBundle package boundary during reconciliation.
+- Keep NuGet publication disabled. A passing build or package artifact is not publication authorization.
+
+The reconciliation must be performed against the current `development` head, not by blindly transplanting the older draft branch. PR #6 remains open until its unique material is fully reconciled; PR #8 remains draft. Neither PR is to be merged as part of this work.
+
 # CommandAi status and release-readiness evidence
 
 ## Current package verification — 2026-11-15
