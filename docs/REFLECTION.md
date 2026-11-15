@@ -3,6 +3,20 @@
 
 # CommandAi status and release-readiness evidence
 
+## Current package verification — 2026-11-15
+
+The current `development` package track now contains two independently packed artifacts:
+
+- **Core:** `TheSingularityWorkshop.CommandAi` `0.1.0-alpha.2`; dependency-free.
+- **Optional adapter:** `TheSingularityWorkshop.CommandAi.MicroBundle` `0.1.0-alpha.1`; depends on the core package and `TheSingularityWorkshop.MicroBundleDomain` `1.0.1`. It has no FSM_COS or MicroBundleRepository dependency.
+
+Exact-head [CommandAi CI run 43683852447](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43683852447) passed on `d3b26f14490eac18966e813e4ceb66e4d3c996db`. It verified Workshop Markdown branding, restore, Release build, tests with coverage, the core quickstart, core package packing and packed-package consumer audit, adapter packing against the packed core package, adapter nuspec dependency checks, and a package-only adapter consumer restore/build/run. The `publish_nuget` job was skipped. Package artifacts were uploaded as `command-ai-nuget-package`; no package was published.
+
+The MicroBundle adapter implements the neutral `IMicroBundle` contract. It declares provider `commandai.proposal`, delegates Encode/Decode to the core codec, and does not authorize, dispatch, or execute proposals. Its `Load` and `Arbitrate` behavior is intentionally stateless and is covered by adapter contract tests.
+
+**Important scope boundary:** this verified development package contains the compact proposal model currently present on `development`. Draft PR #8 contains a richer candidate contract and remains separate; its code is not silently treated as part of this package. Before a public release, reconcile the candidate API and all source-backed documentation, then rerun exact-head package/consumer CI. Do not merge PR #8, publish either package, modify `master`, or release without the owner's explicit authorization.
+
+
 ## Approved direction
 
 **Retain CommandAi/1.** The Workshop owns all current consumers, so internal repositories adapt together to the existing /1 model and wire shape. Do not migrate to /2, add /2-only fields, or bump the package/protocol version merely for internal coordination.
