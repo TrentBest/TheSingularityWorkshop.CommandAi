@@ -22,6 +22,15 @@ CommandAi/1 is the approved provider-neutral representation for immutable, order
 | Read agent instructions | [AGENTS.md](AGENTS.md) |
 | Shared documentation rules | [FSM_COS Documentation Standard](https://github.com/TrentBest/TheSingularityWorkshop.FSM_COS/blob/development/DOCUMENTATION_STANDARD.md) |
 
+## Package installation
+
+| Consumer need | Install |
+|---|---|
+| Use CommandAi proposals and the /1 codec without MicroBundle infrastructure | `TheSingularityWorkshop.CommandAi` |
+| Compose CommandAi as a code-defined MicroBundle | `TheSingularityWorkshop.CommandAi.MicroBundle` |
+
+The optional adapter depends on the core package and `TheSingularityWorkshop.MicroBundleDomain`; it does not depend on FSM_COS or MicroBundleRepository.
+
 ## Current public types
 
 The approved /1 model is centered on `CommandProposal`, `CommandInstruction`, `CommandArgument`, `CommandValue`, `CommandValueKind`, `CommandLimits`, `CommandAiTextCodec`, `CommandProposalBuilder`, and `CommandInstructionBuilder`.
