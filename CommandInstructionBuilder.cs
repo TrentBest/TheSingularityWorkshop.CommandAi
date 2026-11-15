@@ -1,18 +1,46 @@
 namespace TheSingularityWorkshop.CommandAi;
 
-/// <summary>Builds one generic command instruction from opaque action and parameter identities.</summary>
-/// <remarks>This builder does not resolve identifiers or attach application-specific meaning to them. This mutable builder is not thread-safe.</remarks>
+/// <summary>Builds either a compact legacy instruction or a complete enriched atomic command.</summary>
+/// <remarks>This mutable builder is not thread-safe and performs no semantic or authorization checks.</remarks>
 public sealed class CommandInstructionBuilder
 {
     private readonly ulong _actionId;
+    private readonly Guid? _commandId;
+    private readonly CommandValue? _target;
+    private readonly CommandValue? _scope;
+    private readonly string? _idempotencyKey;
+    private readonly CommandOutcomeContract? _outcomeContract;
     private readonly List<CommandArgument> _arguments = [];
+    private readonly List<CommandPrecondition> _preconditions = [];
+    private CommandGrammarBody? _grammarBody;
 
-    /// <summary>Creates a command builder.</summary>
-    /// <param name="actionId">Application-owned action identity; must be positive.</param>
+    /// <summary>Creates a compact CommandAi/1 instruction builder.</summary>
     public CommandInstructionBuilder(ulong actionId)
     {
-        if (actionId == 0) throw new ArgumentOutOfRangeException(nameof(actionId));
+        if (actionId == 0)
+            throw new ArgumentOutOfRangeException(nameof(actionId), "Action identifiers must be positive.");
         _actionId = actionId;
+    }
+
+    /// <summary>Creates a fully specified enriched atomic-command builder.</summary>
+    public CommandInstructionBuilder(
+        Guid commandId,
+        ulong actionId,
+        CommandValue target,
+        CommandValue scope,
+        string idempotencyKey,
+        CommandOutcomeContract outcomeContract)
+    {
+        if (commandId == Guid.Empty)
+            throw new ArgumentException("A command identity is required.", nameof(commandId));
+        if (actionId == 0)
+            throw new ArgumentOutOfRangeException(nameof(actionId), "Action identifiers must be positive.");
+        _commandId = commandId;
+        _actionId = actionId;
+        _target = target ?? throw new ArgumentNullException(nameof(target));
+        _scope = scope ?? throw new ArgumentNullException(nameof(scope));
+        _idempotencyKey = idempotencyKey;
+        _outcomeContract = outcomeContract ?? throw new ArgumentNullException(nameof(outcomeContract));
     }
 
     /// <summary>Adds an opaque integer identifier value for a parameter.</summary>
@@ -35,6 +63,37 @@ public sealed class CommandInstructionBuilder
         return this;
     }
 
-    /// <summary>Creates an immutable command snapshot.</summary>
-    public CommandInstruction Build() => new(_actionId, _arguments);
+    /// <summary>Adds an opaque precondition expression associated with a GrammarAi version.</summary>
+    public CommandInstructionBuilder WithPrecondition(string grammarVersion, string expression)
+    {
+        if (!_commandId.HasValue)
+            throw new InvalidOperationException("Grammar-versioned preconditions require the enriched atomic-command contract.");
+        if (_preconditions.Count >= CommandLimits.MaxPreconditionsPerCommand)
+            throw new InvalidOperationException($"A command cannot contain more than {CommandLimits.MaxPreconditionsPerCommand} preconditions.");
+        _preconditions.Add(new CommandPrecondition(grammarVersion, expression));
+        return this;
+    }
+
+    /// <summary>Attaches an opaque, bounded GrammarAi wire body to an enriched command.</summary>
+    public CommandInstructionBuilder WithGrammarBody(CommandGrammarBody body)
+    {
+        if (!_commandId.HasValue)
+            throw new InvalidOperationException("Grammar bodies require the enriched atomic-command contract.");
+        _grammarBody = body ?? throw new ArgumentNullException(nameof(body));
+        return this;
+    }
+
+    /// <summary>Creates an immutable compact or enriched command snapshot.</summary>
+    public CommandInstruction Build() => _commandId is Guid commandId
+        ? new CommandInstruction(
+            commandId,
+            _actionId,
+            _target!,
+            _scope!,
+            _idempotencyKey!,
+            _outcomeContract!,
+            _arguments,
+            _preconditions,
+            _grammarBody)
+        : new CommandInstruction(_actionId, _arguments);
 }
