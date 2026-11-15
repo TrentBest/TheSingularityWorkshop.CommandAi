@@ -189,4 +189,6 @@ jobs:
         with:
           user: TheSingularityWorkshop
       - name: Publish package to NuGet.org
-        run: dotnet nuget push "./artifacts/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --skip-duplicate
+        run: |
+          dotnet nuget push "./artifacts/TheSingularityWorkshop.CommandAi.0.1.0-alpha.2.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --skip-duplicate
+          dotnet nuget push "./artifacts/TheSingularityWorkshop.CommandAi.MicroBundle.0.1.0-alpha.1.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --skip-duplicate
