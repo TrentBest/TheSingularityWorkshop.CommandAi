@@ -3,78 +3,95 @@
 
 # CommandAi domain completeness and ownership
 
-> Status: this document describes the compact CommandAi/1 proposal model currently present on `development`. Richer work in draft PR #8 is tracked separately and is not part of the current development package.
+> Status: compact and enriched atomic proposal forms plus the address-space exchange/response JSON codec are represented under CommandAi/1. The protocol identity remains CommandAi/1; internal evolution does not itself require a protocol or NuGet version increment.
 
-## 01 — What does CommandAi own?
+## 1. Domain definition
 
-CommandAi represents a bounded, provider-neutral proposal of ordered atomic actions. Each instruction has a positive opaque action identity and an ordered collection of positive parameter identities paired with either a positive integer identity or literal text.
+CommandAi represents two related but distinct data contracts:
 
-The current public model is centered on:
+- **Atomic proposals** describe bounded action intent using compact legacy commands or enriched atomic-command declarations.
+- **Address-space exchanges** describe named, typed, direction-constrained slots through which an application supplies context and receives proposed values. A local exchange identifier correlates request and response.
 
-- `CommandProposal` — immutable, non-empty ordered proposal.
-- `CommandInstruction` — one atomic action declaration.
-- `CommandArgument` — one parameter identity/value pair.
-- `CommandValue` and `CommandValueKind` — integer-identity or literal-text representation.
-- `CommandLimits` — structural resource bounds.
-- `CommandAiTextCodec` — CommandAi/1 encoding and decoding.
-- `CommandProposalBuilder` and `CommandInstructionBuilder` — mutable authoring helpers that produce immutable snapshots.
+The application retains ownership of actual memory, persistence, calculations, operation semantics, and execution. An address is a contract identifier, never a pointer or a direct memory capability. The exchange model adds structured context and response values without replacing the atomic proposal model.
 
-## 02 — Why is the boundary deliberately narrow?
+## 2. Atomic proposal contract
 
-A model can describe an action without knowing what the action means or whether it is allowed. A host needs a predictable representation but must retain trusted vocabulary mappings, current-state checks, policy, authorization, approval, dispatch, execution, and actual outcome recording.
+| Concern | Current implementation | Owner / boundary |
+|---|---|---|
+| Protocol identity | CommandProposal.CurrentProtocolVersion is CommandAi/1 | CommandAi |
+| Proposal structure | Non-empty ordered collection; compact and enriched entries may coexist | CommandAi |
+| Command identity | Non-empty GUID, distinct from action identity; unique among enriched commands in one proposal | CommandAi carries identity; host owns lifecycle/correlation |
+| Proposal identity | No proposal-level identity is carried by the atomic proposal model | Intentionally absent; ProtocolAi/host owns cross-message correlation and provenance. Add only for a concrete consumer requirement |
+| Parent, causal, and correlation identity | Not represented on an atomic command | ProtocolAi/host owns causal chains, event correlation, and provenance; do not duplicate these without a concrete contract need |
+| Action identity | Positive opaque integer | CommandAi validates representation; consuming host defines meaning |
+| Target and scope | Required typed opaque values for enriched commands; absent for compact commands | CommandAi bounds representation; consuming host defines meaning and validates current state |
+| Parameter identity/value | Positive parameter ID paired with integer identifier or bounded literal text; duplicate parameter IDs rejected per command | CommandAi |
+| Optionality, defaults, and parameter schema semantics | Missing arguments do not receive inferred defaults; CommandAi carries only supplied typed values | GrammarAi/domain action definition owns required/optional/default/schema semantics; host resolves the action definition |
+| Schema identity | Not embedded as per-argument metadata; precondition grammar token is preserved as opaque `DefinitionId@SchemaVersion` | Trusted action-definition registry pins body definition/schema; GrammarAi validates against it; host performs exact identity/version resolution with no alias/fallback |
+| Preconditions | Optional bounded expression paired with a grammar-version identifier | CommandAi carries opaque data; GrammarAi owns grammar/structural validation; host evaluates live state |
+| Opaque GrammarAi body | Optional immutable byte payload paired with a positive grammar wire version; canonical Base64 on the text wire | CommandAi validates framing, canonical encoding, and byte bounds only; GrammarAi owns decoding and structural validation |
+| Idempotency identity | Required bounded string for enriched commands; unique among enriched commands in a proposal | CommandAi carries identity only; host owns replay/deduplication; no exactly-once guarantee |
+| Expected outcome | Required outcome identity and bounded unique field declarations for enriched commands | CommandAi declares shape only; ProtocolAi/runtime carries actual correlated outcomes |
+| Actual result and errors | Not represented as command intent | ProtocolAi and runtime/host |
+| Ordering | Proposal preserves insertion order | Representation only; no dependency semantics |
+| Workflow/transaction/retry/cancellation/compensation | Not represented or executed | Orchestrator / host |
+| Resource bounds | Envelope 262,144 characters; commands 256; arguments/command 64; preconditions/command 32; outcome fields 64; literal 16,384 characters; grammar version 128 characters; precondition expression 16,384 characters; idempotency identity 256 characters; opaque GrammarAi body 32 KiB/command and 128 KiB/proposal (decoded bytes); aggregate in-memory literal data 1,048,576 characters; enriched JSON depth 16 | CommandAi representation safeguards |
+| Encoding and decoding | Legacy Command line unchanged; enriched AtomicCommand JSON line; mixed proposals supported; strict duplicate/unknown JSON-property rejection | CommandAi codec |
+| Validation diagnostics | Invalid model/wire data is rejected through constructor/codec exceptions; no stable machine-readable diagnostic envelope is part of CommandAi/1 | Intentionally excluded; host/application diagnostics and ProtocolAi events own user-facing or correlated error reporting |
+| Unknown extensions | Unknown JSON properties are rejected; no generic extension bag or preservation promise | Intentionally excluded to retain a closed, bounded wire contract; add a named bounded extension only for a demonstrated consumer requirement |
+| Deterministic encoding and signing | Codec emits a defined representation, but no canonical-signature/hash contract is promised for enriched JSON | Canonical cryptographic bytes/signatures remain unimplemented; round-trip stability is not signing canonicalization |
+| Older-reader compatibility | Older compact-only /1 readers reject AtomicCommand entries | Consumer upgrade required before enriched forms are emitted/accepted; not universal forward compatibility |
+| Canonical bytes, signatures, hashes | No canonical signing/digest contract | Not implemented |
+| Secret classification and redaction | No secret metadata or redaction API | Host/security layer; opaque does not mean secret-safe |
+| Authorization and execution | No policy, credential, dispatch, or execution API | FSM_Foundry / host |
 
-CommandAi therefore owns representation and structural validation, not application semantics or authority. Positive integer identities are opaque identifiers, not pointers, capabilities, or authorization tokens. A successfully decoded proposal remains untrusted intent.
+These are representation guarantees. They do not establish that an ID exists in a host vocabulary, that a precondition is true, that an idempotency key has been enforced, or that execution is safe or authorized.
 
-## 03 — How are responsibilities divided?
+## 3. Address-space exchange guarantees
 
-| Concern | Owner |
+| Concern | Current implementation |
 |---|---|
-| Shared vocabulary identity and broader causal/event/outcome provenance | ProtocolAi |
-| Grammar definitions and grammar-specific structural validation | GrammarAi |
-| Immutable proposal model, builders, bounds, CommandAi/1 codec | CommandAi core |
-| Endpoint communication | HeadlessAi |
-| CI evidence and verdicts | CiAi |
-| Trusted mappings, domain validation, live-state checks, policy, authorization, approval, dispatch, execution | FSM_Foundry / consuming host |
-| MicroBundle identity, dependencies, load lifecycle, composition participation | MicroBundleDomain |
-| Artifact discovery, storage, retrieval, verification, materialization | MicroBundleRepository |
-| Dependency resolution and composition orchestration | FSM_COS or another composition host |
+| Address identity | Positive application-defined integer ID |
+| Address metadata | Name, optional description, access direction, declared value kind |
+| Direction | Read, write, or read/write; request values require read access and response values require write access |
+| Required slots | Required input and required output flags enforced independently |
+| Typed values | Existing integer-identifier and literal-text kinds; value kind must match descriptor |
+| Grammar binding | Optional positive GrammarAi definition ID + schema version pair; metadata is opaque here |
+| Request/response correlation | Non-empty GUID; response validation requires matching GUID and an exact ordered match of address descriptors |
+| Descriptor ordering | Preserved in the JSON envelope and significant for response validation; producers must retain the originating descriptor order |
+| Duplicate/unknown slots | Rejected |
+| Immutability | Descriptor and value objects are immutable; collections are defensive read-only snapshots |
+| Resource bounds | At most 1,024 descriptors and values; literals at most 16,384 UTF-16 characters; encoded exchange/response envelope at most 262,144 characters |
+| Wire format | Deterministic compact JSON; strict protocol/kind, field, duplicate-property, type, and structural validation |
 
-CommandAi has no runtime dependency on GrammarAi, ProtocolAi, HeadlessAi, FSM_COS, or MicroBundleRepository.
+## 4. Explicit ownership
 
-### Optional MicroBundle distribution
+- **CommandAi:** immutable atomic proposal data, exchange descriptors and values, direction/type-shape checks, required-slot checks, local exchange correlation, bounded collections, and proposal/exchange codecs.
+- **GrammarAi:** grammar definitions and structural validation of grammar-governed content; it does not establish live-state truth.
+- **ProtocolAi:** shared vocabulary identity and broader causal/event/outcome provenance.
+- **CiAi / consuming application:** domain-specific command/action definitions and mappings to grammar definitions and protocol categories.
+- **HeadlessAi:** configured model endpoint communication.
+- **AppAi (future):** composition of application programs, chaining, branching, and execution-plan representation.
+- **FSM_Foundry / host:** resolve identities against trusted capabilities and live state; policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, lifecycle, and persistence.
 
-The optional `TheSingularityWorkshop.CommandAi.MicroBundle` package implements `IMicroBundle` from `TheSingularityWorkshop.MicroBundleDomain` 1.0.1. It declares provider `commandai.proposal` and delegates Encode/Decode to the core codec.
+## 5. Deliberate exclusions
 
-The package split is intentional:
+CommandAi does not dereference application addresses, read/write live memory, evaluate business semantics or preconditions, resolve capability names, authorize, execute, persist, transport to endpoints, or orchestrate workflows. It does not guarantee retries, cancellation, idempotent handling, atomicity, or exactly-once delivery.
+CommandAi is presentation-neutral: localization, accessibility, age/education-stage adaptation, rendering, narration, speech, and haptics are observer/application concerns. The same semantic command must not prescribe a reading level, user age, feedback modality, or screen.
 
-- `TheSingularityWorkshop.CommandAi` remains dependency-free for ordinary library consumers.
-- `TheSingularityWorkshop.CommandAi.MicroBundle` depends on the core package and the neutral MicroBundleDomain contract.
-- Neither package depends on FSM_COS or MicroBundleRepository.
-- The adapter's Load lifecycle is stateless; its Arbitrate method reports no composition mutation. Neither method executes a proposal.
+A grammar-valid payload remains untrusted intent. GrammarAi validation is not host authorization. An expected-outcome contract is a declaration, not an actual result, success signal, CI verdict, or proof of execution.
 
-## 04 — What is implemented and verified?
+## 6. Wire contract, compatibility, and scale
 
-The current compact CommandAi/1 codec validates the envelope, protocol identity, command/argument identities, typed values, and configured resource limits. The encoder emits deterministic LF separators; the decoder accepts LF and CRLF.
+The original compact Command= proposal line remains byte-for-byte stable. Enriched commands use an explicit AtomicCommand= JSON entry under the same CommandAi/1 identifier. New readers accept compact, enriched, and mixed proposals. Older compact-only readers reject the enriched entry and must be upgraded before consuming it; retaining the /1 label does not make old readers forward-compatible.
 
-Exact-head [CommandAi CI run 43683852447](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43683852447) passed on `d3b26f14490eac18966e813e4ceb66e4d3c996db`. It completed 58 tests, built and ran the core quickstart, packed and audited the dependency-free core package, packed the optional adapter against that core package, checked adapter package metadata/dependency closure, and restored, built, and ran a package-only adapter consumer. NuGet publication was skipped.
+The exchange/response JSON envelope uses fixed canonical field order and exact string names for access and value kinds. Decoding rejects unknown and duplicate properties, malformed or empty exchange IDs, invalid descriptor/value data, and payloads above the 262,144-character envelope bound. The codec enforces a maximum JSON nesting depth of 16 and does not permit comments or trailing commas.
 
-The package identities verified by that run were:
+Before accepting high-volume or 10,000-command scenarios, define separate framing/streaming, chunking, ordering, cancellation, idempotency, and partial-failure semantics. Neither codec is a multi-command execution protocol.
 
-- Core: `TheSingularityWorkshop.CommandAi` `0.1.0-alpha.2`.
-- Adapter: `TheSingularityWorkshop.CommandAi.MicroBundle` `0.1.0-alpha.1`.
-- MicroBundle contract: `TheSingularityWorkshop.MicroBundleDomain` `1.0.1`.
+## 7. Version policy
 
-## 05 — What is not part of the current development package?
-
-The following must not be described as current `development` behavior until the candidate source is reconciled and verified there:
-
-- Address-space `CommandExchange` and `CommandResponse` models and their JSON codec.
-- Enriched `AtomicCommand` entries, preconditions, idempotency declarations, and expected-outcome contracts.
-- The optional opaque GrammarAi command-body transport seam.
-
-Those features are documented and tested on draft PR #8, whose exact-head evidence is recorded in that PR. They are not silently included in the current development package or the package artifacts verified above. Decide whether to incorporate that candidate before a public release, then rerun source, documentation, compatibility, package, and consumer verification on the resulting exact head.
-
-A proposal is not a transaction, workflow, authorization token, execution receipt, or actual outcome. Ordering is preserved, but atomicity, rollback, retry, cancellation, replay enforcement, idempotency enforcement, and execution guarantees remain outside the current compact proposal contract.
+CommandAi/1 is the protocol identity used for internal Workshop coordination and may evolve in place by owner direction. The NuGet package version is a separate release label. No package version bump, publication, merge, release, or deployment is implied by these source changes.
 
 ---
 
