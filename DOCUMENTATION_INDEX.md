@@ -3,14 +3,14 @@
 
 # CommandAi — documentation index
 
-CommandAi/1 is the approved provider-neutral representation for immutable, ordered proposals of atomic actions with typed arguments. The host owns meaning, policy, authorization, and execution.
+CommandAi/1 is the provider-neutral representation for immutable, ordered proposals of compact or enriched atomic actions with typed arguments. The host owns meaning, policy, authorization, and execution.
 
 ## Start here
 
 | Goal | Read |
 |---|---|
 | Understand the problem and boundaries | [README](README.md) · [Problem domain](docs/PROBLEM_DOMAIN.md) · [Domain completeness](docs/DOMAIN_COMPLETENESS.md) |
-| Understand command theory and atomicity | [Theory](docs/THEORY.md) |
+| Understand compact and enriched command theory | [Theory](docs/THEORY.md) |
 | Understand policy, authority, approval, disclosure, and execution ownership | [Governed command lifecycle](docs/GOVERNED_COMMAND_LIFECYCLE.md) |
 | Use the current API and wire format | [Usage guide](docs/USAGE.md) |
 | Understand package responsibilities | [Architecture](docs/ARCHITECTURE.md) · [AI series](docs/AI_SERIES.md) |
@@ -26,18 +26,18 @@ CommandAi/1 is the approved provider-neutral representation for immutable, order
 
 | Consumer need | Install |
 |---|---|
-| Use CommandAi proposals and the /1 codec without MicroBundle infrastructure | `TheSingularityWorkshop.CommandAi` |
-| Compose CommandAi as a code-defined MicroBundle | `TheSingularityWorkshop.CommandAi.MicroBundle` |
+| Use CommandAi proposals and the /1 codec without MicroBundle infrastructure | TheSingularityWorkshop.CommandAi |
+| Compose CommandAi as a code-defined MicroBundle | TheSingularityWorkshop.CommandAi.MicroBundle |
 
-The optional adapter depends on the core package and `TheSingularityWorkshop.MicroBundleDomain`; it does not depend on FSM_COS or MicroBundleRepository.
+The optional adapter depends on the core package and TheSingularityWorkshop.MicroBundleDomain; it does not depend on FSM_COS or MicroBundleRepository.
 
 ## Current public types
 
-The approved /1 model is centered on `CommandProposal`, `CommandInstruction`, `CommandArgument`, `CommandValue`, `CommandValueKind`, `CommandLimits`, `CommandAiTextCodec`, `CommandProposalBuilder`, and `CommandInstructionBuilder`.
+The proposal contract includes CommandProposal, CommandInstruction, CommandArgument, CommandValue, CommandValueKind, CommandLimits, CommandAiTextCodec, CommandProposalBuilder, and CommandInstructionBuilder. The enriched atomic-command contract additionally includes CommandPrecondition, CommandOutcomeContract, CommandOutcomeField, and CommandGrammarBody.
 
-The prior /2 candidate introduced `CommandPrecondition`, `CommandOutcomeContract`, and `CommandOutcomeField`. Those types and their type guides are not present in the current source tree and are not part of the approved /1 contract; historical context is recorded in [Legacy compatibility](docs/LEGACY_COMPATIBILITY.md).
+The separate address-space exchange/response model remains part of the core package. Consult the type guides and UML pages for the exact source-backed surfaces.
 
-All Markdown pages must retain the animated moniker at the top and canonical Workshop PNG footer. CI validates those branding requirements. No NuGet publication is authorized.
+No NuGet publication is authorized.
 
 ---
 
