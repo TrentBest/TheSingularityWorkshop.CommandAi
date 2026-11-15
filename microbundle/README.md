@@ -9,7 +9,7 @@
 
 This optional companion package exposes CommandAi's provider-neutral proposal codec as a code-defined MicroBundle. It implements `IMicroBundle` from `TheSingularityWorkshop.MicroBundleDomain` and declares the `commandai.proposal` provider.
 
-Installing this package also brings in the CommandAi core and MicroBundleDomain dependencies. Applications that only need the CommandAi data model and codec should install `TheSingularityWorkshop.CommandAi` instead.
+Installing this package also brings in the CommandAi core and MicroBundleDomain dependencies. Applications that only need the CommandAi data model and codec should install `TheSingularityWorkshop.CommandAi` instead.\n\nThe `0.1.0-alpha.1` package is currently verified as a CI artifact and has **not** been published to NuGet. Publication remains a separate owner-authorized release operation.
 
 ## 02 Why is it separate?
 
