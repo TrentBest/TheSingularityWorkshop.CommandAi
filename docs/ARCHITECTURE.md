@@ -1,93 +1,64 @@
 <!-- The Singularity Workshop moniker -->
 <p align="center"><a href="https://github.com/TrentBest"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.Visualize/development/docs/assets/moniker.svg" alt="The Singularity Workshop animated moniker" width="720" /></a></p>
 
-# CommandAi package architecture
+# CommandAi architecture
 
-## 01 — What are the two packages?
+## Exchange model and wire representation
 
-CommandAi is distributed as a small core library and an optional MicroBundle adapter.
+CommandAi has two representation surfaces within the same `CommandAi/1` protocol identity:
 
-| Package | Owns | Dependencies |
-|---|---|---|
-| `TheSingularityWorkshop.CommandAi` | Immutable proposals, instructions, typed arguments, bounded CommandAi/1 text codec | None |
-| `TheSingularityWorkshop.CommandAi.MicroBundle` | A code-defined MicroBundle descriptor/provider that exposes the core proposal codec | CommandAi core and MicroBundleDomain |
+- `CommandProposal` represents ordered atomic action proposals in the original compact form or an enriched form with explicit command identity, target, scope, preconditions, idempotency identity, and expected-outcome shape.
+- The address-space exchange model describes application-defined input/context slots and output slots, correlated by an exchange GUID.
 
-The core package remains useful in ordinary .NET applications. The adapter is installed only by consumers that want the CommandAi capability to participate in MicroBundle composition.
+`CommandExchangeTextCodec` serializes exchanges and responses as deterministic compact JSON. The envelope declares the protocol, message kind, exchange ID, complete address descriptors, and the corresponding input or output values. Property order is fixed by the encoder; decoders reject duplicate or unknown properties, unsupported enum names, malformed identifiers, invalid descriptor/value shapes, and over-limit collections or envelopes. The proposal codec is line-oriented: legacy compact `Command=` entries retain their representation, while enriched commands use bounded `AtomicCommand=` JSON entries. The enriched reader rejects unknown and duplicate JSON properties and enforces JSON depth 16. Older compact-only readers must be upgraded before consuming enriched entries.
 
-## 02 — Why is the adapter separate?
+An address descriptor declares a positive local ID, name, access direction, value kind, optional description, required-input/output constraints, and optional GrammarAi definition identity plus schema version. Grammar metadata is opaque: CommandAi checks that both values are present and positive, but does not load GrammarAi, resolve definitions, or validate grammar payloads.
 
-A consumer should not have to adopt a composition contract merely to encode or decode a proposal. Keeping the adapter optional preserves the core package's dependency-free boundary while still allowing the capability to be composed by any host that understands `IMicroBundle`.
+`CommandExchange` accepts values only for readable addresses and enforces required inputs. `CommandResponse` accepts values only for writable addresses and enforces required outputs. Both reject unknown or duplicate addresses and mismatched value kinds. `ValidateFor` verifies correlation and exact ordered equality of the address-descriptor snapshot: descriptor order is part of the exchange contract, not merely a presentation choice. Producers must preserve the originating descriptor order when constructing a response.
 
-The adapter depends on the neutral `TheSingularityWorkshop.MicroBundleDomain` contract. It does not depend on FSM_COS, MicroBundleRepository, a GUI framework, or a particular application host.
+## Atomic proposal contract
 
-## 03 — How does the capability participate?
+An enriched `CommandInstruction` requires a non-empty command GUID, positive action ID, typed opaque target and scope, bounded idempotency key, and expected-outcome contract. It may include bounded preconditions carrying an exact grammar definition identity/schema-version token (conventionally `DefinitionId@SchemaVersion`) and opaque expression, plus ordered typed arguments. Compact legacy instructions retain absent enriched metadata; no defaults are inferred.
 
-```text
-Application / agent
-       |
-       v
-CommandProposal
-       |
-       v
-CommandAiTextCodec
-       |
-       v
-bounded CommandAi/1 representation
-       |
-       v
-trusted host resolves meaning, checks live state,
-applies policy and authorization, then decides whether to execute
+CommandAi validates representation and resource bounds only. GrammarAi owns precondition grammar; consumers pin the exact definition identity/schema version (the observer contract is `TheSingularityWorkshop.GrammarAi.Observer@1`) without alias or fallback; the host evaluates conditions against live state, enforces replay/deduplication using the supplied idempotency identity, resolves target/scope meaning, and owns authorization and execution. An expected-outcome contract declares shape only; it is not an actual result, success signal, CI verdict, or proof. Proposal order does not define dependencies, transactionality, or workflow semantics.
 
-Optional composition path:
+## Responsibility boundaries
 
-CommandAi.MicroBundle
-       |
-       +-- IMicroBundle
-       +-- stable descriptor identity
-       +-- commandai.proposal provider
-       +-- Encode / Decode delegation
-       +-- no dependencies of its own
-       |
-       v
-MicroBundleDomain
-       |
-       v
-MicroBundleRepository stores/retrieves the artifact
-       |
-       v
-FSM_COS or another host composes the capability
-```
+    Application / host
+      owns address meaning, live memory, computation, persistence
+                 |
+                 v
+       CommandExchange (readable context)
+                 |
+                 v
+        LLM / model interaction
+                 |
+                 v
+        CommandResponse (writable values)
+                 |
+                 v
+    Host validates meaning, policy, authorization, then executes
 
-`CommandAiMicroBundle` exposes the provider ID `commandai.proposal` and stable descriptor identity `0x434F4D4D414E4441`. Its descriptor capability version is independent of the NuGet package version and the `CommandAi/1` wire identity.
+The address space is a contract, not a memory map. Address IDs are not pointers. A structurally valid response is still untrusted intent. CommandAi never dereferences addresses, reads or writes application memory, authorizes, dispatches, or executes.
 
-The adapter is stateless. `Load` validates that a host lifecycle context was supplied; it does not register host-specific services or execute proposals. `Arbitrate` reports no composition mutation because the codec has no cross-bundle arbitration behavior. The host can discover the capability through its descriptor/provider and use the concrete adapter's `Encode` and `Decode` methods.
+## Grammar-bound bodies
 
-## 04 — See it in a minute
+A writable address may identify a grammar-governed body through its GrammarAi definition ID and schema version. The body remains a bounded typed value at this layer. GrammarAi owns definition lookup and structural validation; CommandAi owns only generic address/value shape and correlation. There is no GrammarAi runtime dependency.
 
-Install the adapter package:
+## Package ownership
 
-```bash
-dotnet add package TheSingularityWorkshop.CommandAi.MicroBundle
-```
+- ProtocolAi owns shared vocabulary identities and broader causal/event/outcome provenance.
+- GrammarAi owns grammar definitions and grammar-specific structural validation.
+- HeadlessAi owns configured LLM endpoint communication.
+- CiAi and consuming applications own their domain-specific definitions and mappings.
+- AppAi may later compose multi-step application programs and response plans.
+- FSM_Foundry / host owns live-state checks, policy, authorization, lifecycle, dispatch, and execution.
 
-A host-neutral consumer can then create the capability and use the canonical codec:
+Exchange GUIDs correlate one local request and response; they are not a replacement for ProtocolAi's broader event/provenance model. CommandAi does not define workflows, branching, retries, cancellation, idempotent execution, or batch guarantees.
 
-```csharp
-var capability = new CommandAiMicroBundle();
-var encoded = capability.Encode(proposal);
-var decoded = capability.Decode(encoded);
-```
+## Resource and trust boundaries
 
-The repository's package-only quickstart restores the adapter from the local packed-package feed, resolves its transitive CommandAi core and MicroBundleDomain dependencies, compiles, and runs a round-trip. That verifies package consumption; it does not prove that a particular FSM_COS composition manifest is wired to load it.
-
-## 05 — Choose your next step
-
-- [Package installation and consumer guide](../README.md#package-boundaries)
-- [Problem domain](PROBLEM_DOMAIN.md)
-- [Theory and wire contract](THEORY.md)
-- [Governed command lifecycle](GOVERNED_COMMAND_LIFECYCLE.md)
-- [CommandAiMicroBundle source](../microbundle/CommandAiMicroBundle.cs)
-- [MicroBundleDomain contract](https://github.com/TrentBest/TheSingularityWorkshop.MicroBundleDomain)
+Address spaces and value collections are capped at 1,024 entries. Individual literal values retain the existing 16,384 UTF-16-character limit; encoded exchange/response envelopes are capped at 262,144 characters. These are structural bounds, not authorization limits or guarantees of safe execution. Large multi-command plans require a separate framing/streaming contract before any 10,000-command scale claim.
 
 ---
 
