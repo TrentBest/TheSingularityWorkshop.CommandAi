@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>TheSingularityWorkshop.CommandAi.MicroBundle</PackageId>
+    <Version>0.1.0-alpha.1</Version>
+    <Authors>Trent Best</Authors>
+    <Company>The Singularity Workshop</Company>
+    <Description>Optional MicroBundleDomain adapter that exposes CommandAi/1 proposal encoding and decoding as a composable capability.</Description>
+    <PackageTags>AI;LLM;CommandAi;MicroBundle;capability;composition;TheSingularityWorkshop</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/TrentBest/TheSingularityWorkshop.CommandAi</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/TrentBest/TheSingularityWorkshop.CommandAi</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../TheSingularityWorkshop.CommandAi.csproj" Condition="'$(UsePackedCommandAi)' != 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.CommandAi" Version="$(CommandAiPackageVersion)" Condition="'$(UsePackedCommandAi)' == 'true'" />
+    <PackageReference Include="TheSingularityWorkshop.MicroBundleDomain" Version="1.0.1" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+    <None Include="../../LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
+  </ItemGroup>
+</Project>
