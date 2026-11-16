@@ -16,7 +16,7 @@ The address-space `CommandExchange` / `CommandResponse` models and their codec r
 - `CommandAi/1` remains the protocol identity. Do not invent a /2 migration or change the NuGet version merely because this contract is richer.
 - Compact-only consumers are not forward-compatible with `AtomicCommand=` entries. Upgrade consuming repositories before sending enriched proposals; compact entries retain absent enriched metadata and receive no inferred defaults.
 - The first push after the enriched implementation exposed missing source declarations for `CommandPrecondition`, `CommandOutcomeField`, and `CommandGrammarBody`. Those types have now been added to `development`, together with focused atomic-contract and opaque-body regression suites.
-- Enriched architecture, theory, usage, problem-domain, compatibility, type-reference, and documentation-index material has been ported to the active branch. Exact-head [CommandAi CI run 43698442760](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43698442760) passed on `6b2b677e44fd51bdf79bc70867b9e728732d8d0c`: branding, restore, Release build, tests with coverage, Codecov upload, core quickstart, core pack and packed-package consumer audit, optional adapter pack, and package-only adapter consumer all succeeded. `publish_nuget` was skipped. This verifies the aligned source/docs snapshot; the following status refresh requires its own exact-head run.
+- Enriched architecture, theory, usage, problem-domain, compatibility, type-reference, and documentation-index material has been ported to the active branch. Exact-head [CommandAi CI run 43698442760](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43698442760) passed on `6b2b677e44fd51bdf79bc70867b9e728732d8d0c`: branding, restore, Release build, tests with coverage, Codecov upload, core quickstart, core pack and packed-package consumer audit, optional adapter pack, and package-only adapter consumer all succeeded. `publish_nuget` was skipped. This verifies the aligned source/docs snapshot at that time. A later exact-head verification is recorded in the 2026-11-16 refresh below.
 - The first failed build is recorded in [CI run 43695659319](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43695659319); its compiler errors identified the missing type declarations above. Follow-up commits add those declarations and the tests.
 - Core package version remains `0.1.0-alpha.2`; optional adapter version remains `0.1.0-alpha.1`. NuGet publication remains disabled and is not authorized.
 
@@ -98,3 +98,16 @@ No further merge, NuGet publication, release, deployment, master alteration, or 
 
 <!-- THE SINGULARITY WORKSHOP FOOTER -->
 <p align="center"><img src="https://raw.githubusercontent.com/TrentBest/FSM_API/master/Documentation/Branding/TheSingularityWorkshop.png" alt="The Singularity Workshop" width="200" /></p>
+
+
+---
+
+## Exact-head release-readiness refresh (2026-11-16)
+
+- Current `development` head assessed: `a6eb758543626087cce3edaad4c6b0ef58c302e0`.
+- Exact-head [CommandAi CI run 43760818003](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/runs/43760818003) completed successfully on that SHA. The `build-and-test` job passed all recorded steps: Workshop Markdown branding, .NET 10 setup, restore, Release build, tests with coverage, Codecov upload, coverage artifact upload, core quickstart, core package pack, packed-package consumer audit/compile/run, optional MicroBundle adapter pack against the packed core package, package-only MicroBundle consumer audit/build/run, and NuGet package artifact upload.
+- The separate `publish_nuget` job was skipped. The workflow still hard-disables publication with the additional `&& false` condition. CI package artifacts are not a publication or release.
+- The earlier statement that this status refresh still needed an exact-head run is superseded by run 43760818003. This refresh records that evidence; the CI run itself predates this documentation-only commit, so the documentation commit must receive its own exact-head push verification.
+- Core package remains `0.1.0-alpha.2`; optional MicroBundle adapter remains `0.1.0-alpha.1`. The core package audit asserts no package dependencies. The adapter explicitly depends on the core package and MicroBundleDomain; it is not part of the core dependency graph.
+- The CI target is currently .NET 10.0. The workflow verifies packed-package consumers for both the core and optional adapter. This does not by itself prove all downstream application semantics, host authorization, or production proposal-to-execution behavior.
+- Current release posture: source/build/test/package evidence is strong for the current development snapshot; downstream integration evidence, release-lineage reconciliation, package compatibility review, and owner-controlled release synchronization remain outstanding. No publication, merge, master write, deployment, release, or branch deletion was performed.
