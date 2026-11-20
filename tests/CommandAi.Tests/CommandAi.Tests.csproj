@@ -10,5 +10,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5"><IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets><PrivateAssets>all</PrivateAssets></PackageReference>
     <ProjectReference Include="../../TheSingularityWorkshop.CommandAi.csproj" />
     <ProjectReference Include="../../microbundle/TheSingularityWorkshop.CommandAi.MicroBundle.csproj" />
+    <ProjectReference Include="../../examples/CommandAi.SingularityBot.QuickStart/CommandAi.SingularityBot.QuickStart.csproj" />
   </ItemGroup>
 </Project>
