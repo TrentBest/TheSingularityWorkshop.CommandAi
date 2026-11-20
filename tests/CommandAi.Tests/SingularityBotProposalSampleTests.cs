@@ -57,11 +57,20 @@ public sealed class SingularityBotProposalSampleTests
     [InlineData("0")]
     [InlineData("-1")]
     [InlineData("four")]
-    [InlineData("")]
     public void InvalidDesiredCount_IsRejected(string count)
     {
         var proposal = CommandAiTextCodec.Decode(
             ValidMarineProposal.Replace("2002=\"4\"", $"2002=\"{count}\""));
+
+        Assert.False(BotCommandProposalReader.TryReadMarineProductionTarget(
+            proposal, out _, out var error));
+        Assert.Contains("count", error, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void DesiredCountMustBeLiteralText()
+    {
+        var proposal = CommandAiTextCodec.Decode(ValidMarineProposal.Replace("2002=\\"4\\"", "2002=4"));
 
         Assert.False(BotCommandProposalReader.TryReadMarineProductionTarget(
             proposal, out _, out var error));
