@@ -79,6 +79,8 @@ jobs:
           if-no-files-found: warn
       - name: Run quickstart
         run: dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj --configuration Release --no-build
+      - name: Run SingularityBot proposal quickstart
+        run: dotnet run --project examples/CommandAi.SingularityBot.QuickStart/CommandAi.SingularityBot.QuickStart.csproj --configuration Release --no-build
       - name: Pack
         run: dotnet pack TheSingularityWorkshop.CommandAi.csproj --configuration Release --no-build --output ./artifacts
       - name: Audit and compile quickstart against packed package
