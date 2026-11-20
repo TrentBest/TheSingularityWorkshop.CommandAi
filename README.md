@@ -33,7 +33,7 @@ The line-oriented proposal codec reads and writes both compact `Command=` entrie
 dotnet run --project examples/CommandAi.QuickStart/CommandAi.QuickStart.csproj
 ~~~
 
-The quickstart demonstrates the compact proposal API. Enriched atomic proposals and address-space exchanges remain separate API surfaces, each with its own model and codec.
+The quickstart demonstrates the compact proposal API. Enriched atomic proposals and address-space exchanges remain separate API surfaces, each with its own model and codec. The [SingularityBot LLM proposal quickstart](examples/CommandAi.SingularityBot.QuickStart/README.md) demonstrates how a model emits a bounded bot proposal without acquiring execution authority.
 
 ## 05 Documentation and theory
 
