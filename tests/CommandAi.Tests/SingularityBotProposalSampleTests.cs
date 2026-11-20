@@ -70,7 +70,7 @@ public sealed class SingularityBotProposalSampleTests
     [Fact]
     public void DesiredCountMustBeLiteralText()
     {
-        var proposal = CommandAiTextCodec.Decode(ValidMarineProposal.Replace("2002=\\"4\\"", "2002=4"));
+        var proposal = CommandAiTextCodec.Decode(ValidMarineProposal.Replace("2002=\"4\"", "2002=4"));
 
         Assert.False(BotCommandProposalReader.TryReadMarineProductionTarget(
             proposal, out _, out var error));
