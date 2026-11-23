@@ -38,7 +38,7 @@ The same action meaning can be presented through different application experienc
 | Older-reader compatibility | Older compact-only /1 readers reject AtomicCommand entries | Consumer upgrade required before enriched forms are emitted/accepted; not universal forward compatibility |
 | Canonical bytes, signatures, hashes | No canonical signing/digest contract | Not implemented |
 | Secret classification and redaction | No secret metadata or redaction API | Host/security layer; opaque does not mean secret-safe |
-| Authorization and execution | No policy, credential, dispatch, or execution API | Foundry / host — intentionally excluded |
+| Authorization and execution | No policy, credential, dispatch, or execution API | FSM_Execution / host — intentionally excluded |
 | Presentation, narration, haptics, pedagogy | No presentation model | Application/observer layers — intentionally excluded |
 
 ## 4. Implemented guarantees
