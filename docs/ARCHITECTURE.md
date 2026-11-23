@@ -72,7 +72,7 @@ A command GUID identifies a proposed command. An idempotency key is a separate c
 - CommandAi owns generic command proposal data and its codec.
 - HeadlessAi owns endpoint transport.
 - CiAi owns CI evidence and verdicts.
-- FSM_Foundry and the host own runtime lifecycle, live-state validation, policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, and actual outcome handling.
+- FSM_Execution and the host own runtime lifecycle, live-state validation, policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, and actual outcome handling.
 
 CommandAi has no runtime dependency on these packages. Application-specific action catalogs, parameter meanings, repository rules, and capabilities remain in the consuming domain/host.
 
