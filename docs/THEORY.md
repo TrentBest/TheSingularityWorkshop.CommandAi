@@ -154,7 +154,7 @@ Opaque identifiers are not secrets, credentials, or authorization tokens. Litera
 | CommandAi | Immutable compact/enriched atomic-command model, representation bounds, builders, /1 codec |
 | HeadlessAi | Configured endpoint request/response communication; not command authority |
 | CiAi | CI evidence and verdicts; not general command execution |
-| FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution, and lifecycle |
+| FSM_Execution / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution, and lifecycle |
 
 CommandAi has no runtime dependency on these sibling packages. The host resolves IDs against trusted definitions, validates domain rules and current state, applies authorization and approval policy, and owns dispatch and execution. Actual outcomes and errors are separate runtime/protocol records.
 
