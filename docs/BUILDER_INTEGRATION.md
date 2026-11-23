@@ -65,7 +65,7 @@ Construction and encoding do not authorize execution. The host resolves identiti
 | Vocabulary meaning and domain identity mapping | ProtocolAi / consuming domain |
 | Endpoint request/response transport | HeadlessAi |
 | CI evidence and verdicts | CiAi |
-| Authorization, approval, replay/delivery, dispatch, execution | FSM_Foundry / host |
+| Authorization, approval, replay/delivery, dispatch, execution | FSM_Execution / host |
 
 Compact CommandAi/1 remains supported. Enriched AtomicCommand entries are an additive /1 extension, but older compact-only readers reject them; internal consumers must upgrade before emitting or accepting enriched entries.
 
