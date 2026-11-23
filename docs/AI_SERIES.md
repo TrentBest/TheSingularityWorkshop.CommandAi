@@ -13,7 +13,7 @@
 | HeadlessAi | How does a host communicate with an endpoint? | Configured AI endpoint request/response transport | Command authority or execution |
 | CiAi | What CI evidence and verdict apply? | CI evidence and verdicts; repository-specific command proposal composition | General command authorization or execution |
 
-FSM_Foundry and the consuming host own trusted configuration, live-state evaluation, policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, and actual outcome lifecycle.
+FSM_Execution and the consuming host own trusted configuration, live-state evaluation, policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, and actual outcome lifecycle.
 
 ## Conceptual flow
 
@@ -35,7 +35,7 @@ FSM_Foundry and the consuming host own trusted configuration, live-state evaluat
     Host evaluates live state and validates domain scope
                     |
                     v
-    Foundry / host authorizes and executes accepted work
+    FSM_Execution / host authorizes and executes accepted work
                     |
                     v
     ProtocolAi / runtime records actual outcomes
