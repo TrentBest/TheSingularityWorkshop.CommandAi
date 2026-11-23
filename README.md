@@ -59,7 +59,7 @@ The quickstart demonstrates the compact proposal API. Enriched atomic proposals 
 | HeadlessAi | Configured endpoint communication |
 | CiAi | CI evidence, verdicts, and domain-specific mappings |
 | AppAi (future) | Application-program composition and response planning |
-| FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
+| FSM_Execution / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
 
 CommandAi has no runtime dependency on sibling packages. It does not dereference addresses, interpret application semantics, authorize, or execute.
 
