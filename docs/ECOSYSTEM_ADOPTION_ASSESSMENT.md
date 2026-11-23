@@ -13,7 +13,7 @@ The strongest adoption finding is **SingularityBot already consumes CommandAi**.
 
 The second major finding is **The (The Architect) is already an active CommandAi consumer/migration target**, not a hypothetical candidate. Its current `Architect.csproj` references `dependencies/CommandAi/TheSingularityWorkshop.CommandAi.csproj`, and its Windows CI workflow checks out the CommandAi `development` branch into that path. Existing [issue #19](https://github.com/TrentBest/The/issues/19) tracks convergence of the Architect command boundary with the shared packages. The key remaining integration risks are exact API alignment with enriched CommandAi/1, pinning the dependency source SHA in CI rather than following a moving branch, and proving host-side authorization and execution-boundary revalidation against the actual shared contract.
 
-**FSM_Foundry, ServerApp, and AnyApp are not recommended as direct CommandAi dependencies today.** Foundry and ServerApp currently expose only minimal placeholder READMEs in their inspected default-branch trees, with no source architecture to validate. Foundry may eventually host an application-specific CommandAi adapter, but the generic Foundry core should not own application command meaning or become an authorization shortcut. AnyApp currently documents a different semantic-intent boundary (ProtocolAi + GrammarAi + FSM_UserIO) and host-owned Experience execution; CommandAi should be introduced there only if a concrete bounded atomic-action proposal workflow is identified.
+**FSM_Execution, ServerApp, and AnyApp are not recommended as direct CommandAi dependencies today.** FSM_Execution and ServerApp currently expose only minimal placeholder READMEs in their inspected default-branch trees, with no source architecture to validate. FSM_Execution may eventually host an application-specific CommandAi adapter, but the generic FSM_Execution core should not own application command meaning or become an authorization shortcut. AnyApp currently documents a different semantic-intent boundary (ProtocolAi + GrammarAi + FSM_UserIO) and host-owned Experience execution; CommandAi should be introduced there only if a concrete bounded atomic-action proposal workflow is identified.
 
 The overall rule: **CommandAi is a representation of proposed atomic intent, not a workflow engine, capability grant, authorization decision, scheduler, event bus, or execution engine.** Hosts own action meaning, live-state validation, policy, authorization, approval, deduplication enforcement, lifecycle, dispatch, and outcomes.
 
@@ -61,19 +61,19 @@ CommandAi remains a dependency-free contract library. The bot owns the action ca
 
 This is an existing integration track, not a request to create a second issue or add another parallel local command implementation.
 
-### 3. FSM_Foundry — future adapter boundary, not a core dependency
+### 3. FSM_Execution — future adapter boundary, not a core dependency
 
 **Disposition:** Defer direct adoption.  
 **Evidence:** inspected default-branch tree contains only repository scaffolding, a minimal README, and Sith-policy assets; no executable source or architecture contract was available to review.
 
-Foundry is an execution/runtime concern. If a concrete host later chooses to accept CommandAi proposals, the application-specific adapter should:
+FSM_Execution is an execution/runtime concern. If a concrete host later chooses to accept CommandAi proposals, the application-specific adapter should:
 - resolve action IDs against a trusted application registry;
 - validate current state and capabilities;
 - enforce authorization and approval;
-- translate approved proposals into existing Foundry/runtime work;
+- translate approved proposals into existing FSM_Execution/runtime work;
 - own deduplication, lifecycle, dispatch, and actual outcomes.
 
-Foundry should not infer application meaning from generic IDs, authorize a proposal because it parses, or make CommandAi a mandatory dependency of the generic runtime. Reassess after Foundry has a documented host/adapter contract and a real consumer.
+FSM_Execution should not infer application meaning from generic IDs, authorize a proposal because it parses, or make CommandAi a mandatory dependency of the generic runtime. Reassess after FSM_Execution has a documented host/adapter contract and a real consumer.
 
 ### 4. ServerApp — future host candidate, not yet evidenced
 
@@ -204,7 +204,7 @@ The connected account returned 100 repositories (including CommandAi). The 99 ot
 | Gestures | No use identified |
 | Physics | No use identified |
 | StoryBuilder | Watchlist only |
-| FSM_Foundry | Defer; no implementation evidence in inspected tree |
+| FSM_Execution | Defer; no implementation evidence in inspected tree |
 | CiAi | No direct dependency indicated |
 | CiAi.CogA | No direct dependency |
 | CiAi.CogB | No direct dependency |
@@ -238,7 +238,7 @@ The connected account returned 100 repositories (including CommandAi). The 99 ot
 
 ## Method and limitations
 
-This is a first-pass ecosystem inventory, not a full code audit of every repository. The connected GitHub account returned 100 repositories; all 99 other names were inventoried and README content was retrieved where available. Targeted deeper review focused on SingularityBot, AnyApp, FSM_COS, HeadlessAi, CiAi, ProtocolAi, GrammarAi, FSM_Foundry, and ServerApp. Several older repositories have missing/minimal READMEs, and Foundry/ServerApp currently expose only scaffolding on the inspected default branch. Those results are marked as no-evidence/defer rather than definitive permanent rejection.
+This is a first-pass ecosystem inventory, not a full code audit of every repository. The connected GitHub account returned 100 repositories; all 99 other names were inventoried and README content was retrieved where available. Targeted deeper review focused on SingularityBot, AnyApp, FSM_COS, HeadlessAi, CiAi, ProtocolAi, GrammarAi, FSM_Execution, and ServerApp. Several older repositories have missing/minimal READMEs, and FSM_Execution/ServerApp currently expose only scaffolding on the inspected default branch. Those results are marked as no-evidence/defer rather than definitive permanent rejection.
 
 A future pass should deepen source inspection when a repository develops a real proposal producer, trusted action registry, or execution adapter. The decision standard remains concrete consumer value plus a fail-closed test—not architectural fashion.
 
