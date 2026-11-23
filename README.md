@@ -74,7 +74,7 @@ The quickstart demonstrates the legacy compact form. See the [usage guide](docs/
 | CommandAi | Atomic-command proposal data, compact/enriched /1 codec, builders and representation bounds |
 | HeadlessAi | Configured endpoint communication |
 | CiAi | CI evidence and verdicts; may compose repository-specific CommandAi proposals |
-| FSM_Foundry / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
+| FSM_Execution / host | Live-state checks, policy, authorization, approval, scheduling, dispatch, execution |
 
 CommandAi has no runtime dependency on sibling packages. It carries precondition grammar identity and opaque expression data but does not parse or evaluate it. It carries an idempotency identity but does not implement replay or exactly-once delivery. It declares expected outcomes but does not produce actual outcomes.
 
