@@ -27,7 +27,7 @@ A proposal is not a transaction. Order is represented, but dependencies, all-or-
 
 CommandAi owns immutable proposal/command data, builders, bounds, and the CommandAi/1 codec. It validates only the bounded shape of the fields. It does not interpret domain meaning, parse or evaluate preconditions, guarantee idempotent handling, authorize, approve, dispatch, execute, or report actual outcomes.
 
-ProtocolAi owns event/outcome envelopes and correlation/provenance. GrammarAi owns grammar definitions and structural validation. CiAi owns CI evidence and verdicts. Foundry/host owns live-state evaluation, policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, and actual outcome handling.
+ProtocolAi owns event/outcome envelopes and correlation/provenance. GrammarAi owns grammar definitions and structural validation. CiAi owns CI evidence and verdicts. FSM_Execution/host owns live-state evaluation, policy, authorization, approval, replay/delivery, scheduling, dispatch, execution, and actual outcome handling.
 
 ## Acceptance criteria
 
