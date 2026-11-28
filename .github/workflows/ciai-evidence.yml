@@ -98,6 +98,8 @@ jobs:
         env:
           CIAI_GITHUB_TOKEN: ${{ github.token }}
           CIAI_REQUIRED_WORKFLOW_PATHS: .github/workflows/build.yml#${{ steps.source.outputs.run_id }}#${{ steps.source.outputs.run_attempt }}
+          CIAI_EXPECTED_WORKFLOW_REF: refs/heads/development
+          CIAI_EXPECTED_WORKFLOW_EVENT: push
           TARGET_REPOSITORY: ${{ steps.source.outputs.repository }}
           TARGET_SHA: ${{ steps.source.outputs.sha }}
           SOURCE_RUN_ID: ${{ steps.source.outputs.run_id }}
@@ -149,9 +151,9 @@ jobs:
           {
             echo "## CiAi exact CommandAi commit evidence"
             echo
-            echo "- Repository: `$REPOSITORY`"
-            echo "- Source SHA: `$SHA`"
-            echo "- Source run / attempt: `$RUN_ID` / `$RUN_ATTEMPT`"
+            echo "- Repository: \`$REPOSITORY\`"
+            echo "- Source SHA: \`$SHA\`"
+            echo "- Source run / attempt: \`$RUN_ID\` / \`$RUN_ATTEMPT\`"
             echo "- CiAi observer gate: **$OBSERVER_STATUS**"
             echo
             echo "Incomplete, ambiguous, unbound, or unsuccessful evidence fails this workflow."
