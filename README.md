@@ -3,7 +3,7 @@
 
 # ✳️ 00 TheSingularityWorkshop.CommandAi
 
-[![Build](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml/badge.svg?branch=development)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml)\n[![Pages](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/pages.yml/badge.svg?branch=development)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/pages.yml)\n\n**[Open the CommandAi architecture portal](https://trentbest.github.io/TheSingularityWorkshop.CommandAi/)** · Published only after the complete CommandAi CI workflow succeeds.
+[![Build](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml/badge.svg?branch=development)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml)\n[![Pages deployment](https://img.shields.io/badge/Pages-after%20full%20CI-247a9b)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml)\n\n**[Open the CommandAi architecture portal](https://trentbest.github.io/TheSingularityWorkshop.CommandAi/)** · Published only after the complete CommandAi CI workflow succeeds.
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/LICENSE.txt)
 
 <p align="center"><img src="https://raw.githubusercontent.com/TrentBest/TheSingularityWorkshop.CommandAi/development/docs/images/command-ai-boundary.svg" alt="CommandAi represents untrusted proposals and correlated application address-space exchanges; the host retains authority and execution." width="100%"></p>
