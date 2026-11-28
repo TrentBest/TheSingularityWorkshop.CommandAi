@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<meta name="description" content="CommandAi: bounded, provider-neutral representations for application and AI exchanges.">
+<title>CommandAi · The Singularity Workshop</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1120;--panel:#121d30;--line:#293a52;--ink:#edf4ff;--muted:#a9bbd2;--cyan:#6bdcff;--gold:#ffd27a;--green:#8ce2ba}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 75% 0%,#18304b 0,transparent 45%),var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}a{color:var(--cyan)}.wrap{width:min(1120px,calc(100% - 40px));margin:auto}header{padding:28px 0;border-bottom:1px solid var(--line)}.eyebrow{color:var(--green);font-size:.78rem;letter-spacing:.16em;text-transform:uppercase}h1{font-size:clamp(2.8rem,8vw,6rem);line-height:.98;letter-spacing:-.06em;margin:28px 0 18px}h2{font-size:1.55rem;letter-spacing:-.025em}p{color:var(--muted)}.lead{font-size:1.25rem;max-width:780px}.hero{padding:76px 0 54px}.pill{display:inline-block;border:1px solid #3b5876;border-radius:99px;padding:5px 12px;color:var(--cyan);font-size:.82rem;margin:4px 6px 4px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:28px 0}.card{background:linear-gradient(145deg,#15243a,var(--panel));border:1px solid var(--line);border-radius:16px;padding:22px}.card h3{margin:0 0 8px}.diagram{background:#f8fafc;border-radius:14px;padding:12px;margin:26px 0;overflow:hidden}.diagram img{display:block;width:100%;height:auto}.callout{border-left:3px solid var(--gold);padding:8px 18px;margin:28px 0;background:#1b2637}code{color:#aee9ff;background:#17283d;padding:2px 6px;border-radius:5px}footer{border-top:1px solid var(--line);margin-top:70px;padding:30px 0;color:var(--muted);font-size:.9rem}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.actions a{border:1px solid #45617d;border-radius:9px;padding:10px 15px;text-decoration:none}.actions a:first-child{background:#b7efff;color:#0b1725;border-color:#b7efff;font-weight:700}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="eyebrow">The Singularity Workshop · Protocol infrastructure</div></div></header>
+<main class="wrap">
+<section class="hero">
+<div class="eyebrow">A well-formed response is still only intent.</div>
+<h1>Command<span style="color:var(--cyan)">Ai</span></h1>
+<p class="lead">A bounded contract for exchanging application context and proposed actions with AI systems—without handing over application authority.</p>
+<div><span class="pill">Provider-neutral</span><span class="pill">Immutable models</span><span class="pill">Correlated exchanges</span><span class="pill">Host-authorized execution</span></div>
+<div class="actions"><a href="https://github.com/TrentBest/TheSingularityWorkshop.CommandAi">Explore source on GitHub</a><a href="https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/DOCUMENTATION_INDEX.md">Documentation index</a><a href="https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/actions/workflows/build.yml">Build evidence</a></div>
+</section>
+<section>
+<h2>The boundary is the product</h2>
+<p>CommandAi describes what an application chooses to expose and how a proposed response is represented. It does not own application memory, domain meaning, policy, authorization, or execution.</p>
+<div class="diagram"><img src="../images/command-ai-boundary.svg" alt="Untrusted response text passes through the CommandAi codec to a structured proposal. The host independently resolves identities, validates, authorizes, obtains approval, and dispatches accepted actions."></div>
+</section>
+<section>
+<h2>Three connected ideas</h2>
+<div class="grid">
+<article class="card"><h3>01 · Proposals</h3><p>Ordered atomic actions can be represented in a compact form or an enriched form with explicit identity, target, scope, preconditions, idempotency identity, and expected outcome.</p></article>
+<article class="card"><h3>02 · Address spaces</h3><p>Applications declare readable context slots and writable response slots. Exchanges carry typed values and correlate requests with responses.</p></article>
+<article class="card"><h3>03 · Wire contracts</h3><p>Versioned codecs enforce structural bounds and correlation. A successful parse establishes shape—not trust, correctness, or permission to act.</p></article>
+</div>
+</section>
+<section>
+<h2>Trust remains outside the model</h2>
+<div class="grid">
+<article class="card"><h3>CommandAi can</h3><p>Validate declared addresses, direction, required slots, value kinds, response correlation, and representation structure.</p></article>
+<article class="card"><h3>The host must</h3><p>Resolve trusted identities, evaluate current state and domain rules, authorize, request human approval where required, and dispatch accepted operations.</p></article>
+</div>
+<div class="callout"><strong>Design invariant:</strong> structured data is not authority. Never treat a decoded proposal as an instruction to execute.</div>
+</section>
+<section>
+<h2>Explore the implementation</h2>
+<div class="grid">
+<article class="card"><h3>Theory &amp; contract</h3><p>Problem domain, ownership, wire format, compatibility, and architecture.</p><a href="https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/docs/THEORY.md">Read the theory →</a></article>
+<article class="card"><h3>Quickstarts</h3><p>Run the compact proposal example or inspect the SingularityBot proposal integration.</p><a href="https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/tree/development/examples">Browse examples →</a></article>
+<article class="card"><h3>Verification</h3><p>The repository CI restores, builds, tests, runs examples, packs packages, and audits package contents and consumers.</p><a href="https://github.com/TrentBest/TheSingularityWorkshop.CommandAi/blob/development/.github/workflows/build.yml">Inspect the pipeline →</a></article>
+</div>
+</section>
+</main>
+<footer><div class="wrap">CommandAi · Protocol identity <code>CommandAi/1</code> · Static documentation portal. This page is not a live command host and does not execute proposals.</div></footer>
+</body></html>
